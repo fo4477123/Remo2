@@ -1,5 +1,6 @@
 /* B1: shared centimetre coordinates for CAD, furniture and WebGL. */
 const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tourStyles.href='studio-tour.css';document.head.append(tourStyles);
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js';detailScript.defer=true;document.head.append(detailScript);
 const T=THREE,canvas=document.querySelector('#scene'),view=document.querySelector('#viewport');
 const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 const scene=new T.Scene();scene.background=new T.Color('#dedfd5');const camera=new T.PerspectiveCamera(42,1,1,8000);
@@ -40,11 +41,11 @@ item('延伸電視牆／單扇玻璃門',1220,505,38,490,()=>{
   box(1220,677,2,51,188,glass,64);box(1218,682,2,2,22,dark,130);
   // Small display ledges above the screen for figures, matching the reference wall.
   const led=mat('#ffe3ad',.36,{emissive:0xffc978,emissiveIntensity:1.15});
-  for(const [yy,w,z]of [[755,75,188],[838,44,213],[883,32,188]]){box(1215,yy,w,8,3,oak,z);box(1216,yy+1,w-2,3,1,led,z+3)}
+  for(const [yy,w,z]of [[755,75,188],[838,44,213],[883,32,188]]){box(1235,yy,20,w,3,oak,z);box(1238,yy+1,2,w-2,1,led,z-.5)}
   for(const yy of [505,561,617])box(1220,yy+2,2,52,193,oak,60);
   // No top cabinets above the TV: this central portion is a clean timber backing.
   for(const yy of [505,561,617,675,730,790,850,895,950])box(1219,yy+2,2,Math.min(54,993-yy),28,oak,27);
-  for(const yy of [505,561,617,675,730,895])box(1220,yy,38,2,235,oak,25);
+  for(const yy of [505,561,617,675,730])box(1220,yy,38,2,235,oak,25);
   // Slippers remain below the suspended cabinet, nearest the entrance.
   for(const yy of [540,553,580,593]){box(1224,yy,25,10,3,sage,1);box(1234,yy,8,10,5,linen,4)}
 });
@@ -61,21 +62,22 @@ const cleaningDoors=[];
 item('左側掃具櫃／上方走道開口',769,520,60,35,()=>{
   box(769,520,2,35,260,oak);box(827,520,2,35,260,oak);box(769,520,60,2,260,oak);box(769,520,60,35,3,oak,257);
   // Lower closed zone for mop/broom; upper niche faces the walkway for bathroom items.
-  cleaningDoors.push(box(771,554,56,2,104,cream,3));
-  box(771,554,56,2,105,oak,108);box(771,554,2,2,145,oak,108);box(825,554,2,2,145,oak,108);
+  cleaningDoors.push(box(771,554,56,2,174,oak,3));
+  for(const z of [178,214,254])box(771,522,56,32,2,oak,z);
+  for(const x of [782,799,813])cyl(x,538,4,13,cream,180);
   box(784,535,3,3,150,dark,8);box(776,532,20,12,5,sage,5);box(812,535,3,3,130,oak,8);
 });
 item('右側掃地機器人櫃／上方收納',909,520,135,35,()=>{
   box(909,520,2,35,260,oak);box(1042,520,2,35,260,oak);box(909,520,135,2,260,oak);box(909,520,135,35,3,oak,257);
   // Low docking bay, then an open shelf and closed storage above.
-  box(911,554,131,2,34,cream,3);box(911,554,131,2,3,oak,36);box(911,554,131,2,3,oak,100);
-  box(911,554,131,2,156,cream,108);box(911,554,131,2,3,oak,168);box(911,554,131,2,3,oak,220);
-  for(const x of [913,977])box(x,554,62,2,150,cream,170);
-  box(914,553,30,2,25,black,5);cyl(929,551,12,4,black,7);
+  for(const x of [911,977])box(x,554,63,2,204,oak,54);
+  box(911,522,131,32,3,oak,51);box(975,522,2,32,50,oak);
+  box(911,554,63,2,47,oak,3);
+  box(989,524,38,15,37,cream,1);cyl(1008,545,16,9,white,1);
 });
 const hiddenDoorHinge=new T.Group();hiddenDoorHinge.position.copy(W(829,555));scene.add(hiddenDoorHinge);
 item('隱藏門 80 cm／齊平內開',829,553,80,3,()=>{const leaf=box(829,553,80,3,230,cream);hiddenDoorHinge.attach(leaf);box(829,553,80,3,30,oak,230)});
-item('延伸至大門的鑰匙平台',1044,520,60,35,()=>{box(1044,520,60,35,85,oak,5);box(1046,554,56,2,81,cream,7);box(1044,520,60,35,4,oak,90);box(1044,520,60,2,166,cream,94);box(1044,520,60,28,90,oak,170);box(1046,547,56,2,84,cream,173);box(1044,544,56,2,1,mat('#ffe8b3',.5,{emissive:0xffd49b,emissiveIntensity:1}),169);box(1060,530,25,16,2,dark,94);cyl(1068,536,2,1,oak,96)});
+item('玄關整面收納櫃',1044,520,60,35,()=>{box(1044,520,60,35,260,oak);box(1046,554,56,2,254,oak,3)});
 item('LG 洗脫烘預留／對面旋轉180度',310,320,75,65,()=>{box(310,320,75,65,85,white);const drum=new T.Mesh(new T.CylinderGeometry(23,23,3,48),black);drum.rotation.x=Math.PI/2;drum.position.copy(W(347.5,387,43));scene.add(drum);box(310,320,75,65,4,oak,90)});
 item('主臥雙人床／轉向90度',425,890,188,150,()=>{box(425,890,188,150,25,oak);box(425,890,188,150,20,linen,25);box(417,890,8,150,85,oak);for(const yy of [900,970])box(438,yy,35,60,12,cream,45);box(538,890,75,150,3,sage,45)});
 item('主臥整牆頂天滑門衣櫥',664,765,55,295,()=>{box(664,765,55,295,260,oak);for(let y=767;y<1058;y+=73){box(662,y,2,71,254,oak,3);box(660,y+61,2,2,35,dark,100)}});
@@ -111,9 +113,9 @@ canvas.onpointerdown=e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture(e.p
 document.querySelector('#walls').onchange=e=>{for(const m of wallGroup.children){m.scale.y=e.target.checked?.35:1;m.position.y=e.target.checked?45.5:130}};document.querySelector('#walls').dispatchEvent(new Event('change'));document.querySelector('#ceiling').onchange=e=>ceilingGroup.visible=e.target.checked;document.querySelector('#night').onchange=e=>{const n=e.target.checked;hemi.intensity=n?.5:2.3;sun.intensity=n?.15:3;scene.background.set(n?'#303b38':'#dedfd5');nightLights.forEach(l=>l.intensity=n?15000:0)};
 const svg=document.querySelector('#plan'),NS='http://www.w3.org/2000/svg';function el(n,a,text){const e=document.createElementNS(NS,n);for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(text)e.textContent=text;svg.append(e);return e}for(const [x,y,w,d]of rooms)el('rect',{x,y:1100-y-d,width:w,height:d,fill:'#e5d3b3',stroke:'#c1b49b','stroke-width':1});for(const p of B1_PLAN.paths)el('polyline',{points:p.points.map(([x,y])=>`${x},${1100-y}`).join(' '),fill:'none',stroke:/WALL|A-RC|wall-i/.test(p.layer)?'#475247':'#a1a897','stroke-width':/WALL/.test(p.layer)?2:1});for(const f of furniture){el('rect',{x:f.x,y:1100-f.y-f.d,width:f.w,height:f.d,rx:5,fill:f.name.includes('地毯')?'#ded8c7':'#b5c0a4','fill-opacity':.75,stroke:'#6f8063','stroke-width':1});el('text',{x:f.x+f.w/2,y:1100-f.y-f.d/2,'text-anchor':'middle','font-size':12,fill:'#314334'},f.name)}
 const compareButton=document.createElement('button');compareButton.dataset.mode='compare';compareButton.textContent='3D＋平面對照';document.querySelector('header nav').append(compareButton);
-const renderButton=document.createElement('button');renderButton.dataset.mode='render';renderButton.textContent='寫實渲染';document.querySelector('header nav').append(renderButton);
-const renderPanel=document.createElement('div');renderPanel.id='render-panel';renderPanel.hidden=true;renderPanel.style.cssText='position:absolute;inset:0;background:#e8e0d3;display:none;align-items:center;justify-content:center;pointer-events:auto';const renderImage=document.createElement('img');renderImage.src='living-room-photoreal-render.png';renderImage.alt='客廳寫實渲染';renderImage.style.cssText='width:100%;height:100%;object-fit:cover';renderPanel.append(renderImage);view.append(renderPanel);
-document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const mode=b.dataset.mode;const plan=mode==='plan';compare=mode==='compare';const render=mode==='render';canvas.hidden=plan||render;svg.toggleAttribute('hidden',!(plan||compare));renderPanel.hidden=!render;renderPanel.style.display=render?'flex':'none';view.classList.toggle('compare',compare);document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b))});
+const renderButton=document.createElement('button');renderButton.dataset.mode='render';renderButton.textContent='寫實3D漫遊';document.querySelector('header nav').append(renderButton);
+const renderPanel=document.createElement('div');renderPanel.id='render-panel';renderPanel.hidden=true;renderPanel.style.cssText='position:absolute;inset:0;background:#e8e0d3;display:none;flex-direction:column;align-items:stretch;justify-content:center;pointer-events:auto';const renderImage=document.createElement('img');renderImage.src='living-room-photoreal-render.png';renderImage.alt='客廳寫實渲染';renderImage.style.cssText='width:100%;height:calc(100% - 48px);object-fit:cover';renderPanel.append(renderImage);const renderNav=document.createElement('div');renderNav.style.cssText='height:48px;display:flex;gap:6px;align-items:center;justify-content:center;background:#f5f0e7';const renderScenes=[['客廳','living-room-photoreal-render.png'],['玄關／浴室櫃','render-entry.png'],['廚房','render-kitchen.png'],['主臥','render-master.png'],['影音室','render-media.png'],['次臥','render-guest.png'],['陽台','render-laundry.png']];for(const [label,src]of renderScenes){const rb=document.createElement('button');rb.textContent=label;rb.style.cssText='padding:6px 10px;font-size:11px;background:#e5e7dc';rb.onclick=()=>{renderImage.src=src;renderImage.alt=label+'寫實渲染'};renderNav.append(rb)}renderPanel.append(renderNav);view.append(renderPanel);
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const mode=b.dataset.mode;const plan=mode==='plan';compare=mode==='compare';const render=mode==='render';canvas.hidden=plan;svg.toggleAttribute('hidden',!(plan||compare));renderPanel.hidden=true;renderPanel.style.display='none';view.classList.toggle('compare',compare);document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));if(render){select('living');setTour(true)}else if(!plan&&walking){setTour(false)}});
 const leaf=box(820,650,90,35,4,oak,73);leaf.visible=false;
 const leafLeg=box(825,654,3,3,73,oak);leafLeg.visible=false;
 const leafPlan=el('rect',{x:820,y:415,width:90,height:35,fill:'#d3b98d',stroke:'#6f8063',visibility:'hidden'});
