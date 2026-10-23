@@ -110,6 +110,14 @@ item('面向浴室左手側／掃具高櫃',910,520,64,35,()=>{
   for(const x of [924,941,956])cyl(x,538,4,13,cream,180);
 });
 const hiddenDoorHinge=new T.Group();hiddenDoorHinge.position.copy(W(829,555));scene.add(hiddenDoorHinge);
+// Bathroom fixtures inside the original footprint: tub, wall-hung toilet and vanity.
+item('浴缸／馬桶／洗手台',780,315,245,185,()=>{
+  const ceramic=mat('#f1eee7',.34,{metalness:.02}),stone=mat('#b9b3a7',.72),chrome=mat('#b4c1bd',.2,{metalness:.72});
+  box(785,320,145,72,12,stone,2);box(790,325,135,62,7,ceramic,14);box(798,332,119,48,3,glass,20);
+  box(939,325,52,36,8,ceramic,2);const bowl=cyl(965,346,18,8,ceramic,10);bowl.scale.z=.72;box(944,320,42,8,70,ceramic,18);cyl(965,324,3,16,chrome,88);
+  box(1010,420,50,45,6,stone,78);box(1013,423,44,39,7,ceramic,85);cyl(1035,442,6,8,chrome,93);box(1018,410,34,3,3,chrome,100);
+  box(815,405,5,5,110,chrome,45);box(810,500,18,4,3,chrome,150);cyl(815,402,4,10,chrome,155);
+});
 item('隱藏門 80 cm／齊平內開',829,553,80,3,()=>{const leaf=box(829,553,80,3,230,cream);hiddenDoorHinge.attach(leaf);box(829,553,80,3,30,oak,230)});
 item('連續工作平台／延伸至大門',974,520,130,35,()=>{
   box(974,520,130,35,88,oak,3);
@@ -121,6 +129,14 @@ item('連續工作平台／延伸至大門',974,520,130,35,()=>{
   box(1060,530,25,16,2,dark,94);
 });
 item('LG 洗脫烘預留／對面旋轉180度',310,320,75,65,()=>{box(310,320,75,65,85,white);const drum=new T.Mesh(new T.CylinderGeometry(23,23,3,48),black);drum.rotation.x=Math.PI/2;drum.position.copy(W(347.5,387,43));scene.add(drum);box(310,320,75,65,4,oak,90)});
+// Balcony guard: slim vertical slats with a continuous top rail.
+item('陽台直條格柵欄',220,300,12,250,()=>{
+  const rail=mat('#4a514c',.48,{metalness:.35});
+  for(let y=305;y<=545;y+=14)box(218,y,3,3,112,rail,0);
+  box(216,300,7,250,4,rail,0);box(216,300,7,250,4,rail,108);box(216,300,7,250,3,rail,112);
+  for(let x=232;x<=370;x+=14)box(x,548,3,3,112,rail,0);
+  box(228,546,150,5,4,rail,0);box(228,546,150,5,4,rail,108);box(228,546,150,3,rail,112);
+});
 item('主臥雙人床／轉向90度',425,890,188,150,()=>{box(425,890,188,150,25,oak);box(425,890,188,150,20,linen,25);box(417,890,8,150,85,oak);for(const yy of [900,970])box(438,yy,35,60,12,cream,45);box(538,890,75,150,3,sage,45)});
 item('主臥整牆頂天滑門衣櫥',664,765,55,295,()=>{box(664,765,55,295,260,oak);for(let y=767;y<1058;y+=73){box(662,y,2,71,254,oak,3);box(660,y+61,2,2,35,dark,100)}});
 item('次臥客床 150×188',415,320,150,188,()=>{box(415,320,150,188,25,oak);box(415,320,150,188,20,linen,25);box(415,508,150,8,75,oak);box(430,465,110,35,12,cream,45)});
