@@ -14,7 +14,7 @@
   // Add a direct bathroom stop and keep all room choices available on small screens.
   configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'暖石色浴室',sub:'浴缸・陶瓷・霧面五金',text:'浴缸有實際內槽、馬桶與洗手台分別建立碰撞範圍。入口保持通行；設備尺寸為提案，未經現場放樣。'};
   configs.ensuite={target:[310,855],radius:370,yaw:.8,pitch:.7,title:'主臥衛浴',sub:'淋浴・馬桶・洗手台',text:'補上原圖第二間衛浴，淋浴區玻璃、排水槽及陶瓷設備；尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
-  stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
+  stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
   const bathButton=document.createElement('button');bathButton.dataset.room='bath';bathButton.textContent='09　浴室';bathButton.onclick=()=>{select('bath');if(walking){[walkX,walkY,walkYaw]=stops.bath;lookPitch=-.48;}};document.querySelector('.rooms').append(bathButton);
   const ensuiteButton=document.createElement('button');ensuiteButton.dataset.room='ensuite';ensuiteButton.textContent='10　主臥衛浴';ensuiteButton.onclick=()=>{select('ensuite');if(walking){[walkX,walkY,walkYaw]=stops.ensuite;lookPitch=-.35;}};document.querySelector('.rooms').append(ensuiteButton);
   for(const b of document.querySelectorAll('[data-room]')){const opt=document.createElement('option');opt.value=b.dataset.room;opt.textContent=b.textContent.replace('↗','').trim();roomPicker.append(opt);}
@@ -23,9 +23,9 @@
   const walkPicker=roomPicker.cloneNode(true);walkPicker.className='walk-picker';walkPicker.setAttribute('aria-label','漫遊中切換房間');walkPicker.onchange=()=>{roomPicker.value=walkPicker.value;roomPicker.onchange();};view.append(walkPicker);
   const selectBefore=select;select=function(name){selectBefore(name);roomPicker.value=walkPicker.value=name;};
   configs.master.text='床頭靠左、150 × 188 cm雙人床向左微移17 cm，床尾至滑門面約66 cm；整牆衣櫥及浴室入口保留。這仍是偏緊的通道，須現場複核。';
-  configs.living.text='奶油色連續電視牆、洗白橡木SPC、亞麻與暖光。茶几與沙發留約29 cm，電視下櫃側約55 cm；主要入口通道保持暢通。窗台離地50 cm。';
-  configs.media.text='右側升降桌、左側輕量收納、60 cm窗邊臥榻。窗台離地50 cm，中央可行走；桌椅與門口保留活動範圍。';
-  B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=29;B1_REVIEW.clearances.tableToTV=55;
+  configs.living.text='77 吋電視置中於連續奶油色電視牆，尺寸約170.4 × 95.9 cm；兩側各保留約46 cm。洗白橡木SPC、亞麻與暖光維持溫馨氛圍，主要入口通道保持暢通。';
+  configs.media.text='右側改為180 × 65 cm升降桌，配置雙螢幕工作區與Enjoy101網布人體工學椅；60 cm窗邊臥榻與桌端保留中央動線。窗台離地50 cm。';
+  B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=29;B1_REVIEW.clearances.tableToTV=55;B1_REVIEW.clearances.mediaDeskLength=180;B1_REVIEW.clearances.mediaDeskToBench=30;
   B1_REVIEW.windows=windowSpecs;
 
   // Geometry instancing reduces hundreds of floor draw calls to a handful.
@@ -107,6 +107,7 @@
   help.textContent=mobile?'左下移動・右側拖曳轉頭・上方切換房間':'WASD 移動・拖曳轉頭・上方選擇房間';
   const immersive=document.createElement('button');immersive.className='immersive-button';immersive.textContent='沉浸參觀';
   immersive.onclick=()=>{const on=!view.classList.contains('immersive');view.classList.toggle('immersive',on);document.body.classList.toggle('immersed',on);immersive.textContent=on?'結束全畫面':'沉浸參觀';if(on&&!walking){select('living');renderButton.click();}};view.append(immersive);
+  const capture=document.createElement('button');capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Phone-friendly plus/minus for orbit zoom, where wheel input is unavailable.
   const zoom=document.createElement('div');zoom.className='orbit-zoom';
   for(const [label,factor]of [['＋',.82],['−',1.22]]){const b=document.createElement('button');b.textContent=label;b.setAttribute('aria-label',factor<1?'拉近':'拉遠');b.onclick=()=>radius=Math.max(200,Math.min(2800,radius*factor));zoom.append(b);}view.append(zoom);
@@ -115,7 +116,7 @@
 
   // A chair is a physical obstacle as well as a visible object.
   const previousStand=canStand;canStand=(x,y)=>{
-    if(x>813&&x<880&&y>858&&y<925)return false;
+    if(x>800&&x<875&&y>846&&y<920)return false;
     if(doorOpen&&distanceToSegment(x,y,[829,475],[829,555])<14)return false;
     return previousStand(x,y);
   };B1_REVIEW.canStand=canStand;

@@ -20,6 +20,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
  let ready=false;for(let i=0;i<120;i++){ready=await ev('Boolean(window.B1_REVIEW?.ready)');if(ready)break;await sleep(300);}assert(ready,'Home module must load');
  const screenshot=async name=>{await sleep(600);const shot=await cdp('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));};
  const report={};report.desktop=await ev('B1_REVIEW.audit()');assert(report.desktop.finite);assert(report.desktop.wallElevations);
+ assert.equal(await ev('B1_REVIEW.designSpecs.tv.diagonalInches'),77,'77-inch TV spec');assert.equal(await ev('B1_REVIEW.designSpecs.mediaDesk.width'),180,'180-cm desk spec');assert.equal(await ev('B1_REVIEW.designSpecs.chair.model'),'Enjoy101','Enjoy101 chair spec');
  assert(report.desktop.windows.filter(w=>w.sill===50).length===3);assert(report.desktop.windows.filter(w=>w.sill===150).length===2);
  for(const [name,s]of Object.entries(report.desktop.roomStops))assert(s.free,'Free teleport stop: '+name);
  assert(await ev('!canStand(869,554)'),'Closed hidden door blocks walking');

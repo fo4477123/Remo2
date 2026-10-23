@@ -15,7 +15,7 @@ function box(x,y,w,d,h,material,z=0,parent=scene){const m=new T.Mesh(new T.BoxGe
 function cyl(x,y,r,h,material,z=0){const m=new T.Mesh(new T.CylinderGeometry(r,r,h,48),material);m.position.copy(W(x,y,z+h/2));m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 function item(name,x,y,w,d,fn){
   // Apply the same placement correction to the model and plan footprint.
-  const shift=name==='220 cm 木框沙發'?[0,65]:name==='升降工作桌'?[135,0]:name==='島語升降茶几／收納茶几'?[25,0]:name==='主臥雙人床／轉向90度'?[-17,0]:[0,0];
+  const shift=name==='220 cm 木框沙發'?[0,65]:name==='180 cm 升降工作桌'?[135,0]:name==='島語升降茶几／收納茶几'?[25,0]:name==='主臥雙人床／轉向90度'?[-17,0]:[0,0];
   const start=scene.children.length;fn();
   for(const mesh of scene.children.slice(start)){mesh.position.x+=shift[0];mesh.position.z-=shift[1];mesh.userData.furnitureName=name;}
   furniture.push({name,x:x+shift[0],y:y+shift[1],w,d});
@@ -83,8 +83,8 @@ item('島語升降茶几／收納茶几',1066,768,82,125,()=>{
 item('延伸電視牆／單扇玻璃門',1220,505,38,490,()=>{
   // One continuous timber plane and floating base run to the planter; no tall cabinet at the end.
   box(1255,505,3,490,235,oak,25);box(1220,505,38,490,32,oak,25);box(1220,505,38,490,5,oak,255);
-  // TV panel spans y732..995; center screen on y863.5, excluding tall storage.
-  box(1250,791,4,145,82,black,85);
+  // 77-inch 16:9 screen: 170.4 × 95.9 cm, centred on the clean wall field.
+  box(1250,778.3,4,170.4,95.9,black,78);
   for(let z=65;z<245;z+=48){box(1220,675,38,55,2,oak,z);cyl(1237,700,7,17,cream,z+2)}
   box(1220,677,2,51,188,glass,64);box(1218,682,2,2,22,dark,130);
   // Small display ledges above the screen for figures, matching the reference wall.
@@ -103,8 +103,30 @@ item('收納折疊餐桌 90×40',820,685,90,40,()=>{
   box(820,680,90,3,32,oak,39);
 });
 item('60 cm 收納臥榻',739,1000,200,60,()=>{box(739,1000,200,60,37,oak);box(739,1000,200,60,7,linen,37);for(let x=740;x<930;x+=65){box(x,999,62,1,31,cream,3)}box(755,1020,45,30,10,sage,44)});
-item('升降工作桌',739,835,65,135,()=>{box(739,835,65,135,4,oak,73);for(const yy of [848,950]){box(750,yy,45,6,4,dark);box(770,yy,5,5,72,dark)}box(795,875,3,55,33,black,77);box(765,882,24,45,1,dark,78);box(690,870,43,43,8,sage,43);cyl(711,892,6,43,dark)});
-item('影音輕量低櫃 110 cm',739,865,30,110,()=>{box(739,865,30,110,60,oak,8);for(const y of [867,921])box(768,y,2,51,54,cream,11);box(739,880,24,80,3,oak,122);cyl(751,895,6,15,cream,125);cyl(753,955,7,15,sage,68)});
+item('180 cm 升降工作桌',739,790,65,180,()=>{
+  // 180 × 65 cm desktop along the right wall; open centre remains the route to the window bench.
+  box(739,790,65,180,4,oak,73);
+  for(const yy of [804,940]){box(750,yy,45,7,4,dark,6);box(770,yy,6,6,70,dark,6);}
+  // Dual monitor / laptop zone, cable tray and a slim side drawer integrated below the top.
+  for(const yy of [824,890]){box(796,yy,3,48,30,black,77);box(780,yy+5,16,34,2,dark,77);}
+  box(742,798,4,164,3,dark,64);box(742,798,18,46,38,cream,20);
+});
+item('Enjoy101 人體工學椅',805,850,66,65,()=>{
+  // Mesh back, adjustable headrest, lumbar pad, 4D armrests and five-star base.
+  const frame=mat('#2e3534',.36,{metalness:.38}),mesh=mat('#55615c',.72),accent=mat('#92a28b',.68);
+  box(812,858,52,48,7,mesh,45);box(814,860,48,44,3,frame,42);
+  const back=new T.Mesh(new T.SphereGeometry(1,28,20),mesh);back.scale.set(4,34,24);back.position.copy(W(811,882,99));back.castShadow=back.receiveShadow=true;scene.add(back);
+  const lumbar=new T.Mesh(new T.SphereGeometry(1,20,16),accent);lumbar.scale.set(4,12,19);lumbar.position.copy(W(806,882,84));lumbar.castShadow=true;scene.add(lumbar);
+  // A visible neck stem keeps the adjustable headrest physically tied to the mesh back.
+  box(806,879,6,6,28,frame,124);
+  // A wide, shallow headrest reads correctly at room scale; a sphere made it appear like a floating orb.
+  box(806,865,5,34,13,mesh,143);box(804,869,3,26,8,accent,146);
+  for(const yy of [854,908]){box(823,yy,16,5,4,frame,67);box(828,yy,5,5,15,frame,49);}
+  cyl(837,882,5,43,frame,2);for(const [x,y]of [[808,882],[828,852],[858,856],[858,908],[828,912]]){box(Math.min(837,x),Math.min(882,y),Math.abs(x-837)+4,Math.abs(y-882)+4,3,frame,3);cyl(x,y,4,5,dark,0);}
+});
+const designSpecs={tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:180,depth:65},chair:{model:'Enjoy101',width:66,depth:65}};
+// Shortened to 70 cm so the desk chair has an unobstructed side route.
+item('影音輕量低櫃 70 cm',739,915,30,70,()=>{box(739,915,30,70,60,oak,8);for(const y of [917,951])box(768,y,2,32,54,cream,11);box(739,930,24,40,3,oak,122);cyl(751,940,6,15,cream,125);cyl(753,965,7,15,sage,68)});
 // Cabinet follows the bathroom north wall; door opening x829..909 stays clear.
 const cleaningDoors=[];
 item('面向浴室右手側／掃地機器人',769,520,60,35,()=>{
@@ -237,7 +259,7 @@ el('path',{d:'M 1150 570 L 1150 500 L 790 500',fill:'none',stroke:'#5c967c','str
 el('text',{x:970,y:493,'text-anchor':'middle','font-size':13,fill:'#3e7059'},'入口 ↔ 餐區通道');
 const cleaningButton=document.createElement('button');cleaningButton.textContent='查看清潔櫃內部';cleaningButton.onclick=()=>{const visible=!cleaningDoors[0].visible;cleaningDoors.forEach(m=>m.visible=visible);cleaningButton.textContent=visible?'查看清潔櫃內部':'關閉清潔櫃';select('entry')};document.querySelector('.toolbar').append(cleaningButton);
 for(const [x,y,w,d]of [[626,478,90,87],[732,763,84,80]])el('rect',{x,y:1100-y-d,width:w,height:d,fill:'none',stroke:'#b88b67','stroke-width':2,'stroke-dasharray':'5 5'});
-window.B1_REVIEW={furniture,clearances:{masterBedToWardrobe:49,mediaDeskToCabinet:105,diningFolded:130,diningExpanded:95,slipperHeight:25,planterEndClear:85},select};
+window.B1_REVIEW={furniture,designSpecs,clearances:{masterBedToWardrobe:49,mediaDeskToCabinet:105,diningFolded:130,diningExpanded:95,slipperHeight:25,planterEndClear:85},select};
 const visitor=el('g',{});visitor.innerHTML='<path d="M 0 0 L -24 -42 L 24 -42 Z" fill="#b87e44" opacity=".3"/><circle r="10" fill="#b87e44" stroke="white" stroke-width="3"/><path d="M 0 0 L 0 -26" stroke="#714b26" stroke-width="3"/>';
 const doorSwing=el('path',{d:'M 909 545 A 80 80 0 0 1 829 625 L 829 545',fill:'none',stroke:'#b87e44','stroke-width':3,'stroke-dasharray':'5 4',visibility:'hidden'});
 const doorButton=document.createElement('button');doorButton.textContent='開啟隱藏門';let doorOpen=false;doorButton.onclick=()=>{doorOpen=!doorOpen;hiddenDoorHinge.rotation.y=doorOpen?-Math.PI/2:0;doorSwing.setAttribute('visibility',doorOpen?'visible':'hidden');doorButton.textContent=doorOpen?'關閉隱藏門':'開啟隱藏門'};document.querySelector('.toolbar').append(doorButton);
