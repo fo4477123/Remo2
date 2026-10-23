@@ -27,9 +27,9 @@ for(const [x,y,w,d]of rooms){box(x,y,w,d,4,cream,-4,floorGroup);for(let j=0;j<d;
 const windowSpecs=[
   {axis:'h',line:292,from:500,to:650,sill:105,head:225,name:'次臥普通窗'},
   {axis:'v',line:230,from:345,to:490,sill:105,head:225,name:'廚房普通窗'},
-  {axis:'h',line:1067,from:455,to:635,sill:72,head:232,name:'多功能室低檯窗'},
-  {axis:'h',line:1067,from:770,to:890,sill:72,head:232,name:'客廳低檯窗'},
-  {axis:'h',line:1002,from:1000,to:1180,sill:72,head:232,name:'客廳低檯窗'}
+  {axis:'h',line:1067,from:455,to:635,sill:50,head:232,name:'多功能室低檯窗'},
+  {axis:'h',line:1067,from:770,to:890,sill:50,head:232,name:'客廳低檯窗'},
+  {axis:'h',line:1002,from:1000,to:1180,sill:50,head:232,name:'客廳低檯窗'}
 ];
 function addWallPiece(a,b,z0,h){const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<1||h<1)return;const m=new T.Mesh(new T.BoxGeometry(length,h,3),cream);m.position.copy(W((a[0]+b[0])/2,(a[1]+b[1])/2,z0+h/2));m.rotation.y=Math.atan2(dy,dx);m.castShadow=m.receiveShadow=true;wallGroup.add(m)}
 function addWallWithWindows(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<20)return;const horizontal=Math.abs(dy)<2,vertical=Math.abs(dx)<2;if(!horizontal&&!vertical){addWallPiece(a,b,0,260);return;}
