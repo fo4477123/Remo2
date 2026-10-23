@@ -25,8 +25,8 @@ for(const [x,y,w,d]of rooms){box(x,y,w,d,4,cream,-4,floorGroup);for(let j=0;j<d;
 // blank plane.  The opening locations follow the DWG room edges: ordinary
 // windows in the bedrooms/kitchen and low-sill windows in living/media rooms.
 const windowSpecs=[
-  {axis:'h',line:292,from:500,to:650,sill:105,head:225,name:'次臥普通窗'},
-  {axis:'v',line:230,from:345,to:490,sill:105,head:225,name:'廚房普通窗'},
+  {axis:'h',line:292,from:500,to:650,sill:150,head:235,name:'次臥高窗'},
+  {axis:'v',line:230,from:345,to:490,sill:150,head:235,name:'廚房高窗'},
   {axis:'h',line:1067,from:455,to:635,sill:50,head:232,name:'多功能室低檯窗'},
   {axis:'h',line:1067,from:770,to:890,sill:50,head:232,name:'客廳低檯窗'},
   {axis:'h',line:1002,from:1000,to:1180,sill:50,head:232,name:'客廳低檯窗'}
