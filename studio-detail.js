@@ -14,7 +14,7 @@
   const rounded=new Map();
   scene.traverse(m=>{if(!m.isMesh||m.geometry.type!=='BoxGeometry'||m.parent===wallGroup||m.parent===floorGroup||m.parent===ceilingGroup)return;
     const {width:w,height:h,depth:d}=m.geometry.parameters;if(Math.min(w,h,d)<3)return;
-    const r=Math.min(.9,Math.min(w,h,d)/5),key=[w,h,d,r].join(',');
+    const r=Math.min(m.material===linen?5:.9,Math.min(w,h,d)/3),key=[w,h,d,r].join(',');
     if(!rounded.has(key)){const g=new T.BoxGeometry(w,h,d,4,4,4),p=g.attributes.position,n=new T.Vector3(),q=new T.Vector3();
       for(let i=0;i<p.count;i++){n.fromBufferAttribute(p,i);q.set(Math.max(-w/2+r,Math.min(w/2-r,n.x)),Math.max(-h/2+r,Math.min(h/2-r,n.y)),Math.max(-d/2+r,Math.min(d/2-r,n.z)));n.sub(q).normalize().multiplyScalar(r).add(q);p.setXYZ(i,n.x,n.y,n.z);}g.computeVertexNormals();rounded.set(key,g);}
     m.geometry=rounded.get(key);
@@ -62,4 +62,5 @@
   configs.living.text='依參考圖調整淡橡木、奶油色連續電視立面、櫃底與展示層板暖光。可用滑鼠轉頭、WASD行走，或用小地圖換位置。';
   configs.entry.text='以客廳面向浴室門：右手側下方為掃地機器人；左手側為掃具高櫃及上方浴室用品開口。原機器人位置至大門旁改為130 cm連續工作平台，高94 cm，上方開放76 cm，搭配燈帶與上櫃。';
   if(new URLSearchParams(location.search).has('realistic')){renderButton.click();}
+  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js';document.head.append(finishScript);
 })();

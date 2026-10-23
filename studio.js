@@ -36,12 +36,13 @@ item('島語升降茶几／收納茶几',1066,768,82,125,()=>{
 item('延伸電視牆／單扇玻璃門',1220,505,38,490,()=>{
   // One continuous timber plane and floating base run to the planter; no tall cabinet at the end.
   box(1255,505,3,490,235,oak,25);box(1220,505,38,490,32,oak,25);box(1220,505,38,490,5,oak,255);
-  box(1250,745,4,145,82,black,85);
+  // TV panel spans y732..995; center screen on y863.5, excluding tall storage.
+  box(1250,791,4,145,82,black,85);
   for(let z=65;z<245;z+=48){box(1220,675,38,55,2,oak,z);cyl(1237,700,7,17,cream,z+2)}
   box(1220,677,2,51,188,glass,64);box(1218,682,2,2,22,dark,130);
   // Small display ledges above the screen for figures, matching the reference wall.
   const led=mat('#ffe3ad',.36,{emissive:0xffc978,emissiveIntensity:1.15});
-  for(const [yy,w,z]of [[755,75,188],[838,44,213],[883,32,188]]){box(1235,yy,20,w,3,oak,z);box(1238,yy+1,2,w-2,1,led,z-.5)}
+  for(const [yy,w,z]of [[783.5,50,188],[838.5,50,200],[893.5,50,188]]){box(1235,yy,20,w,3,oak,z);box(1238,yy+1,2,w-2,1,led,z-.5)}
   for(const yy of [505,561,617])box(1220,yy+2,2,52,193,oak,60);
   // No top cabinets above the TV: this central portion is a clean timber backing.
   for(const yy of [505,561,617,675,730,790,850,895,950])box(1219,yy+2,2,Math.min(54,993-yy),28,oak,27);
