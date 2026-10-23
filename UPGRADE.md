@@ -1,0 +1,49 @@
+# 暖木日常：手機即時漫遊
+
+## Outcome and scope
+Improve the existing local Three.js site without changing hosting or introducing Unity.
+Use the supplied CAD coordinates and accepted furnishing choices. This is an interactive
+design visualisation, not a measured digital twin or a photograph of the finished home.
+Public UI identifies Qingpu / fifth-floor context only; the owner's full address is not published.
+The existing generated exterior is illustrative, not an address-specific sightline.
+
+## Corrections and assumptions
+- Window positions from paired TO / WALL endpoints: guest x391.1 y309.7–429.7;
+  kitchen x231.1 y574.7–654.7; master x453.6–633.6 y1067.2;
+  media x763.6–883.6 y1067.2; living x998.6–1178.6 y1002.2.
+- User-specified sill heights: guest/kitchen 150 cm, remaining three 50 cm.
+  Heads remain provisional 235/232 cm, room height 260 cm.
+- Restore sill and lintel solids in CAD gaps and preserve elevations through cutaway toggles.
+- Separate bathroom fixture footprints and model hollow sanitary ware; preserve entry.
+- Balcony slats on exposed west/north edges, not across the laundry doorway.
+- Remove floating decor, contain bath fixtures within walls, and show realistic table/book scale.
+- Preserve standard beds and full wardrobe; improve bed-end clearance without moving walls.
+  Remaining narrow furnishing clearances are documented, not represented as construction approval.
+
+## Interaction and rendering
+Phone: left thumb movement, right canvas drag look, room picker, immersive view, portrait/landscape,
+stacked plan comparison, safe-area spacing, stopped movement on blur/cancel/visibility change.
+Desktop: keyboard/mouse, room changes and full-height/cutaway round trip continue working.
+Use roughness, ceramic interiors, seams, softer warm lighting, window daylight and local textures.
+Batch floor geometry; cap mobile pixel ratio; reuse static shadows and limit light count.
+
+## Acceptance and validation
+Node syntax checks plus a local Chromium browser run: no JS exceptions, finite scene transforms,
+reachable room stops, 50/150 cm sill solids, correct wall elevations after mode switching,
+door collision, touch movement and look concurrently, pointer cancellation, stacked comparison,
+and screenshots at desktop, phone portrait and landscape sizes. Device emulation is not physical
+iPhone/Android hardware validation. Publish existing Pages repo and refresh local ZIP after checks.
+
+## Implemented and checked
+- Added actual vessel interiors, second-bathroom shower/toilet/vanity, kitchen sink/faucet/hood,
+  soft cushions and seam piping, HDR contact shading and antialiasing.
+- Restored missing exterior returns omitted from CAD layer 3F. Existing generated backdrop
+  now covers all viewing directions; repeated context imagery is still not a surveyed panorama.
+- Browser QA uses Chromium with 390×844 and 844×390 touch emulation, checks two simultaneous
+  touches, cancellation, all free room stops, door/dining-leaf collision, mode round trips,
+  zero runtime/console errors and plan stacking; saves screenshots and JSON under qa-output/.
+- No dependency install or framework change. `node qa-home.cjs` runs the focused browser check.
+- Remaining constraints: bed-foot clearance about 66 cm; sofa/table about 29 cm;
+  table/TV cabinet about 55 cm. These are explicitly shown as tight in the UI. Retained purchased
+  sofa and table footprints; no claim that these are approved circulation or installation sizes.
+- Not a laser scan, construction plan, fully photoreal path-traced scene, or physical-phone benchmark.

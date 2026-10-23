@@ -77,6 +77,8 @@
   const exteriorMaterial=new T.MeshBasicMaterial({map:texture(skyCanvas),side:T.DoubleSide,fog:false});
   const exterior=new T.Mesh(new T.PlaneGeometry(8000,4500),exteriorMaterial);exterior.position.copy(W(750,4500,230));scene.add(exterior);
   const westExterior=exterior.clone();westExterior.position.copy(W(-3500,650,230));westExterior.rotation.y=Math.PI/2;scene.add(westExterior);
+  const southExterior=exterior.clone();southExterior.position.copy(W(750,-3300,230));southExterior.rotation.y=Math.PI;scene.add(southExterior);
+  const eastExterior=exterior.clone();eastExterior.position.copy(W(4500,650,230));eastExterior.rotation.y=-Math.PI/2;scene.add(eastExterior);
   const exteriorAsset=document.createElement('script');exteriorAsset.src='exterior-texture.js';exteriorAsset.onload=()=>new T.TextureLoader().load(window.B1_EXTERIOR_DATA,map=>{map.colorSpace=T.SRGBColorSpace;map.anisotropy=renderer.capabilities.getMaxAnisotropy();exteriorMaterial.map=map;exteriorMaterial.needsUpdate=true;window.B1_REVIEW.exteriorLoaded=true;});document.head.append(exteriorAsset);
   const exteriorNight=()=>exteriorMaterial.color.set(nightControl.checked?'#414b65':'#ffffff');nightControl.addEventListener('change',exteriorNight);exteriorNight();
   // Rounded linen pillows with stitched seams, fitted within the existing sofa.
@@ -86,7 +88,7 @@
   // read as a home instead of a showroom while keeping the DWG circulation clear.
   const cozyGroup=new T.Group();cozyGroup.name='cozy-home-details';scene.add(cozyGroup);
   const cozyLightSet=[];
-  function cozyLight(x,y,z,color,intensity,range){const l=new T.PointLight(color,intensity,range,2);l.position.copy(W(x,y,z));l.castShadow=true;l.shadow.mapSize.set(512,512);scene.add(l);cozyLightSet.push({light:l,intensity});return l;}
+  function cozyLight(x,y,z,color,intensity,range){const l=new T.PointLight(color,intensity,range,2);l.position.copy(W(x,y,z));l.castShadow=false;scene.add(l);cozyLightSet.push({light:l,intensity});return l;}
   cozyLight(1060,805,190,0xffc982,180,360);
   cozyLight(1010,540,170,0xffd79b,115,260);
   cozyLight(790,820,165,0xffcf91,90,220);
@@ -94,19 +96,19 @@
   function decoBox(x,y,w,d,h,material,z=.7){const m=box(x,y,w,d,h,material,.05,cozyGroup);m.position.y=z;return m;}
   function decoCyl(x,y,r,h,material,z=0){const m=cyl(x,y,r,h,material,z);scene.remove(m);cozyGroup.add(m);return m;}
   // Coffee-table books and a ceramic tray.
-  decoBox(1065,820,76,48,2,mat('#b7a58d',.88),58);decoBox(1074,828,61,38,2,mat('#6d7b69',.82),61);
-  const tray=decoCyl(1098,805,18,1.8,mat('#c8b596',.9),63);tray.position.y=64;
-  const mug=decoCyl(1094,805,5,8,mat('#f1eadc',.9),65);mug.position.y=69;
+  decoBox(1108,796,21,28,1.8,mat('#b7a58d',.88),73);decoBox(1109,798,19,25,1.6,mat('#6d7b69',.82),74.7);
+  const tray=decoCyl(1132,864,12,1.8,mat('#c8b596',.9),72);
+  const mug=decoCyl(1132,864,3.8,7.5,mat('#f1eadc',.9),74);
   // A floor plant is placed by the window, away from the continuous TV wall.
-  const pot=decoCyl(1052,965,16,24,mat('#a77755',.8),1);pot.position.y=13;
-  for(const [dx,dy,dz,s] of [[-13,0,70,13],[5,4,84,15],[18,0,66,12],[-2,3,101,11]]){const leaf=new T.Mesh(new T.SphereGeometry(1,16,12),mat('#6f806c',.95));leaf.scale.set(s*.55,s*.18,s);leaf.position.copy(W(1052+dx,965+dy,dz));leaf.rotation.z=dx*.02;leaf.castShadow=true;cozyGroup.add(leaf);}
+  // No plant intrudes into the sofa or the owner's continuous TV wall.
   // Soft throw at the end of the sofa and a small entry catch-all dish.
-  decoBox(875,928,72,12,6,mat('#b7a995',.98),54);
-  const catchAll=decoCyl(1038,540,18,2.2,mat('#c7ad83',.86),114);catchAll.position.y=116;
+  decoBox(1000,903,50,37,2,mat('#b7a995',.98),47.5);
+  const catchAll=decoCyl(1038,538,11,2.2,mat('#c7ad83',.86),94);
   // Bedside glow and a simple fabric pendant silhouette.
-  cozyLight(300,250,150,0xffc477,55,170);
-  const shade=new T.Mesh(new T.ConeGeometry(18,18,24,1,true),mat('#d8c5a6',.82));shade.position.copy(W(315,252,150));shade.rotation.x=Math.PI;cozyGroup.add(shade);
-  const applyCozy=()=>cozyLightSet.forEach(({light,intensity})=>{light.intensity=(nightControl.checked?1.15:1)*intensity;});
+  cozyLight(450,810,230,0xffc477,600,170);
+  const shade=new T.Mesh(new T.ConeGeometry(18,18,24,1,true),mat('#d8c5a6',.82));shade.position.copy(W(450,810,230));cozyGroup.add(shade);
+  const stem=box(449,809,2,2,21,chrome,239,cozyGroup);
+  const applyCozy=()=>cozyLightSet.forEach(({light,intensity})=>{light.intensity=cozyEnabled?(nightControl.checked?1.15:1)*intensity:0;});
   const cozyButton=document.createElement('button');cozyButton.textContent='溫馨情境';cozyButton.setAttribute('aria-pressed','true');cozyButton.style.cssText='border-color:#c79a67;background:#fff4df';
   let cozyEnabled=true;cozyButton.onclick=()=>{cozyEnabled=!cozyEnabled;cozyButton.setAttribute('aria-pressed',String(cozyEnabled));cozyButton.style.background=cozyEnabled?'#fff4df':'#f8f6ef';cozyLightSet.forEach(({light,intensity})=>light.intensity=cozyEnabled?(nightControl.checked?1.15:1)*intensity:0);cozyGroup.visible=cozyEnabled;window.B1_REVIEW.cozy=cozyEnabled;};
   document.querySelector('.toolbar').append(cozyButton);window.B1_REVIEW.cozy=true;nightControl.addEventListener('change',applyCozy);applyCozy();
@@ -121,4 +123,5 @@
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode!=='render'&&document.pointerLockElement)document.exitPointerLock();}));
   // A small instrumentation hook for browser QA without placing technical data in the UI.
   let previous=performance.now(),samples=[];function measure(now){samples.push(now-previous);previous=now;if(samples.length>90)samples.shift();window.B1_REVIEW.frameMs=samples.reduce((a,b)=>a+b,0)/samples.length;requestAnimationFrame(measure);}requestAnimationFrame(measure);
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024';document.head.append(homeScript);
 })();

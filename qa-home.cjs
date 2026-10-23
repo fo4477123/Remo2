@@ -1,0 +1,57 @@
+// Dependency-free Chromium/CDP verification; no files are uploaded by this script.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{spawn}=require('node:child_process');
+const assert=require('node:assert/strict');
+const root=__dirname,outputRoot=path.join(root,'qa-output');fs.mkdirSync(outputRoot,{recursive:true});const out=fs.mkdtempSync(path.join(outputRoot,'run-'));console.log('QA artifacts: '+out);
+const server=http.createServer((req,res)=>{const target=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!target.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(target,(err,data)=>{if(err){res.writeHead(404).end();return;}const ext=path.extname(target);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png'})[ext]||'application/octet-stream');res.end(data);});});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
+(async()=>{
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const profile=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'b1-browser-'));
+ browser=spawn('C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',['--headless=new','--remote-debugging-port=0','--user-data-dir='+profile,'--no-first-run','--no-default-browser-check','--disable-background-networking','--enable-unsafe-swiftshader','--window-size=1440,1000','about:blank'],{windowsHide:true,stdio:'ignore'});
+ let port;for(let i=0;i<100;i++){try{port=fs.readFileSync(path.join(profile,'DevToolsActivePort'),'utf8').split('\n')[0];break;}catch{await sleep(200);}}
+ assert(port,'Chromium debugging port unavailable');
+ const tabs=await (await fetch(`http://127.0.0.1:${port}/json`)).json();ws=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await new Promise(r=>ws.addEventListener('open',r,{once:true}));
+ let id=0;const pending=new Map(),exceptions=[];
+ ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result);}}if(m.method==='Runtime.exceptionThrown')exceptions.push(m.params.exceptionDetails);if(m.method==='Runtime.consoleAPICalled'&&m.params.type==='error')exceptions.push(m.params.args.map(x=>x.value||x.description));};
+ const cdp=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}));});
+ const ev=async expression=>{const r=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+ await cdp('Runtime.enable');await cdp('Page.enable');
+ await cdp('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/index.html?realistic=1`});
+ let ready=false;for(let i=0;i<120;i++){ready=await ev('Boolean(window.B1_REVIEW?.ready)');if(ready)break;await sleep(300);}assert(ready,'Home module must load');
+ const screenshot=async name=>{await sleep(600);const shot=await cdp('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));};
+ const report={};report.desktop=await ev('B1_REVIEW.audit()');assert(report.desktop.finite);assert(report.desktop.wallElevations);
+ assert(report.desktop.windows.filter(w=>w.sill===50).length===3);assert(report.desktop.windows.filter(w=>w.sill===150).length===2);
+ for(const [name,s]of Object.entries(report.desktop.roomStops))assert(s.free,'Free teleport stop: '+name);
+ assert(await ev('!canStand(869,554)'),'Closed hidden door blocks walking');
+ await ev('doorButton.click()');assert(await ev('canStand(869,554)'),'Open hidden door allows entry');await ev('doorButton.click()');
+ assert(await ev('canStand(850,660)'),'Folded dining leaf leaves passage');await ev('foldButton.click()');assert(await ev('!canStand(850,660)'),'Expanded dining leaf participates in collision');await ev('foldButton.click()');
+ await ev("document.querySelector('[data-mode=\"3d\"]').click();document.querySelector('[data-mode=\"render\"]').click()");
+ assert(await ev('B1_REVIEW.audit().wallElevations'),'Wall heights survive orbit/tour toggle');
+ await ev("document.querySelector('[data-room=\"living\"]').click()");await screenshot('desktop-living');
+ await ev("document.querySelector('[data-room=\"bath\"]').click()");await screenshot('desktop-bath');
+ await ev("document.querySelector('[data-room=\"master\"]').click()");await screenshot('desktop-master');
+ for(const room of ['kitchen','laundry','ensuite','media']){await ev(`document.querySelector('[data-room="${room}"]').click()`);await screenshot('desktop-'+room);}
+ await ev("document.querySelector('[data-room=\"living\"]').click()");
+ await cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,isMobile:true,mobile:true});
+ await cdp('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+ await cdp('Page.reload');for(let i=0;i<120;i++){if(await ev('Boolean(window.B1_REVIEW?.ready)'))break;await sleep(300);}
+ await sleep(800);await screenshot('phone-portrait');
+ assert(await ev('document.documentElement.scrollWidth<=innerWidth+1'),'No phone horizontal overflow');
+ assert(await ev('renderer.getPixelRatio()<=1'),'Phone default rendering budget');
+ await ev("document.querySelector('.immersive-button').click()");await screenshot('phone-immersive');
+ const rects=await ev("JSON.stringify({stick:document.querySelector('#walk-stick').getBoundingClientRect().toJSON(),canvas:canvas.getBoundingClientRect().toJSON()})");const r=JSON.parse(rects);
+ const sx=r.stick.x+r.stick.width/2,sy=r.stick.y+r.stick.height/2,lx=r.canvas.x+r.canvas.width*.7,ly=r.canvas.y+r.canvas.height*.45;
+ const state0=await ev('B1_REVIEW.getTourState()');
+ await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:sx,y:sy-30,id:1},{x:lx,y:ly,id:2}]});
+ await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:sx,y:sy-30,id:1},{x:lx+35,y:ly+8,id:2}]});await sleep(900);
+ const state1=await ev('B1_REVIEW.getTourState()');assert(Math.abs(state1.yaw-state0.yaw)>.04,'Second finger rotates while stick is held');assert(Math.hypot(state1.x-state0.x,state1.y-state0.y)>2,'Thumbstick actually moves');
+ await cdp('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});assert(await ev('keys.size===0'),'Touch cancel clears movement');
+ await ev("document.querySelector('[data-mode=\"compare\"]').click()");await screenshot('phone-compare');
+ report.phone=await ev('({audit:B1_REVIEW.audit(),width:innerWidth,height:innerHeight,canvasW:canvas.clientWidth,canvasH:canvas.clientHeight,planTop:svg.getBoundingClientRect().top,canvasBottom:canvas.getBoundingClientRect().bottom})');
+ assert(Math.abs(report.phone.planTop-report.phone.canvasBottom)<3,'Phone compare stacks the plan below 3D');
+ await cdp('Emulation.setDeviceMetricsOverride',{width:844,height:390,deviceScaleFactor:2,mobile:true});await screenshot('phone-landscape');
+ await ev("document.querySelector('[data-mode=\"render\"]').click();document.querySelector('[data-room=\"guest\"]').click()");await screenshot('phone-guest');
+ report.exceptions=exceptions;assert(exceptions.length===0,'No browser runtime exceptions');
+ fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));console.log('PASS: geometry, room stops, wall mode switch, mobile multitouch movement/look/cancel, responsive comparison.');console.log(JSON.stringify(report));
+ await cdp('Browser.close');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{ws?.close();browser?.kill();server.close();});

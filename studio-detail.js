@@ -42,7 +42,7 @@
   const night=document.querySelector('#night');night.addEventListener('change',()=>{hemi.intensity=night.checked?.65:1.8;sun.intensity=night.checked?.12:2.4;nightLights.forEach(l=>l.intensity=night.checked?8000:0);});
 
   // Actual door thresholds join the room rectangles used for navigation.
-  const thresholds=[[614,665,115,90],[729,740,90,25],[829,500,80,65],[626,550,90,20],[239,548,145,20]];
+  const thresholds=[[614,665,115,90],[729,740,90,25],[829,500,80,65],[626,550,90,20],[239,548,145,20],[389,740,10,79]];
   for(const z of thresholds){rooms.push(z);box(...z,2,cream,-2,floorGroup);}
   const originalCanStand=canStand;
   canStand=function(x,y){if(!doorOpen&&x>829&&x<909&&y>541&&y<567)return false;return originalCanStand(x,y);};
@@ -62,5 +62,5 @@
   configs.living.text='依參考圖調整淡橡木、奶油色連續電視立面、櫃底與展示層板暖光。可用滑鼠轉頭、WASD行走，或用小地圖換位置。';
   configs.entry.text='以客廳面向浴室門：右手側下方為掃地機器人；左手側為掃具高櫃及上方浴室用品開口。原機器人位置至大門旁改為130 cm連續工作平台，高94 cm，上方開放76 cm，搭配燈帶與上櫃。';
   if(new URLSearchParams(location.search).has('realistic')){renderButton.click();}
-  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js';document.head.append(finishScript);
+  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js?v=20261024-home';document.head.append(finishScript);
 })();
