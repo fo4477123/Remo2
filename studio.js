@@ -59,25 +59,29 @@ item('升降工作桌',739,835,65,135,()=>{box(739,835,65,135,4,oak,73);for(cons
 item('影音輕量低櫃 110 cm',739,865,30,110,()=>{box(739,865,30,110,60,oak,8);for(const y of [867,921])box(768,y,2,51,54,cream,11);box(739,880,24,80,3,oak,122);cyl(751,895,6,15,cream,125);cyl(753,955,7,15,sage,68)});
 // Cabinet follows the bathroom north wall; door opening x829..909 stays clear.
 const cleaningDoors=[];
-item('左側掃具櫃／上方走道開口',769,520,60,35,()=>{
+item('面向浴室右手側／掃地機器人',769,520,60,35,()=>{
   box(769,520,2,35,260,oak);box(827,520,2,35,260,oak);box(769,520,60,2,260,oak);box(769,520,60,35,3,oak,257);
-  // Lower closed zone for mop/broom; upper niche faces the walkway for bathroom items.
-  cleaningDoors.push(box(771,554,56,2,174,oak,3));
-  for(const z of [178,214,254])box(771,522,56,32,2,oak,z);
-  for(const x of [782,799,813])cyl(x,538,4,13,cream,180);
-  box(784,535,3,3,150,dark,8);box(776,532,20,12,5,sage,5);box(812,535,3,3,130,oak,8);
+  box(771,522,56,32,3,oak,51);box(771,554,56,2,202,oak,55);
+  box(780,524,38,15,37,cream,1);cyl(799,545,16,9,white,1);
 });
-item('右側掃地機器人櫃／上方收納',909,520,135,35,()=>{
-  box(909,520,2,35,260,oak);box(1042,520,2,35,260,oak);box(909,520,135,2,260,oak);box(909,520,135,35,3,oak,257);
-  // Low docking bay, then an open shelf and closed storage above.
-  for(const x of [911,977])box(x,554,63,2,204,oak,54);
-  box(911,522,131,32,3,oak,51);box(975,522,2,32,50,oak);
-  box(911,554,63,2,47,oak,3);
-  box(989,524,38,15,37,cream,1);cyl(1008,545,16,9,white,1);
+item('面向浴室左手側／掃具高櫃',910,520,64,35,()=>{
+  box(910,520,2,35,260,oak);box(972,520,2,35,260,oak);box(910,520,64,2,260,oak);box(910,520,64,35,3,oak,257);
+  cleaningDoors.push(box(912,554,60,2,174,oak,3));
+  for(const z of [178,214,254])box(912,522,60,32,2,oak,z);
+  box(926,535,3,3,150,dark,8);box(918,532,20,12,5,sage,5);box(953,535,3,3,130,oak,8);
+  for(const x of [924,941,956])cyl(x,538,4,13,cream,180);
 });
 const hiddenDoorHinge=new T.Group();hiddenDoorHinge.position.copy(W(829,555));scene.add(hiddenDoorHinge);
 item('隱藏門 80 cm／齊平內開',829,553,80,3,()=>{const leaf=box(829,553,80,3,230,cream);hiddenDoorHinge.attach(leaf);box(829,553,80,3,30,oak,230)});
-item('玄關整面收納櫃',1044,520,60,35,()=>{box(1044,520,60,35,260,oak);box(1046,554,56,2,254,oak,3)});
+item('連續工作平台／延伸至大門',974,520,130,35,()=>{
+  box(974,520,130,35,88,oak,3);
+  for(const x of [976,1040])box(x,554,62,2,84,cream,5);
+  box(974,520,130,36,3,cream,91);
+  box(974,520,130,2,166,oak,94);
+  box(974,520,130,30,90,oak,170);
+  for(const x of [976,1040])box(x,549,62,2,84,oak,173);
+  box(1060,530,25,16,2,dark,94);
+});
 item('LG 洗脫烘預留／對面旋轉180度',310,320,75,65,()=>{box(310,320,75,65,85,white);const drum=new T.Mesh(new T.CylinderGeometry(23,23,3,48),black);drum.rotation.x=Math.PI/2;drum.position.copy(W(347.5,387,43));scene.add(drum);box(310,320,75,65,4,oak,90)});
 item('主臥雙人床／轉向90度',425,890,188,150,()=>{box(425,890,188,150,25,oak);box(425,890,188,150,20,linen,25);box(417,890,8,150,85,oak);for(const yy of [900,970])box(438,yy,35,60,12,cream,45);box(538,890,75,150,3,sage,45)});
 item('主臥整牆頂天滑門衣櫥',664,765,55,295,()=>{box(664,765,55,295,260,oak);for(let y=767;y<1058;y+=73){box(662,y,2,71,254,oak,3);box(660,y+61,2,2,35,dark,100)}});

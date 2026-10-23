@@ -33,7 +33,8 @@
     box(x+8,y+8,w-16,7,7,cream,246);strip(x+10,y+10,w-20,2,254);
     light(x+w/2,y+35,240,6500,Math.max(w,d));
   }
-  strip(774,525,49,2,212);light(797,546,205,800,100);
+  strip(915,525,54,2,212);light(942,546,205,800,100);
+  strip(978,545,122,2,168);light(1040,548,155,1100,150);
   const illumination=document.createElement('label');illumination.textContent='氣氛燈 ';
   const dimmer=document.createElement('input');dimmer.type='range';dimmer.min=0;dimmer.max=100;dimmer.value=65;dimmer.setAttribute('aria-label','氣氛燈亮度');illumination.append(dimmer);document.querySelector('.toolbar').append(illumination);
   const updateLights=()=>{const value=Number(dimmer.value)/100;for(const [l,p]of lights)l.intensity=p*value;warm.emissiveIntensity=value*2.8;};dimmer.oninput=updateLights;updateLights();
@@ -59,6 +60,6 @@
   function hud(){mini.style.display=walking&&!compare&&!canvas.hidden?'block':'none';if(miniVisitor)miniVisitor.setAttribute('transform',`translate(${walkX} ${1100-walkY}) rotate(${walkYaw*180/Math.PI})`);requestAnimationFrame(hud);}hud();
   window.B1_REVIEW.canStand=canStand;window.B1_REVIEW.getTourState=()=>({walking,x:walkX,y:walkY,yaw:walkYaw,compare,lights:lights.length});
   configs.living.text='依參考圖調整淡橡木、奶油色連續電視立面、櫃底與展示層板暖光。可用滑鼠轉頭、WASD行走，或用小地圖換位置。';
-  configs.entry.text='左側掃具高櫃上方開放收納；右側整面櫃，靠右下方預留掃地機器人位置。隱藏門與櫃面齊平，可切換向內開門。';
+  configs.entry.text='以客廳面向浴室門：右手側下方為掃地機器人；左手側為掃具高櫃及上方浴室用品開口。原機器人位置至大門旁改為130 cm連續工作平台，高94 cm，上方開放76 cm，搭配燈帶與上櫃。';
   if(new URLSearchParams(location.search).has('realistic')){renderButton.click();}
 })();
