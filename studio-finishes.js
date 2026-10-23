@@ -82,6 +82,34 @@
   // Rounded linen pillows with stitched seams, fitted within the existing sofa.
   function pillow(x,y,z,color){const material=linen.clone();material.color.set(color);const g=new T.SphereGeometry(1,28,20);const a=g.attributes.position;for(let i=0;i<a.count;i++){const px=a.getX(i),py=a.getY(i),pz=a.getZ(i);a.setXYZ(i,Math.sign(px)*Math.pow(Math.abs(px),.55)*8,Math.sign(py)*Math.pow(Math.abs(py),.55)*18,Math.sign(pz)*Math.pow(Math.abs(pz),.55)*18);}g.computeVertexNormals();const m=new T.Mesh(g,material);m.position.copy(W(x,y,z));m.rotation.z=-.16;m.castShadow=m.receiveShadow=true;scene.add(m);}
   pillow(1005,795,66,'#d1c5af');pillow(1007,945,65,'#939b85');
+  // Warm, lived-in details: small objects and layered amber light make the apartment
+  // read as a home instead of a showroom while keeping the DWG circulation clear.
+  const cozyGroup=new T.Group();cozyGroup.name='cozy-home-details';scene.add(cozyGroup);
+  const cozyLightSet=[];
+  function cozyLight(x,y,z,color,intensity,range){const l=new T.PointLight(color,intensity,range,2);l.position.copy(W(x,y,z));l.castShadow=true;l.shadow.mapSize.set(512,512);scene.add(l);cozyLightSet.push({light:l,intensity});return l;}
+  cozyLight(1060,805,190,0xffc982,180,360);
+  cozyLight(1010,540,170,0xffd79b,115,260);
+  cozyLight(790,820,165,0xffcf91,90,220);
+  cozyLight(260,410,150,0xffc982,70,210);
+  function decoBox(x,y,w,d,h,material,z=.7){const m=box(x,y,w,d,h,material,.05,cozyGroup);m.position.y=z;return m;}
+  function decoCyl(x,y,r,h,material,z=0){const m=cyl(x,y,r,h,material,z);scene.remove(m);cozyGroup.add(m);return m;}
+  // Coffee-table books and a ceramic tray.
+  decoBox(1065,820,76,48,2,mat('#b7a58d',.88),58);decoBox(1074,828,61,38,2,mat('#6d7b69',.82),61);
+  const tray=decoCyl(1098,805,18,1.8,mat('#c8b596',.9),63);tray.position.y=64;
+  const mug=decoCyl(1094,805,5,8,mat('#f1eadc',.9),65);mug.position.y=69;
+  // A floor plant is placed by the window, away from the continuous TV wall.
+  const pot=decoCyl(1052,965,16,24,mat('#a77755',.8),1);pot.position.y=13;
+  for(const [dx,dy,dz,s] of [[-13,0,70,13],[5,4,84,15],[18,0,66,12],[-2,3,101,11]]){const leaf=new T.Mesh(new T.SphereGeometry(1,16,12),mat('#6f806c',.95));leaf.scale.set(s*.55,s*.18,s);leaf.position.copy(W(1052+dx,965+dy,dz));leaf.rotation.z=dx*.02;leaf.castShadow=true;cozyGroup.add(leaf);}
+  // Soft throw at the end of the sofa and a small entry catch-all dish.
+  decoBox(875,928,72,12,6,mat('#b7a995',.98),54);
+  const catchAll=decoCyl(1038,540,18,2.2,mat('#c7ad83',.86),114);catchAll.position.y=116;
+  // Bedside glow and a simple fabric pendant silhouette.
+  cozyLight(300,250,150,0xffc477,55,170);
+  const shade=new T.Mesh(new T.ConeGeometry(18,18,24,1,true),mat('#d8c5a6',.82));shade.position.copy(W(315,252,150));shade.rotation.x=Math.PI;cozyGroup.add(shade);
+  const applyCozy=()=>cozyLightSet.forEach(({light,intensity})=>{light.intensity=(nightControl.checked?1.15:1)*intensity;});
+  const cozyButton=document.createElement('button');cozyButton.textContent='溫馨情境';cozyButton.setAttribute('aria-pressed','true');cozyButton.style.cssText='border-color:#c79a67;background:#fff4df';
+  let cozyEnabled=true;cozyButton.onclick=()=>{cozyEnabled=!cozyEnabled;cozyButton.setAttribute('aria-pressed',String(cozyEnabled));cozyButton.style.background=cozyEnabled?'#fff4df':'#f8f6ef';cozyLightSet.forEach(({light,intensity})=>light.intensity=cozyEnabled?(nightControl.checked?1.15:1)*intensity:0);cozyGroup.visible=cozyEnabled;window.B1_REVIEW.cozy=cozyEnabled;};
+  document.querySelector('.toolbar').append(cozyButton);window.B1_REVIEW.cozy=true;nightControl.addEventListener('change',applyCozy);applyCozy();
   // Turn simple cylindrical display placeholders into ceramic vessels.
   for(const m of [...scene.children]){if(m.geometry?.type==='CylinderGeometry'&&m.material===cream&&m.position.x>470&&m.position.z<30&&m.position.z>-35){const h=m.geometry.parameters.height;m.geometry=new T.LatheGeometry([new T.Vector2(0,0),new T.Vector2(5,0),new T.Vector2(7,3),new T.Vector2(6,h*.65),new T.Vector2(3,h*.9),new T.Vector2(3,h)],32);m.position.y-=h/2;m.material=mat('#d6cbbc',.45);}}
   const quality=document.createElement('select');quality.setAttribute('aria-label','畫質');quality.innerHTML='<option value="high">高畫質</option><option value="balanced">順暢模式</option>';quality.style.cssText='padding:7px;border:1px solid #c9c8bb;background:#f8f6ef;border-radius:4px';document.querySelector('.toolbar').append(quality);
