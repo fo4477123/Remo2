@@ -21,9 +21,46 @@ function item(name,x,y,w,d,fn){
 }
 const rooms=[[399,740,320,320],[729,765,220,295],[959,520,300,475],[399,300,360,255],[769,300,275,210],[399,565,560,175],[239,565,160,165],[239,300,145,250],[239,740,150,250]];
 for(const [x,y,w,d]of rooms){box(x,y,w,d,4,cream,-4,floorGroup);for(let j=0;j<d;j+=18){const shade=mat(j%36?'#ceb48c':'#d8bd96');box(x,y+j,w,17.6,.6,shade,.1,floorGroup)}box(x,y,w,d,8,cream,260,ceilingGroup)}ceilingGroup.visible=false;
-const seen=new Set();for(const p of B1_PLAN.walls){for(let i=1;i<p.points.length;i++){const a=p.points[i-1],b=p.points[i],dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<20)continue;const key=[...a,...b].map(Math.round).join();if(seen.has(key))continue;seen.add(key);const m=new T.Mesh(new T.BoxGeometry(length,260,3),cream);m.position.copy(W((a[0]+b[0])/2,(a[1]+b[1])/2,130));m.rotation.y=Math.atan2(dy,dx);m.castShadow=m.receiveShadow=true;wallGroup.add(m)}}
-// Windows: thin frames and a soft curtain rhythm at existing north openings.
-for(const [x,w,y]of [[454,180,1067],[764,120,1067],[999,180,1002]]){box(x,y,w,2,140,glass,80);for(let a=0;a<w;a+=16){box(x+a,y+3,3,3,150,linen,70)}box(x,y,w,7,4,oak,76)}
+// Rebuild CAD walls with real window voids instead of leaving the exterior as a
+// blank plane.  The opening locations follow the DWG room edges: ordinary
+// windows in the bedrooms/kitchen and low-sill windows in living/media rooms.
+const windowSpecs=[
+  {axis:'h',line:292,from:500,to:650,sill:105,head:225,name:'次臥普通窗'},
+  {axis:'v',line:230,from:345,to:490,sill:105,head:225,name:'廚房普通窗'},
+  {axis:'h',line:1067,from:455,to:635,sill:72,head:232,name:'多功能室低檯窗'},
+  {axis:'h',line:1067,from:770,to:890,sill:72,head:232,name:'客廳低檯窗'},
+  {axis:'h',line:1002,from:1000,to:1180,sill:72,head:232,name:'客廳低檯窗'}
+];
+function addWallPiece(a,b,z0,h){const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<1||h<1)return;const m=new T.Mesh(new T.BoxGeometry(length,h,3),cream);m.position.copy(W((a[0]+b[0])/2,(a[1]+b[1])/2,z0+h/2));m.rotation.y=Math.atan2(dy,dx);m.castShadow=m.receiveShadow=true;wallGroup.add(m)}
+function addWallWithWindows(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);if(length<20)return;const horizontal=Math.abs(dy)<2,vertical=Math.abs(dx)<2;if(!horizontal&&!vertical){addWallPiece(a,b,0,260);return;}
+  const lo=horizontal?Math.min(a[0],b[0]):Math.min(a[1],b[1]),hi=horizontal?Math.max(a[0],b[0]):Math.max(a[1],b[1]);
+  const openings=windowSpecs.filter(w=>(horizontal?w.axis==='h':w.axis==='v')&&Math.abs((horizontal?((a[1]+b[1])/2):((a[0]+b[0])/2))-w.line)<10).map(w=>({...w,from:Math.max(lo,w.from),to:Math.min(hi,w.to)})).filter(w=>w.to-w.from>8);
+  if(!openings.length){addWallPiece(a,b,0,260);return;}
+  const dir=horizontal?Math.sign(dx):Math.sign(dy),ordered=openings.sort((u,v)=>u.from-v.from);let cursor=lo;
+  const pointAt=t=>horizontal?[t,(a[1]+b[1])/2]:[(a[0]+b[0])/2,t];
+  for(const w of ordered){if(w.from>cursor)addWallPiece(pointAt(cursor),pointAt(w.from),0,260);addWallPiece(pointAt(w.from),pointAt(w.to),0,w.sill);addWallPiece(pointAt(w.from),pointAt(w.to),w.head,260-w.head);cursor=w.to;}
+  if(cursor<hi)addWallPiece(pointAt(cursor),pointAt(hi),0,260);
+}
+const seen=new Set();for(const p of B1_PLAN.walls){for(let i=1;i<p.points.length;i++){const a=p.points[i-1],b=p.points[i],length=Math.hypot(b[0]-a[0],b[1]-a[1]);if(length<20)continue;const key=[...a,...b].map(Math.round).join();if(seen.has(key))continue;seen.add(key);addWallWithWindows(a,b)}}
+// Windows: real glass, sill, head and mullions.  The two upper openings are
+// regular windows; living/media remain low-sill windows as requested.
+function makeWindow(axis,line,from,to,sill,head){
+  const w=to-from,frame=5;
+  if(axis==='h'){
+    box(from,line,w,3,head-sill,glass,sill);
+    box(from-frame,line-3,w+frame*2,8,5,oak,sill-5);
+    box(from-frame,line-3,w+frame*2,8,5,oak,head);
+    box(from-frame,line-3,5,8,head-sill+10,oak,sill-5);box(to-1,line-3,5,8,head-sill+10,oak,sill-5);
+    box((from+to)/2-2.5,line-4,5,10,head-sill-8,linen,sill+4);
+  }else{
+    box(line,from,3,w,head-sill,glass,sill);
+    box(line-3,from-frame,8,w+frame*2,5,oak,sill-5);
+    box(line-3,from-frame,8,w+frame*2,5,oak,head);
+    box(line-3,from-frame,8,5,head-sill+10,oak,sill-5);box(line-3,to-1,8,5,head-sill+10,oak,sill-5);
+    box(line-4,(from+to)/2-2.5,10,5,head-sill-8,linen,sill+4);
+  }
+}
+for(const spec of windowSpecs)makeWindow(spec.axis,spec.line,spec.from,spec.to,spec.sill,spec.head);
 item('220 cm 木框沙發',970,700,92,220,()=>{box(970,700,92,220,10,oak,17);box(972,705,15,210,55,oak,27);box(985,705,72,103,18,linen,28);box(985,812,72,103,18,linen,28);box(986,705,14,102,35,linen,44);box(986,813,14,102,35,linen,44);for(const yy of [700,910])box(970,yy,90,9,34,oak,27);box(998,718,25,38,12,sage,46);for(const yy of [710,900])for(const xx of [980,1040])box(xx,yy,4,4,20,oak)});
 item('羊毛地毯',1020,680,210,250,()=>box(1020,680,210,250,1.5,mat('#ded8c7'),1));
 item('島語升降茶几／收納茶几',1066,768,82,125,()=>{
