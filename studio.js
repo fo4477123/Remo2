@@ -3,7 +3,7 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261024-explore1';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261024-life1';detailScript.async=false;
 function loadFailure(name){if(window.B1_REVIEW)B1_REVIEW.ready=true;loading.replaceChildren(document.createTextNode(`${name}載入未完成。`));const retry=document.createElement('button');retry.textContent='重新載入';retry.onclick=()=>location.reload();loading.append(retry);}
 detailScript.onerror=()=>loadFailure('空間細節');
 setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},20000);
@@ -238,6 +238,7 @@ box(1101,501,6,12,242,oak,2);box(1207,501,6,12,242,oak,2);box(1101,501,112,12,6,
 });
 item('LG WD-S15NDB 洗脫烘／270度再轉90度',315,320.25,65,64.5,()=>{
   const washer=new T.Group();washer.position.copy(W(347.5,352.5));washer.rotation.y=2*Math.PI;scene.add(washer);
+  window.B1_WASHER=washer;
   const graphite=mat('#30383a',.24,{metalness:.12}),glassDoor=mat('#171d20',.14,{metalness:.22}),display=mat('#a9b8b1',.28,{emissive:0x16201d,emissiveIntensity:.12});
   const body=new T.Mesh(new T.BoxGeometry(65,95,64.5),graphite);body.position.y=47.5;body.castShadow=body.receiveShadow=true;washer.add(body);
   const trim=new T.Mesh(new T.TorusGeometry(23,2.5,12,56),mat('#5c6262',.23,{metalness:.55}));trim.position.set(0,47,-32.5);trim.castShadow=true;washer.add(trim);
@@ -275,16 +276,20 @@ item('原圖橫向廚具 235×60',239,670,235,60,()=>{
   box(239,728,235,1,75,cream,90);box(253,714,64,15,9,chrome,186);box(273,718,24,11,65,chrome,195);
 });
 // Panasonic NR-D505XGS-W cloud-rock white: upper French doors + two wide drawers.
+const fridgeDoors=[];
 item('Panasonic NR-D505XGS-W 雲岩白四門冰箱',474,670,72.1,69.5,()=>{
   const glassWhite=mat('#e7e5dc',.19,{metalness:.08}),edge=mat('#aeb1ad',.22,{metalness:.18});
-  box(474,670,72.1,69.5,183.4,white,2);
+  box(474,670,2.2,69.5,183.4,white,2);box(543.9,670,2.2,69.5,183.4,white,2);box(476.2,737,67.7,2.5,183.4,white,2);
+  for(const z of [2,90,183.2])box(476.2,670,67.7,67,2.2,white,z);
+  for(const z of [112,137,161])box(477,678,66,55,1.2,glass,z);
+  for(const [x,y,z]of [[485,704,115],[507,714,140],[526,707,115]])cyl(x,y,4,14,cream,z);
   // Upper doors: left leaf is narrower than the right. Drawers below span full width.
-  box(474.6,666.8,28.5,1.2,91,glassWhite,92);box(504,666.8,41,1.2,91,glassWhite,92);
+  fridgeDoors.push(box(474.6,666.8,28.5,1.2,91,glassWhite,92),box(504,666.8,41,1.2,91,glassWhite,92));
   box(474.6,666.8,70.9,1.2,33,glassWhite,57);box(474.6,666.8,70.9,1.2,47,glassWhite,8);
   // Fine shadow gaps reproduce the four-door arrangement without wood trim or handles.
-  box(474.4,666.2,71.2,1.5,1.1,edge,91.7);box(502.9,666.2,1.1,1.5,91,edge,92.2);
+  box(474.4,666.2,71.2,1.5,1.1,edge,91.7);
   box(474.4,666.2,71.2,1.5,1.1,edge,56);box(474.4,666.2,71.2,1.5,1.1,edge,8);
-  box(539.3,666.7,2,1.2,2,dark,177);
+  const fridgeControl=box(539.3,666.7,2,1.2,2,dark,177);fridgeDoors[1].attach(fridgeControl);
 });
 const applianceDoors=[];
 item('頂天電器櫃 80 cm',546.1,670,80,70,()=>{
@@ -347,4 +352,4 @@ function distanceToSegment(x,y,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],l=dx*dx+dy*d
 function canStand(x,y){if(!rooms.some(([rx,ry,w,d])=>x>=rx&&x<=rx+w&&y>=ry&&y<=ry+d))return false;for(const f of furniture){if(/地毯|隱藏門/.test(f.name))continue;if(x>f.x-12&&x<f.x+f.w+12&&y>f.y-12&&y<f.y+f.d+12)return false}for(const p of B1_PLAN.walls)for(let i=1;i<p.points.length;i++)if(distanceToSegment(x,y,p.points[i-1],p.points[i])<12)return false;for(const w of windowSpecs){const a=w.axis==='h'?[w.from,w.line]:[w.line,w.from],b=w.axis==='h'?[w.to,w.line]:[w.line,w.to];if(distanceToSegment(x,y,a,b)<16)return false;}if(leaf.visible&&x>808&&x<922&&y>638&&y<697)return false;return true}
 svg.style.cursor='crosshair';svg.addEventListener('click',e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse()),y=1100-q.y;if(canStand(q.x,y)){if(!walking)setTour(true);walkX=q.x;walkY=y}});
 window.B1_REVIEW.canStand=canStand;window.B1_REVIEW.setTour=setTour;
-let lastTime=performance.now();function frame(now=performance.now()){if(!window.B1_REVIEW?.ready){lastTime=now;requestAnimationFrame(frame);return;}const dt=Math.min((now-lastTime)/1000,.05);lastTime=now;window.B1_GAME?.tick(dt,now);const stacked=compare&&matchMedia('(max-width:650px)').matches;const w=compare&&!stacked?view.clientWidth/2:view.clientWidth,h=stacked?view.clientHeight/2:view.clientHeight;if(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio())){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}if(walking){let forward=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0),side=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0);const speed=95*dt/Math.max(1,Math.hypot(forward,side)),dx=(Math.sin(walkYaw)*forward+Math.cos(walkYaw)*side)*speed,dy=(Math.cos(walkYaw)*forward-Math.sin(walkYaw)*side)*speed;if(canStand(walkX+dx,walkY))walkX+=dx;if(canStand(walkX,walkY+dy))walkY+=dy;camera.position.copy(W(walkX,walkY,160));camera.lookAt(W(walkX+Math.sin(walkYaw)*100,walkY+Math.cos(walkYaw)*100,160+Math.tan(lookPitch)*100));}else{camera.position.set(target.x+radius*Math.cos(pitch)*Math.sin(yaw),target.y+radius*Math.sin(pitch),target.z+radius*Math.cos(pitch)*Math.cos(yaw));camera.lookAt(target)}visitor.setAttribute('transform',`translate(${walkX} ${1100-walkY}) rotate(${walkYaw*180/Math.PI})`);visitor.style.display=walking?'':'none';renderer.render(scene,camera);requestAnimationFrame(frame)}select(configs[location.hash.slice(1)]?location.hash.slice(1):'all');if(new URLSearchParams(location.search).has('tour'))setTour(true);if(new URLSearchParams(location.search).has('compare'))compareButton.click();frame();document.head.append(detailScript);
+let lastTime=performance.now();function frame(now=performance.now()){if(!window.B1_REVIEW?.ready){lastTime=now;requestAnimationFrame(frame);return;}const dt=Math.min((now-lastTime)/1000,.05);lastTime=now;const stacked=compare&&matchMedia('(max-width:650px)').matches;const w=compare&&!stacked?view.clientWidth/2:view.clientWidth,h=stacked?view.clientHeight/2:view.clientHeight;if(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio())){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}if(walking){let forward=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0),side=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0);const speed=95*dt/Math.max(1,Math.hypot(forward,side)),dx=(Math.sin(walkYaw)*forward+Math.cos(walkYaw)*side)*speed,dy=(Math.cos(walkYaw)*forward-Math.sin(walkYaw)*side)*speed;if(canStand(walkX+dx,walkY))walkX+=dx;if(canStand(walkX,walkY+dy))walkY+=dy;camera.position.copy(W(walkX,walkY,160));camera.lookAt(W(walkX+Math.sin(walkYaw)*100,walkY+Math.cos(walkYaw)*100,160+Math.tan(lookPitch)*100));}else{camera.position.set(target.x+radius*Math.cos(pitch)*Math.sin(yaw),target.y+radius*Math.sin(pitch),target.z+radius*Math.cos(pitch)*Math.cos(yaw));camera.lookAt(target)}window.B1_GAME?.tick(dt,now);visitor.setAttribute('transform',`translate(${walkX} ${1100-walkY}) rotate(${walkYaw*180/Math.PI})`);visitor.style.display=walking?'':'none';renderer.render(scene,camera);requestAnimationFrame(frame)}select(configs[location.hash.slice(1)]?location.hash.slice(1):'all');if(new URLSearchParams(location.search).has('tour'))setTour(true);if(new URLSearchParams(location.search).has('compare'))compareButton.click();frame();document.head.append(detailScript);

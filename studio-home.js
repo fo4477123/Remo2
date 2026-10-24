@@ -1,13 +1,13 @@
 /* Warm-home walkthrough: phone input, rendering budget, and design validation. */
 (() => {
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261024-explore1';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261024-life1';document.head.append(css);
   const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<850;
   document.body.classList.add('home-ready');
   // Full-height walls and real windows are the default; cutaway is opt-in.
   const wallToggle=document.querySelector('#walls');wallToggle.checked=false;wallToggle.dispatchEvent(new Event('change'));
-  document.querySelector('.intro').textContent='青埔・五樓的暖木日常。洗白橡木、霧面奶油牆與柔和燈光，沿著真實尺寸走進每個房間。';
+  document.querySelector('.intro').textContent='青埔八街與九街路口・五樓的暖木日常。客廳朝高鐵桃園站，後側為青松街。拉開窗簾，沿著生活動線探索每個房間。';
   document.querySelector('.edition').textContent='QINGPU / WARM HOME';
-  const status=document.querySelector('.status');status.textContent='互動設計預覽｜青埔五樓情境。窗外為生成示意，非本戶實拍；窗台依你的指定為50／150 cm，窗頂與天花高度仍為假設。家具淨距及衛浴設備需現場複核。';
+  const status=document.querySelector('.status');status.textContent='互動設計預覽｜青埔八街 × 青埔九街，客廳朝高鐵桃園站，後側青松街；窗外為依方向製作的區域情境。窗台50／150 cm，家具淨距與完成面尺寸須現場複核。';
   const controls=document.createElement('details');controls.className='home-controls';
   const summary=document.createElement('summary');summary.textContent='燈光、家具與顯示設定';controls.append(summary);
   const toolbar=document.querySelector('.toolbar');toolbar.before(controls);controls.append(toolbar);
@@ -112,7 +112,7 @@
   const capture=document.createElement('button');capture.id='capture-view';capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{renderer.render(scene,camera);const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Curated photoreal render gallery: these are high-detail design views, while
   // the canvas above remains the measured interactive model.
-  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261024-explore1'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
+  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261024-life1'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
   const gallery=document.createElement('section');gallery.className='render-gallery';gallery.innerHTML='<div class="render-gallery__head"><div><p class="overline">PREMIUM RENDER COLLECTION</p><b>高級空間渲染</b></div><label>選擇空間 <select aria-label="選擇高級渲染空間"></select></label></div><figure><img alt="高級室內設計渲染"><figcaption></figcaption></figure>';
   const gallerySelect=gallery.querySelector('select'),galleryImage=gallery.querySelector('img'),galleryCaption=gallery.querySelector('figcaption');
   for(const [key,[label]] of Object.entries(premiumRenders)){const option=document.createElement('option');option.value=key;option.textContent=label;gallerySelect.append(option);}
@@ -135,8 +135,12 @@
   else if(mobile&&!location.hash&&!location.search){renderButton.click();}
   select(selected);
   B1_REVIEW.audit=()=>({windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
-  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261024-explore1';
-  const loadGame=()=>{const s=document.createElement('script');s.src='studio-game.js?v=20261024-explore1';s.onload=()=>{B1_REVIEW.ready=true;loading.remove();};s.onerror=()=>{B1_REVIEW.ready=true;loading.textContent='探索功能載入失敗；仍可查看模型，請重新整理重試。';};document.head.append(s);};
+  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261024-life1';
+  const loadGame=()=>{
+    const life=document.createElement('script');life.src='studio-life.js?v=20261024-life1';
+    const attachGame=()=>{const s=document.createElement('script');s.src='studio-game.js?v=20261024-life1';s.onload=()=>{B1_REVIEW.ready=true;if(B1_REVIEW.gameReady)loading.remove();else loadFailure('探索功能');};s.onerror=()=>loadFailure('探索功能');document.head.append(s);};
+    life.onload=()=>{if(window.B1_LIFE)attachGame();else loadFailure('生活互動');};life.onerror=()=>loadFailure('生活互動');document.head.append(life);
+  };
   renderScript.onload=loadGame;renderScript.onerror=loadGame;document.head.append(renderScript);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clearMovement();loading.textContent='圖形記憶體暫時不足，請重新載入頁面。';view.append(loading);});
 })();

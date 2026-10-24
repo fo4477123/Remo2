@@ -66,14 +66,17 @@
   scene.traverse(m=>{if(m.isMesh&&m.geometry.parameters?.width===210&&m.geometry.parameters?.depth===250)m.material=rugMat;});
   // Replace the former narrow curtain bars with flowing fabric panels.
   const curtainMat=new T.MeshStandardMaterial({color:'#eee5d6',roughness:.98,side:T.DoubleSide,map:tex,transparent:true,opacity:.9});
+  window.B1_CURTAINS=[];
   for(const [x,width,y]of [[454,180,1067],[764,120,1067],[999,180,1002]]){
+    const panels=[];
     for(const m of [...scene.children])if(m.isMesh&&m.material===linen&&m.geometry.parameters?.width===3&&Math.abs(m.position.z-(700-y-4.5))<1){scene.remove(m);}
     for(const edge of [x-7,x+width-28]){
       const g=new T.PlaneGeometry(38,242,36,32),a=g.attributes.position;
       for(let i=0;i<a.count;i++){const xx=a.getX(i),yy=a.getY(i);a.setZ(i,Math.sin(xx*.65)*2.4+Math.sin(yy*.018)*.6);a.setY(i,yy+Math.cos(xx*.65)*.6);}g.computeVertexNormals();
-      const m=new T.Mesh(g,curtainMat);m.position.copy(W(edge+19,y-4,132));m.receiveShadow=true;scene.add(m);
+      const m=new T.Mesh(g,curtainMat);m.position.copy(W(edge+19,y-4,132));m.receiveShadow=true;scene.add(m);panels.push(m);
     }
     box(x-10,y-8,width+20,9,6,cream,254);
+    B1_CURTAINS.push({id:x===454?'master':x===764?'media':'living',x,width,y,panels,openX:panels.map(m=>m.position.x)});
   }
   // Reflection environment from neutral interior surfaces and large window lights.
   const envScene=new T.Scene();envScene.background=new T.Color('#b8b7b0');
@@ -91,15 +94,23 @@
   configs.living.text='洗白橡木SPC材質示意：122 × 18 cm錯縫拼接、細木紋及霧面反光；搭配亞麻、奶油色礦物牆和暖光。尺寸與色澤為本次設計假設。';
   if(selected==='living')document.querySelector('#description').textContent=configs.living.text;
   window.B1_REVIEW.finishes={plankCount,plankVariants:boards.length,daylightCount:daylight.length,environment:true};
-  // Distant, softly coloured exterior gives the real window openings depth.
-  const skyCanvas=document.createElement('canvas');skyCanvas.width=32;skyCanvas.height=256;const skyCtx=skyCanvas.getContext('2d'),skyGradient=skyCtx.createLinearGradient(0,0,0,256);skyGradient.addColorStop(0,'#b3c7d7');skyGradient.addColorStop(.65,'#e7e9e3');skyGradient.addColorStop(1,'#9eafa3');skyCtx.fillStyle=skyGradient;skyCtx.fillRect(0,0,32,256);
-  const exteriorMaterial=new T.MeshBasicMaterial({map:texture(skyCanvas),side:T.DoubleSide,fog:false});
-  const exterior=new T.Mesh(new T.PlaneGeometry(8000,4500),exteriorMaterial);exterior.position.copy(W(750,4500,230));scene.add(exterior);
-  const westExterior=exterior.clone();westExterior.position.copy(W(-3500,650,230));westExterior.rotation.y=Math.PI/2;scene.add(westExterior);
-  const southExterior=exterior.clone();southExterior.position.copy(W(750,-3300,230));southExterior.rotation.y=Math.PI;scene.add(southExterior);
-  const eastExterior=exterior.clone();eastExterior.position.copy(W(4500,650,230));eastExterior.rotation.y=-Math.PI/2;scene.add(eastExterior);
-  const exteriorAsset=document.createElement('script');exteriorAsset.src='exterior-texture.js';exteriorAsset.onload=()=>new T.TextureLoader().load(window.B1_EXTERIOR_DATA,map=>{map.colorSpace=T.SRGBColorSpace;map.anisotropy=renderer.capabilities.getMaxAnisotropy();exteriorMaterial.map=map;exteriorMaterial.needsUpdate=true;window.B1_REVIEW.exteriorLoaded=true;});document.head.append(exteriorAsset);
-  const exteriorNight=()=>exteriorMaterial.color.set(nightControl.checked?'#414b65':'#ffffff');nightControl.addEventListener('change',exteriorNight);exteriorNight();
+  // One continuous panorama: living-room +CAD-y points toward Taoyuan HSR.
+  // The other headings show adjacent streets rather than cloning that facade.
+  const exteriorMaterial=new T.MeshBasicMaterial({color:'#d5e0df',side:T.BackSide,fog:false,depthWrite:false,toneMapped:false});
+  const exterior=new T.Mesh(new T.SphereGeometry(6000,64,32),exteriorMaterial);exterior.name='qingpu-360-environment';exterior.position.copy(W(750,690,160));exterior.rotation.y=Math.PI/2;exterior.renderOrder=-10;scene.add(exterior);
+  camera.far=20000;camera.updateProjectionMatrix();
+  B1_REVIEW.exterior={location:'青埔八街 × 青埔九街',rear:'青松街',livingFacing:'高鐵桃園站',floor:5,kind:'generated-regional-panorama',continuous:true};
+  new T.TextureLoader().load('assets/qingpu-8th-9th-panorama.jpg?v=20261024-life1',map=>{map.colorSpace=T.SRGBColorSpace;map.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());map.wrapS=T.RepeatWrapping;exteriorMaterial.color.set('#ffffff');exteriorMaterial.map=map;exteriorMaterial.needsUpdate=true;B1_REVIEW.exteriorLoaded=true;window.B1_EXTERIOR?.setMood(window.B1_GAME?.snapshot().scene||(document.querySelector('#night').checked?'night':'day'));},undefined,()=>{B1_REVIEW.exteriorLoaded=false;});
+  window.B1_EXTERIOR={material:exteriorMaterial,setMood:mode=>{exteriorMaterial.color.set(mode==='night'?'#344362':mode==='dusk'?'#e2bca1':'#ffffff');}};
+  // A forward-facing detail plate keeps the station view crisp at window scale.
+  // Project it onto the same sky sphere so the plate never forms a floating card.
+  const detailGeometry=new T.PlaneGeometry(9600,4800,48,24),detailVertices=detailGeometry.attributes.position;
+  for(let i=0;i<detailVertices.count;i++){const p=new T.Vector3(detailVertices.getX(i),detailVertices.getY(i)-400,-5000).normalize().multiplyScalar(5995);detailVertices.setXYZ(i,p.x,p.y,p.z);}
+  const detailMaterial=new T.MeshBasicMaterial({color:'#ffffff',depthWrite:false,depthTest:false,toneMapped:false,fog:false});
+  const stationDetail=new T.Mesh(detailGeometry,detailMaterial);stationDetail.name='qingpu-station-detail';stationDetail.position.copy(exterior.position);stationDetail.renderOrder=-9;stationDetail.visible=false;scene.add(stationDetail);
+  const setExteriorMood=B1_EXTERIOR.setMood;B1_EXTERIOR.setMood=mode=>{setExteriorMood(mode);detailMaterial.color.copy(exteriorMaterial.color);};
+  new T.TextureLoader().load('assets/qingpu-station-facing.jpg?v=20261024-life1',map=>{map.colorSpace=T.SRGBColorSpace;map.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());detailMaterial.map=map;detailMaterial.needsUpdate=true;stationDetail.visible=true;B1_REVIEW.exteriorDetailLoaded=true;B1_EXTERIOR.setMood(window.B1_GAME?.snapshot().scene||(nightControl.checked?'night':'day'));},undefined,()=>{B1_REVIEW.exteriorDetailLoaded=false;});
+  const exteriorNight=()=>B1_EXTERIOR.setMood(nightControl.checked?'night':'day');nightControl.addEventListener('change',exteriorNight);exteriorNight();
   // Rounded linen pillows with stitched seams, fitted within the existing sofa.
   function pillow(x,y,z,color){const material=linen.clone();material.color.set(color);const g=new T.SphereGeometry(1,28,20);const a=g.attributes.position;for(let i=0;i<a.count;i++){const px=a.getX(i),py=a.getY(i),pz=a.getZ(i);a.setXYZ(i,Math.sign(px)*Math.pow(Math.abs(px),.55)*8,Math.sign(py)*Math.pow(Math.abs(py),.55)*18,Math.sign(pz)*Math.pow(Math.abs(pz),.55)*18);}g.computeVertexNormals();const m=new T.Mesh(g,material);m.position.copy(W(x,y,z));m.rotation.z=-.16;m.castShadow=m.receiveShadow=true;scene.add(m);}
   pillow(1005,795,66,'#d1c5af');pillow(1007,945,65,'#939b85');
@@ -181,5 +192,5 @@
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
   }
-  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024-explore1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024-life1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
 })();
