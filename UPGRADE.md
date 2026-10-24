@@ -83,12 +83,14 @@ iPhone/Android hardware validation. Publish existing Pages repo and refresh loca
 - The toolbar and first-person proximity prompt can both open and close it; it remains outside the fixed-furniture collider so the entrance stays passable.
 
 ## Premium render gallery
-- Add eight curated, 16:9 photoreal design renders for the living room, kitchen, bedrooms, media room, both bathrooms and laundry balcony.
+- Add nine curated, 16:9 photoreal design renders for the living room, its concealed-door cabinet wall, kitchen, bedrooms, media room, both bathrooms and laundry balcony.
 - The website provides a space selector; choosing a view also selects the matching measured 3D room. Render images are a presentation layer, not a construction drawing.
-- Regenerate the seven non-living-room views against the B1 plan and existing 3D room layout: room footprint, furniture orientation, window position, appliance or fixture sizes, and balcony railing are constrained to their modeled arrangements.
+- Regenerate the eight non-living-room views against the B1 plan and existing 3D room layout: room footprint, furniture orientation, window position, appliance or fixture sizes, and balcony railing are constrained to their modeled arrangements.
 
 ## Revised kitchen, guest bath, and laundry
-- Remove the entry render from the gallery. Move the kitchen cooktop to the left end of the existing 235 x 60 cm counter and the sink to the right end; preserve refrigerator and appliance cabinet positions.
+- Replace the old entry render with a living-room-facing view of the concealed-door cabinet wall. Move the kitchen cooktop to the left end of the existing 235 x 60 cm counter and the sink to the right end; preserve refrigerator and appliance cabinet positions.
 - Swap the guest bathroom toilet and vanity. Place both against the left wall facing the room center; keep the tub and shower in their existing right-side bays.
 - Replace the laundry placeholder with LG WD-S15NDB geometry at 65 x 64.5 x 95 cm. Set its final orientation to 360 degrees (270 + 90), equivalent to the original inward-facing direction, and update the high-resolution balcony render.
 - Kitchen render and 3D specification use the Panasonic NR-D505XGS-W cloud-rock white four-door refrigerator (72.1 × 69.5 × 183.4 cm), with the cooktop on the left and sink on the right.
+- Recreate the kitchen render against Panasonic's official NR-D505XGS-W product image: two upper hinged doors (asymmetric split) and two full-width drawers, in white stone-glass finish.
+- Add a living-room-facing render of the continuous storage wall and flush guest-bath hidden door; the hidden door itself remains interactable in the measured model.
