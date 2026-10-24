@@ -17,7 +17,7 @@ function box(x,y,w,d,h,material,z=0,parent=scene){const m=new T.Mesh(new T.BoxGe
 function cyl(x,y,r,h,material,z=0){const m=new T.Mesh(new T.CylinderGeometry(r,r,h,48),material);m.position.copy(W(x,y,z+h/2));m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 function item(name,x,y,w,d,fn){
   // Apply the same placement correction to the model and plan footprint.
-  const shift=name==='180 cm 升降工作桌'?[135,0]:name==='主臥雙人床／轉向90度'?[-17,0]:[0,0];
+  const shift=name==='主臥雙人床／轉向90度'?[-17,0]:[0,0];
   const start=scene.children.length;fn();
   for(const mesh of scene.children.slice(start)){mesh.position.x+=shift[0];mesh.position.z-=shift[1];mesh.userData.furnitureName=name;}
   furniture.push({name,x:x+shift[0],y:y+shift[1],w,d});
@@ -118,14 +118,13 @@ item('圓角岩板折疊餐桌 90×40',820,685,90,40,()=>{
   box(820,680,90,3,32,oak,39);
 });
 item('60 cm 收納臥榻',739,1000,200,60,()=>{box(739,1000,200,60,37,oak);box(739,1000,200,60,7,linen,37);for(let x=740;x<930;x+=65){box(x,999,62,1,31,cream,3)}box(755,1020,45,30,10,sage,44)});
-item('200 cm 升降工作桌',739,775,65,200,()=>{
-  // 200 × 65 cm desktop along the right wall; its northern start and the 30 cm
-  // gap before the window bench preserve a clear central route.
-  box(739,775,65,200,4,oak,73);
-  for(const yy of [789,940]){box(750,yy,45,7,4,dark,6);box(770,yy,6,6,70,dark,6);}
+item('160 cm 升降工作桌／無窗側',739,790,65,160,()=>{
+  // Move the desk to the solid wall, facing into the room instead of the window.
+  box(739,790,65,160,4,oak,73);
+  for(const yy of [804,914]){box(750,yy,45,7,4,dark,6);box(770,yy,6,6,70,dark,6);}
   // Dual monitor / laptop zone, cable tray and a slim side drawer integrated below the top.
-  for(const yy of [810,885]){box(796,yy,3,48,30,black,77);box(780,yy+5,16,34,2,dark,77);}
-  box(742,783,4,184,3,dark,64);box(742,783,18,46,38,cream,20);
+  for(const yy of [822,880]){box(796,yy,3,48,30,black,77);box(780,yy+5,16,34,2,dark,77);}
+  box(742,798,4,144,3,dark,64);box(742,798,18,46,38,cream,20);
 });
 item('高階網布人體工學椅',805,850,66,65,()=>{
   // Mesh back, adjustable headrest, lumbar pad, 4D armrests and five-star base.
@@ -140,7 +139,7 @@ item('高階網布人體工學椅',805,850,66,65,()=>{
   for(const yy of [854,908]){box(823,yy,16,5,4,frame,67);box(828,yy,5,5,15,frame,49);}
   cyl(837,882,5,43,frame,2);for(const [x,y]of [[808,882],[828,852],[858,856],[858,908],[828,912]]){box(Math.min(837,x),Math.min(882,y),Math.abs(x-837)+4,Math.abs(y-882)+4,3,frame,3);cyl(x,y,4,5,dark,0);}
 });
-const designSpecs={style:'warm-japandi-premium',tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:200,depth:65},chair:{model:'PremiumMesh',width:66,depth:65},living:{sofa:[970,750,90,210],table:[1097,785,72,110],sofaToTable:37,tableToTvWall:51},guestBath:{vanity:[798,318,84,40],toilet:[772,432,66,42],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,66,42]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
+const designSpecs={style:'warm-japandi-premium',tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:160,depth:65,wall:'solid'},chair:{model:'PremiumMesh',width:66,depth:65},living:{sofa:[970,750,90,210],table:[1097,785,72,110],sofaToTable:37,tableToTvWall:51},guestBath:{vanity:[798,318,84,40],toilet:[772,432,66,42],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,66,42]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
 // Shortened to 70 cm so the desk chair has an unobstructed side route.
 item('影音輕量低櫃 70 cm',739,915,30,70,()=>{box(739,915,30,70,60,oak,8);for(const y of [917,951])box(768,y,2,32,54,cream,11);box(739,930,24,40,3,oak,122);cyl(751,940,6,15,cream,125);cyl(753,965,7,15,sage,68)});
 // Cabinet follows the bathroom north wall; door opening x829..909 stays clear.
@@ -269,7 +268,7 @@ const nightLights=[];for(const [x,y]of [[1100,800],[840,900],[860,640],[1070,580
 const configs={all:{target:[750,690],radius:1650,yaw:.6,pitch:.8,title:'全室配置',sub:'依 DWG 房間位置配置',text:'客廳在右側、最小臥室位於上方中央；將其規劃為影音工作室。淨高暫定 260 cm，牆體顯示為可切換剖面。'},living:{target:[1110,790],radius:560,yaw:1.2,pitch:.46,title:'木框沙發 × 玻璃收藏牆',sub:'客廳 / 暖木與留白',text:'220 cm 沙發沿影音室外牆擺放，朝向右側電視。展示櫃集中於電視兩端，以封閉底櫃收整日常雜物；淺色地毯統一客廳範圍。'},media:{target:[840,900],radius:490,yaw:.8,pitch:.65,title:'一間房，三種日常',sub:'影音 / 工作 / 收藏',text:'最小房暫採上方中央約 220 × 300 cm 臥室。60 cm 深臥榻沿窗、升降桌靠左牆、展示收納靠右牆。影音設備與座位視線待選型調整。'},entry:{target:[1080,570],radius:500,yaw:1,pitch:.6,title:'以同一片立面迎接回家',sub:'玄關 / 隱藏門概念',text:'玄關以淺橡木與奶油白櫃門串連入口。廁所隱藏門須依原門洞位置及開門方向確認；目前展示櫃體語彙與預留範圍。'},laundry:{target:[310,420],radius:500,yaw:-1,pitch:.7,title:'清爽的洗衣陽台',sub:'洗脫烘 / 耐潮工作檯',text:'LG 15 kg 機器先預留 65 × 75 cm 示意體積，並非已核對型號尺寸。陽台安排獨立洗衣檯面，後續依實際型號確認管線與維修空間。'}};
 configs.living.yaw=-1.12;configs.living.radius=700;
 configs.living.title='弧背沙發 × 石材茶几';configs.living.text='奶油色弧背模組沙發改採低矮、柔和的飯店式比例，搭配圓角石材升降茶几；桌緣至沙發保留約37 cm、至電視牆約51 cm。花台端不放植栽或高櫃，讓採光與主要動線保持留白。';
-configs.media.text='右牆改為 200 cm × 65 cm 升降桌；左側展示為 110 cm 長、30 cm 深的低櫃，僅搭配一片短層板。桌端至窗邊 60 cm 臥榻保留約30 cm，低櫃離開原門弧。';
+configs.media.text='升降桌改至無窗實牆側並縮為 160 × 65 cm，避免螢幕逆光；窗邊只保留 60 cm 臥榻與採光，中央通道保持開闊。';
 configs.entry.target=[935,560];configs.entry.yaw=.15;configs.entry.pitch=.4;configs.entry.text='隱藏門兩側為完整櫃體：浴室走道側保留 14 cm 淺挖備品格，並整合掃把／拖把的直立收納；面向客廳的立面則是平整封閉櫃門，沒有開孔。右側下方保留掃地機器人高度，上方為置物與封閉收納。隱藏門與櫃體切平、往廁所內開。';
 configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約275 × 55 × 260 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做 275 cm 長木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；260 cm高度為模型暫定值。'};
 configs.guest={target:[580,430],radius:570,yaw:.7,pitch:.85,title:'清空次臥櫃體，保留彈性',sub:'次臥 / 只保留客床與完整動線',text:'移除原本的衣櫃、書桌與零散櫃體，留下150×188 cm客床及完整門口動線。後續可依實際需求再放入活動式家具，不先以固定櫃體壓縮空間。'};

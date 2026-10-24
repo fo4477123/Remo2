@@ -165,9 +165,9 @@
     // The locally modelled mesh chair stays in place: the externally available
     // showcase chair is saturated red and would break the home's quiet palette.
     {id:'deskChair',disabled:true,url:null,fallbackName:'高階網布人體工學椅'},
-    {id:'refrigerator',url:'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/CommercialRefrigerator/glTF-Binary/CommercialRefrigerator.glb',placement:{x:474,y:670,width:72.1,depth:69.5,height:183.4},fallbackName:'Panasonic NR-D505XGS 冰箱'},
+    {id:'refrigerator',disabled:true,url:null,fallbackName:'Panasonic NR-D505XGS 冰箱'},
     // The desk model is rescaled to the approved 200 × 65 cm footprint.
-    {id:'sitStandDesk',url:'https://cdn.3dassets.dev/assets/27886/v1/model.glb',placement:{x:874,y:775,width:65,depth:200,height:75,rotate:Math.PI/2},fallbackName:'200 cm 升降工作桌'}
+    {id:'sitStandDesk',disabled:true,url:null,fallbackName:'160 cm 升降工作桌／無窗側'}
   ];
   window.B1_REVIEW.assetPolicy={remoteModels:true,plant:false,localFurnitureFallback:true};window.B1_REVIEW.premiumAssets=premiumAssets.map(({id,url,fallbackName,disabled=false})=>({id,url,fallbackName,disabled}));window.B1_REVIEW.gltfAssets=gltfAssets;
   function attachPremiumAssets(){

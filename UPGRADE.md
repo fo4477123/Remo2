@@ -69,3 +69,8 @@ iPhone/Android hardware validation. Publish existing Pages repo and refresh loca
 ## Material replacement pass
 - Outcome: replace simplified procedural wood where an online connection is available with a 2K CC0 PBR wood-floor set (albedo, normal and roughness); retain an offline procedural PBR fallback.
 - Calibration: fabric remains high-roughness, ceramic is glazed but non-metallic, dark metal is highly metallic, and architectural glass has low roughness. The shared environment/reflection and ACES pipeline preserve a consistent light response.
+
+## Reference-led living wall and media room
+- Reference direction: creamy oak full-height storage with fine panel reveals, a low floating TV cabinet, amber display niches and a low-glare black screen; this is a cinematic PBR target, not DLSS.
+- Media desk: moved from the window-side wall to the solid wall and reduced to 160 × 65 cm to prevent display glare and keep the window zone clear.
+- Refrigerator: the mismatched commercial showcase GLB is disabled; the correctly sized domestic refrigerator remains the rendered fallback until a suitable residential PBR asset is selected.

@@ -24,8 +24,8 @@
   const selectBefore=select;select=function(name){selectBefore(name);roomPicker.value=walkPicker.value=name;};
   configs.master.text='床頭靠左、150 × 188 cm雙人床向左微移17 cm，床尾至滑門面約66 cm；整牆衣櫥及浴室入口保留。這仍是偏緊的通道，須現場複核。';
   configs.living.text='77 吋電視置中於連續奶油色電視牆，搭配弧背模組沙發與圓角石材升降茶几；洗白橡木、礦物石材、織品與暖光統一成安靜的暖日式質感，花台端不放植栽，入口通道保持留白。';
-  configs.media.text='右側為200 × 65 cm升降桌，搭配高階網布人體工學椅與雙螢幕工作區；60 cm窗邊臥榻與桌端保留約30 cm。窗台離地50 cm。';
-  B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=37;B1_REVIEW.clearances.tableToTV=51;B1_REVIEW.clearances.mediaDeskLength=200;B1_REVIEW.clearances.mediaDeskToBench=30;
+  configs.media.text='160 × 65 cm升降桌改放無窗實牆側，搭配高階網布人體工學椅與雙螢幕工作區；窗邊維持臥榻與採光，不再讓螢幕面對窗戶。';
+  B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=37;B1_REVIEW.clearances.tableToTV=51;B1_REVIEW.clearances.mediaDeskLength=160;B1_REVIEW.clearances.mediaDeskToBench=50;
   B1_REVIEW.windows=windowSpecs;
 
   // Geometry instancing reduces hundreds of floor draw calls to a handful.
