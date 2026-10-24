@@ -85,3 +85,4 @@ iPhone/Android hardware validation. Publish existing Pages repo and refresh loca
 ## Premium render gallery
 - Add nine curated, 16:9 photoreal design renders for the living room, kitchen, bedrooms, media room, both bathrooms, entry and laundry balcony.
 - The website provides a space selector; choosing a view also selects the matching measured 3D room. Render images are a presentation layer, not a construction drawing.
+- Regenerate the eight non-living-room views against the B1 plan and existing 3D room layout: room footprint, furniture orientation, window position, appliance or fixture sizes, entry clearance, and balcony railing are constrained to their modeled arrangements.
