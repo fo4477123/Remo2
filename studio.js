@@ -140,7 +140,7 @@ item('高階網布人體工學椅',805,850,66,65,()=>{
   for(const yy of [854,908]){box(823,yy,16,5,4,frame,67);box(828,yy,5,5,15,frame,49);}
   cyl(837,882,5,43,frame,2);for(const [x,y]of [[808,882],[828,852],[858,856],[858,908],[828,912]]){box(Math.min(837,x),Math.min(882,y),Math.abs(x-837)+4,Math.abs(y-882)+4,3,frame,3);cyl(x,y,4,5,dark,0);}
 });
-const designSpecs={style:'warm-japandi-premium',tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:200,depth:65},chair:{model:'PremiumMesh',width:66,depth:65},living:{sofa:[970,750,90,210],table:[1097,785,72,110],sofaToTable:37,tableToTvWall:51},guestBath:{vanity:[772,432,84,40],toilet:[798,318,42,66],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,42,66]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
+const designSpecs={style:'warm-japandi-premium',tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:200,depth:65},chair:{model:'PremiumMesh',width:66,depth:65},living:{sofa:[970,750,90,210],table:[1097,785,72,110],sofaToTable:37,tableToTvWall:51},guestBath:{vanity:[798,318,84,40],toilet:[772,432,66,42],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,66,42]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
 // Shortened to 70 cm so the desk chair has an unobstructed side route.
 item('影音輕量低櫃 70 cm',739,915,30,70,()=>{box(739,915,30,70,60,oak,8);for(const y of [917,951])box(768,y,2,32,54,cream,11);box(739,930,24,40,3,oak,122);cyl(751,940,6,15,cream,125);cyl(753,965,7,15,sage,68)});
 // Cabinet follows the bathroom north wall; door opening x829..909 stays clear.
@@ -178,17 +178,17 @@ function vessel(x,y,w,d,h,z,material){
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();
   const m=new T.Mesh(g,material);m.material.side=T.DoubleSide;m.position.copy(W(x,y,z));m.castShadow=m.receiveShadow=true;scene.add(m);return m;
 }
-// Guest bathroom: the dry fixtures are deliberately swapped at the owner's request.
-// Clockwise from the entrance: toilet at upper-left, vanity at lower-left, then a square tub
+// Guest bathroom: dry fixtures return to their opposite bays, and the toilet faces sideways.
+// Clockwise from the entrance: vanity at upper-left, toilet at lower-left, then a square tub
 // and the separate shower bay on the right, divided by the existing I-BATH glass line.
-item('客用衛浴馬桶／上左',798,318,42,66,()=>{
-  const base=cyl(819,356,14,28,ceramic,3);base.scale.z=1.35;
-  vessel(819,355,42,55,15,27,ceramic);box(801,318,36,14,65,ceramic,3);cyl(818,324,2,1,chrome,68);
+item('客用衛浴洗手台／上左',798,318,84,40,()=>{
+  box(798,318,84,40,43,oak,30);box(796,316,88,44,4,ceramic,73);
+  vessel(840,338,52,30,13,77,ceramic);box(863,334,3,3,20,chrome,77);box(851,334,15,3,3,chrome,95);
+  box(798,315,84,1.5,78,mat('#bac5c5',.08,{metalness:.85}),105);
 });
-item('客用衛浴洗手台／下左',772,432,84,40,()=>{
-  box(772,432,84,40,43,oak,30);box(770,430,88,44,4,ceramic,73);
-  vessel(814,452,52,30,13,77,ceramic);box(837,448,3,3,20,chrome,77);box(825,448,15,3,3,chrome,95);
-  box(772,429,84,1.5,78,mat('#bac5c5',.08,{metalness:.85}),105);
+item('客用衛浴馬桶／下左轉向',772,432,66,42,()=>{
+  const base=cyl(805,453,14,28,ceramic,3);base.scale.z=1.35;
+  vessel(805,453,55,42,15,27,ceramic);box(772,435,14,36,65,ceramic,3);cyl(778,452,2,1,chrome,68);
 });
 item('客用衛浴方形浴缸 110×100',924,310,110,100,()=>{
   vessel(979,360,110,100,55,0,ceramic);cyl(1008,328,3,1,chrome,8);
@@ -213,9 +213,9 @@ item('主臥衛浴洗手台／入口側',241,752,42,62,()=>{
   box(241,752,42,62,45,oak,30);vessel(263,783,42,60,12,77,ceramic);
   box(243,776,3,3,20,chrome,79);box(243,776,14,3,3,chrome,96);
 });
-item('主臥衛浴馬桶／淋浴前',246,837,42,66,()=>{
-  const pedestal=cyl(267,875,14,28,ceramic,3);pedestal.scale.z=1.3;
-  vessel(267,874,42,55,15,27,ceramic);box(249,837,36,14,65,ceramic,3);
+item('主臥衛浴馬桶／淋浴前轉向',246,837,66,42,()=>{
+  const pedestal=cyl(279,858,14,28,ceramic,3);pedestal.scale.z=1.3;
+  vessel(279,858,55,42,15,27,ceramic);box(246,840,14,36,65,ceramic,3);
 });
 item('隱藏門 80 cm／齊平內開',829,553,80,3,()=>{const leaf=box(829,553,80,3,230,cream);hiddenDoorHinge.attach(leaf);box(829,553,80,3,30,oak,230)});
 item('連續工作平台／延伸至大門',974,520,130,35,()=>{
@@ -237,7 +237,7 @@ item('陽台直條格柵欄',220,300,12,250,()=>{
   box(230,293,108,7,4,rail,0);box(230,293,108,7,4,rail,112);
 });
 item('主臥飯店級軟包雙人床／轉向90度',425,890,188,150,()=>{box(425,890,188,150,12,oak,14);softBox(425,890,188,150,22,linen,24);softBox(417,890,12,150,82,mat('#c2b4a3',.94),18);for(const yy of [902,972])softBox(438,yy,35,58,11,cream,46);box(538,890,75,150,3,sage,47)});
-item('主臥整牆頂天滑門衣櫥',664,765,55,295,()=>{box(664,765,55,295,260,oak);for(let y=767;y<1058;y+=73){box(662,y,2,71,254,oak,3);box(660,y+61,2,2,35,dark,100)}});
+item('主臥整牆頂天滑門衣櫥 275 cm',664,765,55,275,()=>{box(664,765,55,275,260,oak);for(let y=767;y<1038;y+=73){box(662,y,2,71,254,oak,3);box(660,y+61,2,2,35,dark,100)}});
 item('次臥飯店級客床 150×188',415,320,150,188,()=>{box(415,320,150,188,12,oak,14);softBox(415,320,150,188,22,linen,24);softBox(415,508,150,10,76,mat('#c2b4a3',.94),16);softBox(430,465,110,35,12,cream,46)});
 item('原圖橫向廚具 235×60',239,670,235,60,()=>{
   // Cabinet shell and split counter leave an actual recess for the stainless sink.
@@ -271,7 +271,7 @@ configs.living.yaw=-1.12;configs.living.radius=700;
 configs.living.title='弧背沙發 × 石材茶几';configs.living.text='奶油色弧背模組沙發改採低矮、柔和的飯店式比例，搭配圓角石材升降茶几；桌緣至沙發保留約37 cm、至電視牆約51 cm。花台端不放植栽或高櫃，讓採光與主要動線保持留白。';
 configs.media.text='右牆改為 200 cm × 65 cm 升降桌；左側展示為 110 cm 長、30 cm 深的低櫃，僅搭配一片短層板。桌端至窗邊 60 cm 臥榻保留約30 cm，低櫃離開原門弧。';
 configs.entry.target=[935,560];configs.entry.yaw=.15;configs.entry.pitch=.4;configs.entry.text='隱藏門兩側為完整櫃體：浴室走道側保留 14 cm 淺挖備品格，並整合掃把／拖把的直立收納；面向客廳的立面則是平整封閉櫃門，沒有開孔。右側下方保留掃地機器人高度，上方為置物與封閉收納。隱藏門與櫃體切平、往廁所內開。';
-configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約295 × 55 × 260 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做滿木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；260 cm高度為模型暫定值。'};
+configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約275 × 55 × 260 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做 275 cm 長木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；260 cm高度為模型暫定值。'};
 configs.guest={target:[580,430],radius:570,yaw:.7,pitch:.85,title:'清空次臥櫃體，保留彈性',sub:'次臥 / 只保留客床與完整動線',text:'移除原本的衣櫃、書桌與零散櫃體，留下150×188 cm客床及完整門口動線。後續可依實際需求再放入活動式家具，不先以固定櫃體壓縮空間。'};
 configs.laundry.text='LG 15 kg洗脫烘已移到原位置對面並旋轉180度，門面朝室內；仍須確認給排水、插座、散熱與維修空間。';
 configs.kitchen={target:[470,690],radius:620,yaw:-.7,pitch:.7,title:'橫向廚具＋冰箱與頂天電器櫃',sub:'NR-D505XGS / 72.1 × 69.5 × 183.4 cm',text:'保留原圖I-KITCHEN的235 × 60 cm橫向檯面；右端接Panasonic NR-D505XGS冰箱，再接80 cm寬、70 cm深頂天電器櫃，設微波／蒸烤設備凹槽與上方封閉收納。冰箱散熱、插座、門片全開與通道尺寸仍須以現場及原廠安裝圖複核。'};

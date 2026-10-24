@@ -38,6 +38,23 @@
   const plaster=document.createElement('canvas');plaster.width=plaster.height=256;const p=plaster.getContext('2d'),pixels=p.createImageData(256,256);
   for(let i=0;i<pixels.data.length;i+=4){const value=120+random()*16;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;pixels.data[i+3]=255;}p.putImageData(pixels,0,0);
   cream.bumpMap=texture(plaster,false);cream.bumpMap.repeat.set(4,4);cream.bumpScale=.025;cream.roughness=.9;cream.metalness=0;cream.needsUpdate=true;
+  // Source high-resolution CC0 PBR maps from Poly Haven when online. These
+  // replace only the corresponding procedural fallback after every map arrives.
+  // A visitor who is offline keeps the existing locally generated material.
+  const pbrSource='https://api.polyhaven.com/files/wood_floor';
+  const mapFrom=(files,key)=>files?.[key]?.['2k']?.jpg?.url||files?.[key]?.['2k']?.png?.url;
+  fetch(pbrSource).then(r=>r.ok?r.json():Promise.reject()).then(files=>{
+    const diffuse=mapFrom(files,'diff'),normal=mapFrom(files,'nor_gl'),roughness=mapFrom(files,'rough');
+    if(!diffuse||!normal||!roughness)return;
+    const load=url=>new Promise((resolve,reject)=>new T.TextureLoader().load(url,t=>{t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=renderer.capabilities.getMaxAnisotropy();resolve(t)},undefined,reject));
+    return Promise.all([load(diffuse),load(normal),load(roughness)]).then(([color,norm,rough])=>{
+      color.colorSpace=T.SRGBColorSpace;for(const m of [...boards,oak]){m.map=color.clone();m.normalMap=norm.clone();m.roughnessMap=rough.clone();m.map.repeat.set(m===oak?3:2,4);m.normalMap.repeat.copy(m.map.repeat);m.roughnessMap.repeat.copy(m.map.repeat);m.roughness=.52;m.metalness=.03;m.needsUpdate=true;}
+      B1_REVIEW.materialLibrary={wood:'Poly Haven Wood Floor CC0',maps:['albedo','normal','roughness'],fallback:'local procedural PBR'};
+    });
+  }).catch(()=>{B1_REVIEW.materialLibrary={wood:'local procedural PBR fallback',maps:['albedo','bump','roughness']};});
+  // Material response is calibrated by surface category, so warm daylight does
+  // not make fabric look plastic or ceramic look like unfinished concrete.
+  linen.roughness=.94;linen.metalness=0;ceramic.roughness=.18;ceramic.metalness=0;chrome.roughness=.16;chrome.metalness=.92;glass.roughness=.045;glass.metalness=.08;
   // Soft furniture grounding: transparent radial contact shadows, no baked scene image.
   const shadowCanvas=document.createElement('canvas');shadowCanvas.width=shadowCanvas.height=128;const s=shadowCanvas.getContext('2d');const gradient=s.createRadialGradient(64,64,8,64,64,64);gradient.addColorStop(0,'rgba(39,29,18,.3)');gradient.addColorStop(.6,'rgba(39,29,18,.18)');gradient.addColorStop(1,'rgba(39,29,18,0)');s.fillStyle=gradient;s.fillRect(0,0,128,128);
   const shadowMaterial=new T.MeshBasicMaterial({map:texture(shadowCanvas),transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1});
@@ -141,7 +158,7 @@
   }
   const premiumAssets=[
     // CC0, detailed piped two-seat sofa — warm timber and upholstery suit the living room.
-    {id:'livingSofa',url:'https://cdn.3dassets.dev/assets/16990/v1/model.glb',placement:{x:970,y:750,width:90,depth:210,height:82,rotate:Math.PI/2},fallbackName:'奶油弧背模組沙發'},
+    {id:'livingSofa',disabled:true,url:null,fallbackName:'奶油弧背模組沙發'},
     // CC0 platform bed with textured bedding, used in the two bedroom footprints.
     {id:'masterBed',url:'https://www.innerscene.com/api/library/platform-bed-with-bedding-original-interior-furnishing-d69cf237/download',placement:{x:408,y:890,width:188,depth:150,height:105},fallbackName:'主臥飯店級軟包雙人床／轉向90度'},
     {id:'guestBed',url:'https://www.innerscene.com/api/library/platform-bed-with-bedding-original-interior-furnishing-d69cf237/download',placement:{x:415,y:320,width:150,depth:188,height:92},fallbackName:'次臥飯店級客床 150×188'},
@@ -152,7 +169,7 @@
     // The desk model is rescaled to the approved 200 × 65 cm footprint.
     {id:'sitStandDesk',url:'https://cdn.3dassets.dev/assets/27886/v1/model.glb',placement:{x:874,y:775,width:65,depth:200,height:75,rotate:Math.PI/2},fallbackName:'200 cm 升降工作桌'}
   ];
-  window.B1_REVIEW.assetPolicy={remoteModels:true,plant:false,localFurnitureFallback:true};window.B1_REVIEW.premiumAssets=premiumAssets.map(({id,url,fallbackName})=>({id,url,fallbackName}));window.B1_REVIEW.gltfAssets=gltfAssets;
+  window.B1_REVIEW.assetPolicy={remoteModels:true,plant:false,localFurnitureFallback:true};window.B1_REVIEW.premiumAssets=premiumAssets.map(({id,url,fallbackName,disabled=false})=>({id,url,fallbackName,disabled}));window.B1_REVIEW.gltfAssets=gltfAssets;
   function attachPremiumAssets(){
     if(attachPremiumAssets.done||!window.B1_GLTFLoader)return;attachPremiumAssets.done=true;const loader=new window.B1_GLTFLoader();premiumAssets.filter(asset=>!asset.disabled).forEach(asset=>loadPremiumAsset(loader,asset));
   }

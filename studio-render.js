@@ -6,7 +6,7 @@
   targetBuffer.samples=renderer.capabilities.isWebGL2?2:0;
   const postScene=new T.Scene(),postCamera=new T.OrthographicCamera(-1,1,1,-1,0,1);
   const material=new T.ShaderMaterial({
-    uniforms:{colorBuffer:{value:targetBuffer.texture},depthBuffer:{value:depth},resolution:{value:new T.Vector2(1,1)},inverseProjection:{value:camera.projectionMatrixInverse},projection:{value:camera.projectionMatrix},aoStrength:{value:.35}},
+    uniforms:{colorBuffer:{value:targetBuffer.texture},depthBuffer:{value:depth},resolution:{value:new T.Vector2(1,1)},inverseProjection:{value:camera.projectionMatrixInverse},projection:{value:camera.projectionMatrix},aoStrength:{value:.35},sharpness:{value:.18}},
     vertexShader:'varying vec2 vUv; void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
     fragmentShader:`
       varying vec2 vUv;
@@ -25,6 +25,7 @@
         vec3 w=texture2D(colorBuffer,vUv-vec2(px.x,0.)).rgb;
         float contrast=max(max(luma(n),luma(s)),max(luma(e),luma(w)))-min(min(luma(n),luma(s)),min(luma(e),luma(w)));
         color=mix(color,(n+s+e+w+color*4.)/8.,smoothstep(.12,.6,contrast)*.45);
+        color=clamp(color+(color-(n+s+e+w)*.25)*sharpness,0.,1.);
         vec3 p=positionAt(vUv);
         // Choose the shorter depth neighbour to avoid turning silhouettes into dark halos.
         vec3 dx1=positionAt(vUv+vec2(px.x,0.))-p,dx2=p-positionAt(vUv-vec2(px.x,0.));
@@ -60,4 +61,5 @@
   const shadeControl=document.createElement('label');shadeControl.textContent='細緻接觸陰影 ';
   const shadeToggle=document.createElement('input');shadeToggle.type='checkbox';shadeToggle.checked=true;shadeToggle.onchange=()=>material.uniforms.aoStrength.value=shadeToggle.checked?.35:0;shadeControl.prepend(shadeToggle);document.querySelector('.toolbar').append(shadeControl);
   B1_REVIEW.rendering='HDR + screen-space contact shading';
+  B1_REVIEW.renderProfile='cinematic-webgl';
 })();

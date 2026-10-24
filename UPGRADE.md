@@ -60,3 +60,12 @@ iPhone/Android hardware validation. Publish existing Pages repo and refresh loca
 - Bathroom: swap the guest-bath dry fixtures: toilet in the upper-left bay (798,318) and vanity in the lower-left bay (772,432). The tub, shower enclosure and walkable route remain in their existing CAD-aligned bays.
 - Non-goals: this remains a centimetre-scale interactive design study, not a construction drawing or a procurement schedule. No dependency or hosting change is introduced.
 - Acceptance: no tree is present; selected CC0 GLTF models only replace their matching local fallback after success; plan labels and collision footprints match the revised furniture; all room stops stay walkable; the revised guest-bath coordinates are exposed to QA; desktop and phone browser checks complete without runtime errors.
+
+## Cinematic rendering and proximity interaction
+- Outcome: deliver a browser-native cinematic quality profile with PBR, HDR tone mapping, environment reflections, contact shading and adaptive render resolution. This approximates a contemporary AAA interior render but is not NVIDIA DLSS.
+- Interaction: in first-person tour, nearby hidden door, cleaning cabinet, wardrobe and appliance cabinet expose one shared prompt. Press E on desktop or tap the prompt on touch to toggle; state can be changed repeatedly without disrupting walking.
+- Acceptance: no unavailable GPU feature is claimed; each prompt targets the nearest in-range object, can open and close it, and touch / keyboard interactions leave movement and existing door collision behavior intact.
+
+## Material replacement pass
+- Outcome: replace simplified procedural wood where an online connection is available with a 2K CC0 PBR wood-floor set (albedo, normal and roughness); retain an offline procedural PBR fallback.
+- Calibration: fabric remains high-roughness, ceramic is glazed but non-metallic, dark metal is highly metallic, and architectural glass has low roughness. The shared environment/reflection and ACES pipeline preserve a consistent light response.

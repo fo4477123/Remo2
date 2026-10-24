@@ -12,8 +12,8 @@
   const roomPicker=document.createElement('select');roomPicker.className='room-picker';roomPicker.setAttribute('aria-label','前往房間');
   document.querySelector('.workspace').insertBefore(roomPicker,controls);
   // Add a direct bathroom stop and keep all room choices available on small screens.
-  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'馬桶・洗手台・方形浴缸・乾濕分離',text:'依你的要求互換乾區位置：上左為馬桶、下左為洗手台；右上保留 110 × 100 cm 方形浴缸，右下為獨立淋浴區。玻璃線沿 I-BATH 分隔，尺寸仍須現場放樣複核。'};
-  configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴',text:'已依你指出的方向互換設備：入口側為洗手台，淋浴前為馬桶，保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
+  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'洗手台・馬桶・方形浴缸・乾濕分離',text:'乾區已再次互換：上左為洗手台、下左為馬桶；馬桶轉向側牆。右上保留 110 × 100 cm 方形浴缸，右下為獨立淋浴區。玻璃線沿 I-BATH 分隔，尺寸仍須現場放樣複核。'};
+  configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴',text:'入口側為洗手台、淋浴前為馬桶；馬桶已轉向側牆，保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
   stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
   const bathButton=document.createElement('button');bathButton.dataset.room='bath';bathButton.textContent='09　浴室';bathButton.onclick=()=>{select('bath');if(walking){[walkX,walkY,walkYaw]=stops.bath;lookPitch=-.48;}};document.querySelector('.rooms').append(bathButton);
   const ensuiteButton=document.createElement('button');ensuiteButton.dataset.room='ensuite';ensuiteButton.textContent='10　主臥衛浴';ensuiteButton.onclick=()=>{select('ensuite');if(walking){[walkX,walkY,walkYaw]=stops.ensuite;lookPitch=-.35;}};document.querySelector('.rooms').append(ensuiteButton);
@@ -113,6 +113,24 @@
   for(const [label,factor]of [['＋',.82],['−',1.22]]){const b=document.createElement('button');b.textContent=label;b.setAttribute('aria-label',factor<1?'拉近':'拉遠');b.onclick=()=>radius=Math.max(200,Math.min(2800,radius*factor));zoom.append(b);}view.append(zoom);
   // Keep plan-only mode from continuing a walk offscreen.
   document.querySelector('[data-mode="plan"]').addEventListener('click',clearMovement);
+
+  // GTA-style proximity actions: each target keeps its own state and exposes a
+  // single keyboard/touch affordance only while the visitor is nearby.
+  const prompt=document.createElement('button');prompt.className='interaction-prompt';prompt.hidden=true;prompt.style.cssText='position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:8;padding:12px 18px;border:1px solid #e9ddc8;border-radius:7px;background:#26342e;color:#fff;font:inherit;box-shadow:0 6px 20px #0006';view.append(prompt);
+  const wardrobePanels=[];const wardrobePanelMat=oak.clone();
+  for(const [y,d]of [[767,134],[903,134]]){const p=box(661.5,y,2,d,252,wardrobePanelMat,4);wardrobePanels.push(p);}
+  let wardrobeOpen=false,cabinetOpen=false;
+  const originalPanelZ=wardrobePanels.map(p=>p.position.z);
+  const storageAction=()=>{wardrobeOpen=!wardrobeOpen;wardrobePanels.forEach((p,i)=>p.position.z=originalPanelZ[i]+(wardrobeOpen?(i?-62:62):0));renderer.shadowMap.needsUpdate=true;};
+  const interactables=[
+    {name:'浴室隱藏門',x:869,y:554,action:()=>doorButton.click()},
+    {name:'清潔櫃',x:940,y:540,action:()=>cleaningButton.click()},
+    {name:'主臥衣櫥',x:690,y:900,action:storageAction},
+    {name:'電器櫃',x:585,y:705,action:()=>{cabinetOpen=!cabinetOpen;scene.traverse(m=>{if(m.userData?.furnitureName==='頂天電器櫃 80 cm'&&m.geometry.parameters?.width===36)m.visible=!cabinetOpen;});renderer.shadowMap.needsUpdate=true;}}
+  ];
+  let nearby=null;const updateInteraction=()=>{nearby=walking?interactables.map(o=>({...o,d:Math.hypot(walkX-o.x,walkY-o.y)})).filter(o=>o.d<85).sort((a,b)=>a.d-b.d)[0]||null:null;prompt.hidden=!nearby;prompt.textContent=nearby?`E　${nearby.name} ${nearby.name==='主臥衣櫥'&&wardrobeOpen?'關閉':'互動'}`:'';requestAnimationFrame(updateInteraction);};updateInteraction();
+  const interact=()=>{if(nearby)nearby.action();};prompt.onclick=interact;addEventListener('keydown',e=>{if(e.key.toLowerCase()==='e'&&nearby){e.preventDefault();interact();}});
+  B1_REVIEW.interaction={targets:interactables.map(({name,x,y})=>({name,x,y})),toggle:interact};
 
   // A chair is a physical obstacle as well as a visible object.
   const previousStand=canStand;canStand=(x,y)=>{
