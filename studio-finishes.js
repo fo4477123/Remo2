@@ -178,5 +178,5 @@
     const importMap=document.createElement('script');importMap.type='importmap';importMap.textContent='{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js"}}';document.head.append(importMap);
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
-  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024-layout6';document.head.append(homeScript);
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024-layout7';document.head.append(homeScript);
 })();
