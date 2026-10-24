@@ -60,6 +60,11 @@
   };
   const shadeControl=document.createElement('label');shadeControl.textContent='細緻接觸陰影 ';
   const shadeToggle=document.createElement('input');shadeToggle.type='checkbox';shadeToggle.checked=true;shadeToggle.onchange=()=>material.uniforms.aoStrength.value=shadeToggle.checked?.35:0;shadeControl.prepend(shadeToggle);document.querySelector('.toolbar').append(shadeControl);
-  B1_REVIEW.rendering='HDR + screen-space contact shading';
-  B1_REVIEW.renderProfile='cinematic-webgl';
+  // Some integrated GPUs return an invalid depth sample for the offscreen
+  // pass, which can turn the whole view black. Keep the cinematic PBR scene
+  // on Three.js' native, broadly compatible render path; the shader remains
+  // available for a later opt-in profile rather than owning the main renderer.
+  renderer.render=renderOriginal;
+  B1_REVIEW.rendering='ACES PBR + native anti-aliasing (safe)';
+  B1_REVIEW.renderProfile='cinematic-webgl-safe';
 })();
