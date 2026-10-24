@@ -3,6 +3,8 @@
   const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261024';document.head.append(css);
   const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<850;
   document.body.classList.add('home-ready');
+  // Full-height walls and real windows are the default; cutaway is opt-in.
+  const wallToggle=document.querySelector('#walls');wallToggle.checked=false;wallToggle.dispatchEvent(new Event('change'));
   document.querySelector('.intro').textContent='青埔・五樓的暖木日常。洗白橡木、霧面奶油牆與柔和燈光，沿著真實尺寸走進每個房間。';
   document.querySelector('.edition').textContent='QINGPU / WARM HOME';
   const status=document.querySelector('.status');status.textContent='互動設計預覽｜青埔五樓情境。窗外為生成示意，非本戶實拍；窗台依你的指定為50／150 cm，窗頂與天花高度仍為假設。家具淨距及衛浴設備需現場複核。';
@@ -13,7 +15,7 @@
   document.querySelector('.workspace').insertBefore(roomPicker,controls);
   // Add a direct bathroom stop and keep all room choices available on small screens.
   configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'洗手台・馬桶・方形浴缸・乾濕分離',text:'乾區已再次互換：上左為洗手台、下左為馬桶；馬桶轉向側牆。右上保留 110 × 100 cm 方形浴缸，右下為獨立淋浴區。玻璃線沿 I-BATH 分隔，尺寸仍須現場放樣複核。'};
-  configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴',text:'入口側為洗手台、淋浴前為馬桶；馬桶已轉向側牆，保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
+  configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴・高窗',text:'入口側為洗手台、淋浴前為馬桶；馬桶已轉向側牆。左側外牆補上與次臥同比例的 150 cm 窗台高窗，並重建窗洞下牆、過梁、窗框與玻璃；保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
   stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
   const bathButton=document.createElement('button');bathButton.dataset.room='bath';bathButton.textContent='09　浴室';bathButton.onclick=()=>{select('bath');if(walking){[walkX,walkY,walkYaw]=stops.bath;lookPitch=-.48;}};document.querySelector('.rooms').append(bathButton);
   const ensuiteButton=document.createElement('button');ensuiteButton.dataset.room='ensuite';ensuiteButton.textContent='10　主臥衛浴';ensuiteButton.onclick=()=>{select('ensuite');if(walking){[walkX,walkY,walkYaw]=stops.ensuite;lookPitch=-.35;}};document.querySelector('.rooms').append(ensuiteButton);
@@ -24,7 +26,7 @@
   const selectBefore=select;select=function(name){selectBefore(name);roomPicker.value=walkPicker.value=name;};
   configs.master.text='床頭靠左、150 × 188 cm雙人床向左微移17 cm，床尾至滑門面約66 cm；整牆衣櫥及浴室入口保留。這仍是偏緊的通道，須現場複核。';
   configs.living.text='77 吋電視置中於連續奶油色電視牆，搭配弧背模組沙發與圓角石材升降茶几；洗白橡木、礦物石材、織品與暖光統一成安靜的暖日式質感，花台端不放植栽，入口通道保持留白。';
-  configs.media.text='160 × 65 cm升降桌改放無窗實牆側，搭配高階網布人體工學椅與雙螢幕工作區；窗邊維持臥榻與採光，不再讓螢幕面對窗戶。';
+  configs.media.text='160 × 65 cm升降桌移到對面實牆，搭配高階網布人體工學椅與雙螢幕工作區；窗邊維持臥榻與採光，不再讓螢幕面對窗戶。';
   B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=37;B1_REVIEW.clearances.tableToTV=51;B1_REVIEW.clearances.mediaDeskLength=160;B1_REVIEW.clearances.mediaDeskToBench=50;
   B1_REVIEW.windows=windowSpecs;
 
@@ -101,13 +103,23 @@
   canvas.onpointermove=e=>{if(document.pointerLockElement===canvas||e.pointerId===lookPointer)oldMove(e);};
   canvas.onpointerup=canvas.onpointercancel=canvas.onlostpointercapture=e=>{if(e.pointerId===lookPointer){lookPointer=null;oldUp(e);}};
   window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearMovement();});
-  const tourBefore=setTour;setTour=function(enabled){clearMovement();tourBefore(enabled);if(enabled)lookPitch=selected==='bath'?-.48:-.22;document.body.classList.toggle('is-walking',enabled);renderer.shadowMap.needsUpdate=true;};
+  const tourBefore=setTour;setTour=function(enabled){clearMovement();tourBefore(enabled);if(enabled)lookPitch=selected==='bath'?-.48:-.22;else{wallToggle.checked=false;wallToggle.dispatchEvent(new Event('change'));}document.body.classList.toggle('is-walking',enabled);renderer.shadowMap.needsUpdate=true;};
   B1_REVIEW.setTour=setTour;
   document.body.classList.toggle('is-walking',walking);
   help.textContent=mobile?'左下移動・右側拖曳轉頭・上方切換房間':'WASD 移動・拖曳轉頭・上方選擇房間';
   const immersive=document.createElement('button');immersive.className='immersive-button';immersive.textContent='沉浸參觀';
   immersive.onclick=()=>{const on=!view.classList.contains('immersive');view.classList.toggle('immersive',on);document.body.classList.toggle('immersed',on);immersive.textContent=on?'結束全畫面':'沉浸參觀';if(on&&!walking){select('living');renderButton.click();}};view.append(immersive);
   const capture=document.createElement('button');capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
+  // Curated photoreal render gallery: these are high-detail design views, while
+  // the canvas above remains the measured interactive model.
+  const premiumRenders={living:['客廳','renders/living-premium.png'],kitchen:['餐廚','renders/kitchen-premium.png'],master:['主臥','renders/master-premium.png'],media:['多功能室','renders/media-premium.png'],guest:['次臥','renders/guest-premium.png'],bath:['客用衛浴','renders/bath-premium.png'],ensuite:['主臥衛浴','renders/ensuite-premium.png'],entry:['玄關','renders/entry-premium.png'],laundry:['洗衣陽台','renders/laundry-premium.png']};
+  const gallery=document.createElement('section');gallery.className='render-gallery';gallery.innerHTML='<div class="render-gallery__head"><div><p class="overline">PREMIUM RENDER COLLECTION</p><b>高級空間渲染</b></div><label>選擇空間 <select aria-label="選擇高級渲染空間"></select></label></div><figure><img alt="高級室內設計渲染"><figcaption></figcaption></figure>';
+  const gallerySelect=gallery.querySelector('select'),galleryImage=gallery.querySelector('img'),galleryCaption=gallery.querySelector('figcaption');
+  for(const [key,[label]] of Object.entries(premiumRenders)){const option=document.createElement('option');option.value=key;option.textContent=label;gallerySelect.append(option);}
+  const showPremiumRender=name=>{const entry=premiumRenders[name]||premiumRenders.living;gallerySelect.value=premiumRenders[name]?name:'living';galleryImage.src=entry[1];galleryImage.alt=`${entry[0]}高級室內設計渲染`;galleryCaption.textContent=`${entry[0]} · 暖日式／北歐質感 · 材質與燈光提案`;};
+  gallerySelect.onchange=()=>{select(gallerySelect.value);document.querySelector('[data-mode="3d"]').click();gallery.scrollIntoView({behavior:'smooth',block:'nearest'});};
+  const gallerySelectBefore=select;select=function(name){gallerySelectBefore(name);showPremiumRender(name);};showPremiumRender(selected);
+  document.querySelector('.workspace').append(gallery);
   // Phone-friendly plus/minus for orbit zoom, where wheel input is unavailable.
   const zoom=document.createElement('div');zoom.className='orbit-zoom';
   for(const [label,factor]of [['＋',.82],['−',1.22]]){const b=document.createElement('button');b.textContent=label;b.setAttribute('aria-label',factor<1?'拉近':'拉遠');b.onclick=()=>radius=Math.max(200,Math.min(2800,radius*factor));zoom.append(b);}view.append(zoom);
@@ -123,6 +135,7 @@
   const originalPanelZ=wardrobePanels.map(p=>p.position.z);
   const storageAction=()=>{wardrobeOpen=!wardrobeOpen;wardrobePanels.forEach((p,i)=>p.position.z=originalPanelZ[i]+(wardrobeOpen?(i?-62:62):0));renderer.shadowMap.needsUpdate=true;};
   const interactables=[
+    {name:'入口大門',x:1158,y:540,action:()=>mainDoorButton.click()},
     {name:'浴室隱藏門',x:869,y:554,action:()=>doorButton.click()},
     {name:'清潔櫃',x:940,y:540,action:()=>cleaningButton.click()},
     {name:'主臥衣櫥',x:690,y:900,action:storageAction},

@@ -74,3 +74,14 @@ iPhone/Android hardware validation. Publish existing Pages repo and refresh loca
 - Reference direction: creamy oak full-height storage with fine panel reveals, a low floating TV cabinet, amber display niches and a low-glare black screen; this is a cinematic PBR target, not DLSS.
 - Media desk: moved from the window-side wall to the solid wall and reduced to 160 × 65 cm to prevent display glare and keep the window zone clear.
 - Refrigerator: the mismatched commercial showcase GLB is disabled; the correctly sized domestic refrigerator remains the rendered fallback until a suitable residential PBR asset is selected.
+
+## Ensuite exterior wall correction
+- Add an 80 cm wide upper-sill window to the master ensuite's left exterior wall, aligned in proportion with the guest-room high window (150 cm sill, 235 cm head). Rebuild all associated lower wall, lintel, frame, mullion and glazing geometry.
+
+## Main entry restoration
+- Restore a 110 cm hinged main entry door at the existing CAD threshold (1104, 505), with a solid oak frame, dark timber leaf, metal pull and threshold.
+- The toolbar and first-person proximity prompt can both open and close it; it remains outside the fixed-furniture collider so the entrance stays passable.
+
+## Premium render gallery
+- Add nine curated, 16:9 photoreal design renders for the living room, kitchen, bedrooms, media room, both bathrooms, entry and laundry balcony.
+- The website provides a space selector; choosing a view also selects the matching measured 3D room. Render images are a presentation layer, not a construction drawing.
