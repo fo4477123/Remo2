@@ -14,7 +14,7 @@
   const roomPicker=document.createElement('select');roomPicker.className='room-picker';roomPicker.setAttribute('aria-label','前往房間');
   document.querySelector('.workspace').insertBefore(roomPicker,controls);
   // Add a direct bathroom stop and keep all room choices available on small screens.
-  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'洗手台・馬桶・方形浴缸・乾濕分離',text:'乾區已再次互換：上左為洗手台、下左為馬桶；馬桶轉向側牆。右上保留 110 × 100 cm 方形浴缸，右下為獨立淋浴區。玻璃線沿 I-BATH 分隔，尺寸仍須現場放樣複核。'};
+  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'洗手台・馬桶・方形浴缸・乾濕分離',text:'洗手台與馬桶已交換：上左為馬桶、下左為洗手台，兩者都朝向房間中央；右上保留 110 × 100 cm 方形浴缸，右下為獨立淋浴區。玻璃線沿 I-BATH 分隔，尺寸仍須現場放樣複核。'};
   configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴・高窗',text:'入口側為洗手台、淋浴前為馬桶；馬桶已轉向側牆。左側外牆補上與次臥同比例的 150 cm 窗台高窗，並重建窗洞下牆、過梁、窗框與玻璃；保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
   stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
   const bathButton=document.createElement('button');bathButton.dataset.room='bath';bathButton.textContent='09　浴室';bathButton.onclick=()=>{select('bath');if(walking){[walkX,walkY,walkYaw]=stops.bath;lookPitch=-.48;}};document.querySelector('.rooms').append(bathButton);
@@ -112,11 +112,11 @@
   const capture=document.createElement('button');capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Curated photoreal render gallery: these are high-detail design views, while
   // the canvas above remains the measured interactive model.
-  const premiumRenders={living:['客廳','renders/living-premium.png'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout2'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout2'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],entry:['玄關','renders/entry-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout2']};
+  const premiumRenders={living:['客廳','renders/living-premium.png'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout4'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
   const gallery=document.createElement('section');gallery.className='render-gallery';gallery.innerHTML='<div class="render-gallery__head"><div><p class="overline">PREMIUM RENDER COLLECTION</p><b>高級空間渲染</b></div><label>選擇空間 <select aria-label="選擇高級渲染空間"></select></label></div><figure><img alt="高級室內設計渲染"><figcaption></figcaption></figure>';
   const gallerySelect=gallery.querySelector('select'),galleryImage=gallery.querySelector('img'),galleryCaption=gallery.querySelector('figcaption');
   for(const [key,[label]] of Object.entries(premiumRenders)){const option=document.createElement('option');option.value=key;option.textContent=label;gallerySelect.append(option);}
-  const showPremiumRender=name=>{const entry=premiumRenders[name]||premiumRenders.living;gallerySelect.value=premiumRenders[name]?name:'living';galleryImage.src=entry[1];galleryImage.alt=`${entry[0]}高級室內設計渲染`;galleryCaption.textContent=`${entry[0]} · 暖日式／北歐質感 · 材質與燈光提案`;};
+  const showPremiumRender=name=>{const key=name==='all'?'living':name,entry=premiumRenders[key];if(!entry){gallery.hidden=true;return;}gallery.hidden=false;gallerySelect.value=key;galleryImage.src=entry[1];galleryImage.alt=`${entry[0]}高級室內設計渲染`;galleryCaption.textContent=`${entry[0]} · 依平面配置與 3D 尺寸重整`;};
   gallerySelect.onchange=()=>{select(gallerySelect.value);document.querySelector('[data-mode="3d"]').click();gallery.scrollIntoView({behavior:'smooth',block:'nearest'});};
   const gallerySelectBefore=select;select=function(name){gallerySelectBefore(name);showPremiumRender(name);};showPremiumRender(selected);
   document.querySelector('.workspace').append(gallery);

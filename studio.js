@@ -140,7 +140,7 @@ item('高階網布人體工學椅',805,850,66,65,()=>{
   for(const yy of [854,908]){box(823,yy,16,5,4,frame,67);box(828,yy,5,5,15,frame,49);}
   cyl(837,882,5,43,frame,2);for(const [x,y]of [[808,882],[828,852],[858,856],[858,908],[828,912]]){box(Math.min(837,x),Math.min(882,y),Math.abs(x-837)+4,Math.abs(y-882)+4,3,frame,3);cyl(x,y,4,5,dark,0);}
 });
-const designSpecs={style:'warm-japandi-premium',tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:160,depth:65,wall:'opposite-solid'},chair:{model:'PremiumMesh',width:66,depth:65},living:{sofa:[970,750,90,210],table:[1097,785,72,110],sofaToTable:37,tableToTvWall:51},guestBath:{vanity:[798,318,84,40],toilet:[772,432,66,42],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,66,42]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
+const designSpecs={style:'warm-japandi-premium',tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:160,depth:65,wall:'opposite-solid'},chair:{model:'PremiumMesh',width:66,depth:65},living:{sofa:[970,750,90,210],table:[1097,785,72,110],sofaToTable:37,tableToTvWall:51},kitchen:{counter:[239,670,235,60],cooktop:[255,680,60,43],sink:[421,700,52,36],fridge:[474,670,72.1,69.5],applianceCabinet:[546.1,670,80,70]},guestBath:{vanity:[772,426,40,84],toilet:[772,318,66,42],vanityFacing:'east',toiletFacing:'east',squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,66,42]},laundry:{model:'LG WD-S15NDB',sizeCm:[65,95,64.5],rotationDeg:360,rotationSteps:[270,90]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
 // Shortened to 70 cm so the desk chair has an unobstructed side route.
 item('影音輕量低櫃 70 cm',739,915,30,70,()=>{box(739,915,30,70,60,oak,8);for(const y of [917,951])box(768,y,2,32,54,cream,11);box(739,930,24,40,3,oak,122);cyl(751,940,6,15,cream,125);cyl(753,965,7,15,sage,68)});
 // Cabinet follows the bathroom north wall; door opening x829..909 stays clear.
@@ -178,17 +178,16 @@ function vessel(x,y,w,d,h,z,material){
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();
   const m=new T.Mesh(g,material);m.material.side=T.DoubleSide;m.position.copy(W(x,y,z));m.castShadow=m.receiveShadow=true;scene.add(m);return m;
 }
-// Guest bathroom: dry fixtures return to their opposite bays, and the toilet faces sideways.
-// Clockwise from the entrance: vanity at upper-left, toilet at lower-left, then a square tub
-// and the separate shower bay on the right, divided by the existing I-BATH glass line.
-item('客用衛浴洗手台／上左',798,318,84,40,()=>{
-  box(798,318,84,40,43,oak,30);box(796,316,88,44,4,ceramic,73);
-  vessel(840,338,52,30,13,77,ceramic);box(863,334,3,3,20,chrome,77);box(851,334,15,3,3,chrome,95);
-  box(798,315,84,1.5,78,mat('#bac5c5',.08,{metalness:.85}),105);
+// Guest bathroom: swap the vanity and toilet, and align both fronts toward the room.
+// Their backs share the left wall; the tub and shower stay on the right.
+item('客用衛浴馬桶／上左面向房間',772,318,66,42,()=>{
+  const base=cyl(805,339,14,28,ceramic,3);base.scale.z=1.2;
+  vessel(805,339,55,42,15,27,ceramic);box(772,318,14,42,65,ceramic,3);box(777,320,6,10,2,chrome,68);
 });
-item('客用衛浴馬桶／下左轉向',772,432,66,42,()=>{
-  const base=cyl(805,453,14,28,ceramic,3);base.scale.z=1.35;
-  vessel(805,453,55,42,15,27,ceramic);box(772,435,14,36,65,ceramic,3);cyl(778,452,2,1,chrome,68);
+item('客用衛浴洗手台／下左面向房間',772,426,40,84,()=>{
+  box(772,426,40,84,43,oak,30);box(770,424,44,88,4,ceramic,73);
+  vessel(792,468,30,52,13,77,ceramic);box(777,464,3,3,18,chrome,79);box(777,464,14,3,3,chrome,95);
+  box(771,426,1.5,84,78,mat('#bac5c5',.08,{metalness:.85}),105);
 });
 item('客用衛浴方形浴缸 110×100',924,310,110,100,()=>{
   vessel(979,360,110,100,55,0,ceramic);cyl(1008,328,3,1,chrome,8);
@@ -235,7 +234,15 @@ const mainDoorHandle=box(1192,500,4,7,24,chrome,104);window.mainDoorHinge.attach
 // Solid oak jambs, head and threshold make the door legible in every view.
 box(1101,501,6,12,242,oak,2);box(1207,501,6,12,242,oak,2);box(1101,501,112,12,6,oak,242);box(1101,501,112,12,4,dark,0);
 });
-item('LG 洗脫烘預留／對面旋轉180度',310,320,75,65,()=>{box(310,320,75,65,85,white);const drum=new T.Mesh(new T.CylinderGeometry(23,23,3,48),black);drum.rotation.x=Math.PI/2;drum.position.copy(W(347.5,387,43));scene.add(drum);box(310,320,75,65,4,oak,90)});
+item('LG WD-S15NDB 洗脫烘／270度再轉90度',315,320.25,65,64.5,()=>{
+  const washer=new T.Group();washer.position.copy(W(347.5,352.5));washer.rotation.y=2*Math.PI;scene.add(washer);
+  const graphite=mat('#30383a',.24,{metalness:.12}),glassDoor=mat('#171d20',.14,{metalness:.22}),display=mat('#a9b8b1',.28,{emissive:0x16201d,emissiveIntensity:.12});
+  const body=new T.Mesh(new T.BoxGeometry(65,95,64.5),graphite);body.position.y=47.5;body.castShadow=body.receiveShadow=true;washer.add(body);
+  const trim=new T.Mesh(new T.TorusGeometry(23,2.5,12,56),mat('#5c6262',.23,{metalness:.55}));trim.position.set(0,47,-32.5);trim.castShadow=true;washer.add(trim);
+  const glassDoorMesh=new T.Mesh(new T.CylinderGeometry(20,20,1.4,48),glassDoor);glassDoorMesh.rotation.x=Math.PI/2;glassDoorMesh.position.set(0,47,-32.2);glassDoorMesh.castShadow=true;washer.add(glassDoorMesh);
+  const control=new T.Mesh(new T.BoxGeometry(29,7,1.5),graphite);control.position.set(0,87,-32);washer.add(control);
+  const screen=new T.Mesh(new T.BoxGeometry(9,3,1),display);screen.position.set(-9,87,-33);washer.add(screen);
+});
 // Balcony guard: slim vertical slats with a continuous top rail.
 item('陽台直條格柵欄',220,300,12,250,()=>{
   const rail=mat('#4a514c',.48,{metalness:.35});
@@ -248,20 +255,20 @@ item('主臥飯店級軟包雙人床／轉向90度',425,890,188,150,()=>{box(425
 item('主臥整牆頂天滑門衣櫥 275 cm',664,765,55,275,()=>{box(664,765,55,275,260,oak);for(let y=767;y<1038;y+=73){box(662,y,2,71,254,oak,3);box(660,y+61,2,2,35,dark,100)}});
 item('次臥飯店級客床 150×188',415,320,150,188,()=>{box(415,320,150,188,12,oak,14);softBox(415,320,150,188,22,linen,24);softBox(415,508,150,10,76,mat('#c2b4a3',.94),16);softBox(430,465,110,35,12,cream,46)});
 item('原圖橫向廚具 235×60',239,670,235,60,()=>{
-  // Cabinet shell and split counter leave an actual recess for the stainless sink.
+  // Keep the existing I-KITCHEN counter while swapping the cooktop and sink bays.
   box(239,670,235,60,7,oak,3);box(239,670,3,60,75,oak,10);box(471,670,3,60,75,oak,10);
   box(239,727,235,3,75,oak,10);
-  for(const [x,w]of [[239,16],[307,167]])box(x,670,w,60,4,cream,85);
-  box(255,670,52,12,4,cream,85);box(255,718,52,12,4,cream,85);
-  vessel(281,700,52,36,20,69,mat('#aeb5b3',.3,{metalness:.8}));
-  const curve=new T.CatmullRomCurve3([W(281,724,89),W(281,724,115),W(281,713,122),W(281,699,114)]);
+  for(const [x,w]of [[239,156],[447,27]])box(x,670,w,60,4,cream,85);
+  box(395,670,52,12,4,cream,85);box(395,718,52,12,4,cream,85);
+  vessel(421,700,52,36,20,69,mat('#aeb5b3',.3,{metalness:.8}));
+  const curve=new T.CatmullRomCurve3([W(421,724,89),W(421,724,115),W(421,713,122),W(421,699,114)]);
   const faucet=new T.Mesh(new T.TubeGeometry(curve,32,1.6,10,false),chrome);faucet.castShadow=true;scene.add(faucet);
-  box(391,680,60,43,2,black,89);for(const x of [404,435])cyl(x,701,9,1,dark,91);
+  box(255,680,60,43,2,black,89);for(const x of [270,300])cyl(x,701,9,1,dark,91);
   for(let x=241;x<470;x+=47){box(x,669,44,2,78,cream,5);box(x+13,667,18,2,1.5,dark,74);}
   box(239,728,235,1,75,cream,90);box(390,714,64,15,9,chrome,186);box(410,718,24,11,65,chrome,195);
 });
-// Panasonic NR-D505XGS: W72.1 × D69.5 × H183.4 cm.  Kept beside the existing counter run.
-item('Panasonic NR-D505XGS 冰箱',474,670,72.1,69.5,()=>{
+// Panasonic NR-D505XGS-W cloud-rock white: W72.1 × D69.5 × H183.4 cm.
+item('Panasonic NR-D505XGS-W 雲岩白四門冰箱',474,670,72.1,69.5,()=>{
   box(474,670,72.1,69.5,183.4,white,2);box(475,668,70.1,2,90,mat('#d8ddd9',.18,{metalness:.18}),4);box(475,668,70.1,2,89,mat('#eef0ea',.18,{metalness:.18}),95);
   box(510,666.5,2,2,179,oak,4);box(475,668,70.1,1,3,oak,92);box(475,668,70.1,1,3,oak,140);box(475,668,70.1,1,3,oak,175);
 });
@@ -281,8 +288,8 @@ configs.media.text='160 × 65 cm升降桌移到對面實牆，椅子面向桌面
 configs.entry.target=[935,560];configs.entry.yaw=.15;configs.entry.pitch=.4;configs.entry.text='隱藏門兩側為完整櫃體：浴室走道側保留 14 cm 淺挖備品格，並整合掃把／拖把的直立收納；面向客廳的立面則是平整封閉櫃門，沒有開孔。右側下方保留掃地機器人高度，上方為置物與封閉收納。隱藏門與櫃體切平、往廁所內開。';
 configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約275 × 55 × 260 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做 275 cm 長木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；260 cm高度為模型暫定值。'};
 configs.guest={target:[580,430],radius:570,yaw:.7,pitch:.85,title:'清空次臥櫃體，保留彈性',sub:'次臥 / 只保留客床與完整動線',text:'移除原本的衣櫃、書桌與零散櫃體，留下150×188 cm客床及完整門口動線。後續可依實際需求再放入活動式家具，不先以固定櫃體壓縮空間。'};
-configs.laundry.text='LG 15 kg洗脫烘已移到原位置對面並旋轉180度，門面朝室內；仍須確認給排水、插座、散熱與維修空間。';
-configs.kitchen={target:[470,690],radius:620,yaw:-.7,pitch:.7,title:'橫向廚具＋冰箱與頂天電器櫃',sub:'NR-D505XGS / 72.1 × 69.5 × 183.4 cm',text:'保留原圖I-KITCHEN的235 × 60 cm橫向檯面；右端接Panasonic NR-D505XGS冰箱，再接80 cm寬、70 cm深頂天電器櫃，設微波／蒸烤設備凹槽與上方封閉收納。冰箱散熱、插座、門片全開與通道尺寸仍須以現場及原廠安裝圖複核。'};
+configs.laundry.text='LG WD-S15NDB 15公斤洗脫烘（65 × 64.5 × 95 cm）放在既有陽台位置，依270度後再轉90度設定為360度；門面朝室內。現場仍需確認開門深度、給排水與插座。';
+configs.kitchen={target:[470,690],radius:620,yaw:-.7,pitch:.7,title:'橫向廚具＋冰箱與頂天電器櫃',sub:'235 × 60 cm 檯面 / Panasonic NR-D505XGS-W 雲岩白',text:'保留原圖 I-KITCHEN 235 × 60 cm 橫向檯面，瓦斯爐改在左端、水槽移到右端，接續 Panasonic NR-D505XGS-W 雲岩白四門冰箱（72.1 × 69.5 × 183.4 cm）與 80 × 70 cm 頂天電器櫃；爐、水槽、冰箱依同一檯面動線排列。冰箱散熱、插座、門片全開與通道尺寸仍須以現場及原廠安裝圖複核。'};
 for(const [name,label]of [['master','06　主臥'],['guest','07　次臥'],['kitchen','08　廚房']]){const b=document.createElement('button');b.dataset.room=name;b.textContent=label;document.querySelector('.rooms').append(b)}
 let selected='all',yaw=.6,pitch=.8,radius=1650,target=W(750,690,30);function select(name){selected=name;const c=configs[name];yaw=c.yaw;pitch=c.pitch;radius=c.radius;target=W(...c.target,35);document.querySelector('#title').textContent=c.title;document.querySelector('#description').textContent=c.text;document.querySelector('#subtitle').textContent=c.sub;document.querySelector('#viewname').textContent=c.title;document.querySelectorAll('[data-room]').forEach(b=>b.classList.toggle('active',b.dataset.room===name))}document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>select(b.dataset.room));document.querySelector('#reset').onclick=()=>select(selected);
 let walking=false,compare=false,walkX=1150,walkY=600,walkYaw=0,lookPitch=0,drag=null;
