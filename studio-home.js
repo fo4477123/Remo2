@@ -1,6 +1,6 @@
 /* Warm-home walkthrough: phone input, rendering budget, and design validation. */
 (() => {
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261024';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261024-explore1';document.head.append(css);
   const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<850;
   document.body.classList.add('home-ready');
   // Full-height walls and real windows are the default; cutaway is opt-in.
@@ -16,7 +16,7 @@
   // Add a direct bathroom stop and keep all room choices available on small screens.
   configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'洗手台・馬桶・方形浴缸・乾濕分離',text:'洗手台與馬桶已交換：上左為馬桶、下左為洗手台，兩者都朝向房間中央；右上保留 110 × 100 cm 方形浴缸，右下為獨立淋浴區。玻璃線沿 I-BATH 分隔，尺寸仍須現場放樣複核。'};
   configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴・高窗',text:'入口側為洗手台、淋浴前為馬桶；馬桶已轉向側牆。左側外牆補上與次臥同比例的 150 cm 窗台高窗，並重建窗洞下牆、過梁、窗框與玻璃；保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
-  stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
+  stops.entry=[1140,670,-2.35];stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
   const bathButton=document.createElement('button');bathButton.dataset.room='bath';bathButton.textContent='09　浴室';bathButton.onclick=()=>{select('bath');if(walking){[walkX,walkY,walkYaw]=stops.bath;lookPitch=-.48;}};document.querySelector('.rooms').append(bathButton);
   const ensuiteButton=document.createElement('button');ensuiteButton.dataset.room='ensuite';ensuiteButton.textContent='10　主臥衛浴';ensuiteButton.onclick=()=>{select('ensuite');if(walking){[walkX,walkY,walkYaw]=stops.ensuite;lookPitch=-.35;}};document.querySelector('.rooms').append(ensuiteButton);
   for(const b of document.querySelectorAll('[data-room]')){const opt=document.createElement('option');opt.value=b.dataset.room;opt.textContent=b.textContent.replace('↗','').trim();roomPicker.append(opt);}
@@ -109,14 +109,15 @@
   help.textContent=mobile?'左下移動・右側拖曳轉頭・上方切換房間':'WASD 移動・拖曳轉頭・上方選擇房間';
   const immersive=document.createElement('button');immersive.className='immersive-button';immersive.textContent='沉浸參觀';
   immersive.onclick=()=>{const on=!view.classList.contains('immersive');view.classList.toggle('immersive',on);document.body.classList.toggle('immersed',on);immersive.textContent=on?'結束全畫面':'沉浸參觀';if(on&&!walking){select('living');renderButton.click();}};view.append(immersive);
-  const capture=document.createElement('button');capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
+  const capture=document.createElement('button');capture.id='capture-view';capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{renderer.render(scene,camera);const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Curated photoreal render gallery: these are high-detail design views, while
   // the canvas above remains the measured interactive model.
-  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261024-layout4'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
+  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261024-explore1'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
   const gallery=document.createElement('section');gallery.className='render-gallery';gallery.innerHTML='<div class="render-gallery__head"><div><p class="overline">PREMIUM RENDER COLLECTION</p><b>高級空間渲染</b></div><label>選擇空間 <select aria-label="選擇高級渲染空間"></select></label></div><figure><img alt="高級室內設計渲染"><figcaption></figcaption></figure>';
   const gallerySelect=gallery.querySelector('select'),galleryImage=gallery.querySelector('img'),galleryCaption=gallery.querySelector('figcaption');
   for(const [key,[label]] of Object.entries(premiumRenders)){const option=document.createElement('option');option.value=key;option.textContent=label;gallerySelect.append(option);}
-  const showPremiumRender=name=>{const key=name==='all'?'living':name,entry=premiumRenders[key];if(!entry){gallery.hidden=true;return;}gallery.hidden=false;gallerySelect.value=key;galleryImage.src=entry[1];galleryImage.alt=`${entry[0]}高級室內設計渲染`;galleryCaption.textContent=`${entry[0]} · 依平面配置與 3D 尺寸重整`;};
+  galleryImage.loading='lazy';galleryImage.decoding='async';
+  const showPremiumRender=name=>{const key=name==='all'?'living':name,entry=premiumRenders[key];if(!entry){gallery.hidden=true;return;}gallery.hidden=false;gallerySelect.value=key;galleryImage.src=entry[1];galleryImage.alt=`${entry[0]}設計提案`;galleryCaption.textContent=`${entry[0]} · 材質與氣氛提案，配置以互動平面為準`;};
   gallerySelect.onchange=()=>{select(gallerySelect.value);document.querySelector('[data-mode="3d"]').click();gallery.scrollIntoView({behavior:'smooth',block:'nearest'});};
   const gallerySelectBefore=select;select=function(name){gallerySelectBefore(name);showPremiumRender(name);};showPremiumRender(selected);
   document.querySelector('.workspace').append(gallery);
@@ -126,31 +127,7 @@
   // Keep plan-only mode from continuing a walk offscreen.
   document.querySelector('[data-mode="plan"]').addEventListener('click',clearMovement);
 
-  // GTA-style proximity actions: each target keeps its own state and exposes a
-  // single keyboard/touch affordance only while the visitor is nearby.
-  const prompt=document.createElement('button');prompt.className='interaction-prompt';prompt.hidden=true;prompt.style.cssText='position:absolute;left:50%;bottom:20px;transform:translateX(-50%);z-index:8;padding:12px 18px;border:1px solid #e9ddc8;border-radius:7px;background:#26342e;color:#fff;font:inherit;box-shadow:0 6px 20px #0006';view.append(prompt);
-  const wardrobePanels=[];const wardrobePanelMat=oak.clone();
-  for(const [y,d]of [[767,134],[903,134]]){const p=box(661.5,y,2,d,252,wardrobePanelMat,4);wardrobePanels.push(p);}
-  let wardrobeOpen=false,cabinetOpen=false;
-  const originalPanelZ=wardrobePanels.map(p=>p.position.z);
-  const storageAction=()=>{wardrobeOpen=!wardrobeOpen;wardrobePanels.forEach((p,i)=>p.position.z=originalPanelZ[i]+(wardrobeOpen?(i?-62:62):0));renderer.shadowMap.needsUpdate=true;};
-  const interactables=[
-    {name:'入口大門',x:1158,y:540,action:()=>mainDoorButton.click()},
-    {name:'浴室隱藏門',x:869,y:554,action:()=>doorButton.click()},
-    {name:'清潔櫃',x:940,y:540,action:()=>cleaningButton.click()},
-    {name:'主臥衣櫥',x:690,y:900,action:storageAction},
-    {name:'電器櫃',x:585,y:705,action:()=>{cabinetOpen=!cabinetOpen;scene.traverse(m=>{if(m.userData?.furnitureName==='頂天電器櫃 80 cm'&&m.geometry.parameters?.width===36)m.visible=!cabinetOpen;});renderer.shadowMap.needsUpdate=true;}}
-  ];
-  let nearby=null;const updateInteraction=()=>{nearby=walking?interactables.map(o=>({...o,d:Math.hypot(walkX-o.x,walkY-o.y)})).filter(o=>o.d<85).sort((a,b)=>a.d-b.d)[0]||null:null;prompt.hidden=!nearby;prompt.textContent=nearby?`E　${nearby.name} ${nearby.name==='主臥衣櫥'&&wardrobeOpen?'關閉':'互動'}`:'';requestAnimationFrame(updateInteraction);};updateInteraction();
-  const interact=()=>{if(nearby)nearby.action();};prompt.onclick=interact;addEventListener('keydown',e=>{if(e.key.toLowerCase()==='e'&&nearby){e.preventDefault();interact();}});
-  B1_REVIEW.interaction={targets:interactables.map(({name,x,y})=>({name,x,y})),toggle:interact};
-
-  // A chair is a physical obstacle as well as a visible object.
-  const previousStand=canStand;canStand=(x,y)=>{
-    if(x>800&&x<875&&y>846&&y<920)return false;
-    if(doorOpen&&distanceToSegment(x,y,[829,475],[829,555])<14)return false;
-    return previousStand(x,y);
-  };B1_REVIEW.canStand=canStand;
+  // The game layer owns interaction state, animation and dynamic collisions.
   // Every jump target must be on free floor; pick the nearest free candidate if needed.
   for(const name of Object.keys(stops)){const p=stops[name];if(canStand(p[0],p[1]))continue;let found=null;for(let r=10;r<100&&!found;r+=10)for(let a=0;a<Math.PI*2;a+=Math.PI/8){const x=p[0]+Math.cos(a)*r,y=p[1]+Math.sin(a)*r;if(canStand(x,y)){found=[x,y,p[2]];break;}}if(found)stops[name]=found;}
   for(const b of document.querySelectorAll('[data-room]'))b.addEventListener('click',()=>{if(walking)lookPitch=b.dataset.room==='bath'?-.48:-.22;});
@@ -158,6 +135,8 @@
   else if(mobile&&!location.hash&&!location.search){renderButton.click();}
   select(selected);
   B1_REVIEW.audit=()=>({windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
-  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261024-home';renderScript.onload=()=>{B1_REVIEW.ready=true;loading.remove();};renderScript.onerror=()=>{B1_REVIEW.ready=true;loading.remove();};document.head.append(renderScript);
+  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261024-explore1';
+  const loadGame=()=>{const s=document.createElement('script');s.src='studio-game.js?v=20261024-explore1';s.onload=()=>{B1_REVIEW.ready=true;loading.remove();};s.onerror=()=>{B1_REVIEW.ready=true;loading.textContent='探索功能載入失敗；仍可查看模型，請重新整理重試。';};document.head.append(s);};
+  renderScript.onload=loadGame;renderScript.onerror=loadGame;document.head.append(renderScript);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clearMovement();loading.textContent='圖形記憶體暫時不足，請重新載入頁面。';view.append(loading);});
 })();

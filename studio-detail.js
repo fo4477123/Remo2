@@ -44,14 +44,13 @@
   // Actual door thresholds join the room rectangles used for navigation.
   const thresholds=[[614,665,115,90],[729,740,90,25],[829,500,80,65],[626,550,90,20],[239,548,145,20],[389,740,10,79]];
   for(const z of thresholds){rooms.push(z);box(...z,2,cream,-2,floorGroup);}
-  const originalCanStand=canStand;
-  canStand=function(x,y){if(!doorOpen&&x>829&&x<909&&y>541&&y<567)return false;return originalCanStand(x,y);};
+  // Door leaves are handled by the animated interaction layer, including their swing.
   stops.master=[640,840,-Math.PI/2];stops.living=[1100,700,.95];stops.entry=[970,620,Math.PI];
   camera.fov=65;camera.near=2;camera.updateProjectionMatrix();
   help.textContent='拖曳轉頭 · WASD 移動 · 右下角方向鍵 · 小地圖點選定位 · Esc 離開';
   document.querySelector('#reset').onclick=()=>{select(selected);if(walking){[walkX,walkY,walkYaw]=stops[selected];lookPitch=0;}};
   // View switching preserves the walk position when comparing with the plan.
-  document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const mode=b.dataset.mode;compare=mode==='compare';canvas.hidden=mode==='plan';svg.toggleAttribute('hidden',!(mode==='plan'||compare));renderPanel.hidden=true;renderPanel.style.display='none';view.classList.toggle('compare',compare);document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));if(mode==='render'){if(!walking){select('living');setTour(true);}}else if(mode==='3d')setTour(false);});
+  document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{const mode=b.dataset.mode;compare=mode==='compare';canvas.hidden=mode==='plan';svg.toggleAttribute('hidden',!(mode==='plan'||compare));renderPanel.hidden=true;renderPanel.style.display='none';view.classList.toggle('compare',compare);document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));if(mode==='render'){if(!walking){select('living');setTour(true);}}else if(mode==='3d'||mode==='plan')setTour(false);});
   const mini=svg.cloneNode(true);mini.id='tour-map';mini.removeAttribute('hidden');mini.setAttribute('aria-label','漫遊定位小地圖');mini.style.cssText='position:absolute;right:14px;top:14px;width:170px;height:140px;background:#f8f5ebe8;border:1px solid #c6b89e;border-radius:8px;cursor:crosshair;display:none';mini.querySelectorAll('text').forEach(t=>t.remove());view.append(mini);
   const miniVisitor=mini.querySelector('g:last-of-type');
   mini.onclick=e=>{const point=mini.createSVGPoint();point.x=e.clientX;point.y=e.clientY;const p=point.matrixTransform(mini.getScreenCTM().inverse());if(canStand(p.x,1100-p.y)){walkX=p.x;walkY=1100-p.y;}};
@@ -60,7 +59,7 @@
   function hud(){mini.style.display=walking&&!compare&&!canvas.hidden?'block':'none';if(miniVisitor)miniVisitor.setAttribute('transform',`translate(${walkX} ${1100-walkY}) rotate(${walkYaw*180/Math.PI})`);requestAnimationFrame(hud);}hud();
   window.B1_REVIEW.canStand=canStand;window.B1_REVIEW.getTourState=()=>({walking,x:walkX,y:walkY,yaw:walkYaw,compare,lights:lights.length});
   configs.living.text='依參考圖調整淡橡木、奶油色連續電視立面、櫃底與展示層板暖光。可用滑鼠轉頭、WASD行走，或用小地圖換位置。';
-  configs.entry.text='以客廳面向浴室門：右手側下方為掃地機器人；左手側為掃具高櫃及上方浴室用品開口。原機器人位置至大門旁改為130 cm連續工作平台，高94 cm，上方開放76 cm，搭配燈帶與上櫃。';
+  configs.entry.text='沿電視牆轉角看向大門，再接客衛隱藏門收納；右側室內動線延伸到主臥、多功能室、次臥與廚房。130 cm 工作檯與短收納立面保留原配置。';
   if(new URLSearchParams(location.search).has('realistic')){renderButton.click();}
-  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js?v=20261024-layout6';document.head.append(finishScript);
+  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js?v=20261024-explore1';finishScript.onerror=()=>loadFailure('材質');document.head.append(finishScript);
 })();

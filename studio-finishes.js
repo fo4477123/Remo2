@@ -23,10 +23,10 @@
   }
   // Replace room-wide strips with individual 122 x 18 cm staggered planks.
   for(const mesh of [...floorGroup.children])if(mesh.geometry.parameters.height<1){floorGroup.remove(mesh);mesh.geometry.dispose();}
-  let plankCount=0;
+  let plankCount=0;const wetTile=mat('#c9c5bb',.85);
   for(const [x,y,w,d]of rooms){
     const wet=(x===769&&y===300)||(x===239&&y===300)||(x===239&&y===740);
-    if(wet){for(let a=0;a<w;a+=60)for(let b=0;b<d;b+=60)box(x+a,y+b,Math.min(60,w-a)-.15,Math.min(60,d-b)-.15,.45,mat('#c9c5bb',.85),.05,floorGroup);continue;}
+    if(wet){for(let a=0;a<w;a+=60)for(let b=0;b<d;b+=60)box(x+a,y+b,Math.min(60,w-a)-.15,Math.min(60,d-b)-.15,.45,wetTile,.05,floorGroup);continue;}
     for(let row=0;row*18<d;row++){
       const yy=y+row*18,depth=Math.min(18,d-row*18),offset=[0,40,81][row%3];
       for(let start=-offset;start<w;start+=122){const from=Math.max(0,start),to=Math.min(w,start+122);if(to-from<.5)continue;
@@ -43,12 +43,14 @@
   // A visitor who is offline keeps the existing locally generated material.
   const pbrSource='https://api.polyhaven.com/files/wood_floor';
   const mapFrom=(files,key)=>files?.[key]?.['2k']?.jpg?.url||files?.[key]?.['2k']?.png?.url;
-  fetch(pbrSource).then(r=>r.ok?r.json():Promise.reject()).then(files=>{
+  const remoteAssets=new URLSearchParams(location.search).get('assets')==='remote';
+  B1_REVIEW.materialLibrary={wood:'local procedural PBR',maps:['albedo','bump','roughness']};
+  if(remoteAssets)fetch(pbrSource).then(r=>r.ok?r.json():Promise.reject()).then(files=>{
     const diffuse=mapFrom(files,'diff'),normal=mapFrom(files,'nor_gl'),roughness=mapFrom(files,'rough');
     if(!diffuse||!normal||!roughness)return;
     const load=url=>new Promise((resolve,reject)=>new T.TextureLoader().load(url,t=>{t.wrapS=t.wrapT=T.RepeatWrapping;t.anisotropy=renderer.capabilities.getMaxAnisotropy();resolve(t)},undefined,reject));
     return Promise.all([load(diffuse),load(normal),load(roughness)]).then(([color,norm,rough])=>{
-      color.colorSpace=T.SRGBColorSpace;for(const m of [...boards,oak]){m.map=color.clone();m.normalMap=norm.clone();m.roughnessMap=rough.clone();m.map.repeat.set(m===oak?3:2,4);m.normalMap.repeat.copy(m.map.repeat);m.roughnessMap.repeat.copy(m.map.repeat);m.roughness=.52;m.metalness=.03;m.needsUpdate=true;}
+      color.colorSpace=T.SRGBColorSpace;for(const m of boards){m.map=color.clone();m.normalMap=norm.clone();m.roughnessMap=rough.clone();m.map.repeat.set(2,4);m.normalMap.repeat.copy(m.map.repeat);m.roughnessMap.repeat.copy(m.map.repeat);m.roughness=.52;m.metalness=.03;m.needsUpdate=true;}
       B1_REVIEW.materialLibrary={wood:'Poly Haven Wood Floor CC0',maps:['albedo','normal','roughness'],fallback:'local procedural PBR'};
     });
   }).catch(()=>{B1_REVIEW.materialLibrary={wood:'local procedural PBR fallback',maps:['albedo','bump','roughness']};});
@@ -144,10 +146,10 @@
   const gltfAssets={};
   function showMeasuredFallback(name,visible){scene.traverse(o=>{if(o.userData?.furnitureName===name)o.visible=visible;});}
   function placeGLB(root,{x,y,width,depth,height,rotate=0}){
-    root.updateMatrixWorld(true);const before=new T.Box3().setFromObject(root),size=before.getSize(new T.Vector3());
+    root.rotation.y=rotate;root.updateMatrixWorld(true);const before=new T.Box3().setFromObject(root),size=before.getSize(new T.Vector3());
     root.scale.set(width/Math.max(size.x,.001),height/Math.max(size.y,.001),depth/Math.max(size.z,.001));
-    root.rotation.y=rotate;root.position.copy(W(x,y,0));root.updateMatrixWorld(true);
-    const after=new T.Box3().setFromObject(root);root.position.y-=after.min.y;root.updateMatrixWorld(true);
+    root.updateMatrixWorld(true);const after=new T.Box3().setFromObject(root),center=after.getCenter(new T.Vector3()),target=W(x+width/2,y+depth/2);
+    root.position.add(new T.Vector3(target.x-center.x,-after.min.y,target.z-center.z));root.updateMatrixWorld(true);
   }
   function loadPremiumAsset(loader,{id,url,placement,fallbackName}){
     loader.load(url,gltf=>{
@@ -169,14 +171,15 @@
     // The desk model is rescaled to the approved 200 × 65 cm footprint.
     {id:'sitStandDesk',disabled:true,url:null,fallbackName:'160 cm 升降工作桌／無窗側'}
   ];
-  window.B1_REVIEW.assetPolicy={remoteModels:true,plant:false,localFurnitureFallback:true};window.B1_REVIEW.premiumAssets=premiumAssets.map(({id,url,fallbackName,disabled=false})=>({id,url,fallbackName,disabled}));window.B1_REVIEW.gltfAssets=gltfAssets;
+  window.B1_REVIEW.assetPolicy={remoteModels:remoteAssets,plant:false,localFurnitureFallback:true};window.B1_REVIEW.premiumAssets=premiumAssets.map(({id,url,fallbackName,disabled=false})=>({id,url,fallbackName,disabled}));window.B1_REVIEW.gltfAssets=gltfAssets;
   function attachPremiumAssets(){
     if(attachPremiumAssets.done||!window.B1_GLTFLoader)return;attachPremiumAssets.done=true;const loader=new window.B1_GLTFLoader();premiumAssets.filter(asset=>!asset.disabled).forEach(asset=>loadPremiumAsset(loader,asset));
   }
-  if(window.B1_GLTFLoader)attachPremiumAssets();else{
+  if(remoteAssets){if(window.B1_GLTFLoader)attachPremiumAssets();else{
     window.addEventListener('b1-gltf-loader-ready',attachPremiumAssets,{once:true});
     const importMap=document.createElement('script');importMap.type='importmap';importMap.textContent='{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js"}}';document.head.append(importMap);
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
-  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024-layout7';document.head.append(homeScript);
+  }
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024-explore1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
 })();
