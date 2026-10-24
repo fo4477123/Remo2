@@ -3,7 +3,7 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261024-home';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261024-layout6';detailScript.async=false;
 const T=THREE,canvas=document.querySelector('#scene'),view=document.querySelector('#viewport');
 const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 const scene=new T.Scene();scene.background=new T.Color('#dedfd5');const camera=new T.PerspectiveCamera(42,1,1,8000);
@@ -292,7 +292,7 @@ const configs={all:{target:[750,690],radius:1650,yaw:.6,pitch:.8,title:'全室�
 configs.living.yaw=-1.12;configs.living.radius=700;
 configs.living.title='弧背沙發 × 石材茶几';configs.living.text='奶油色弧背模組沙發改採低矮、柔和的飯店式比例，搭配圓角石材升降茶几；桌緣至沙發保留約37 cm、至電視牆約51 cm。花台端不放植栽或高櫃，讓採光與主要動線保持留白。';
 configs.media.text='160 × 65 cm升降桌移到對面實牆，椅子面向桌面；窗邊只保留 60 cm 臥榻與採光，中央通道保持開闊。';
-configs.entry.target=[935,560];configs.entry.yaw=.15;configs.entry.pitch=.4;configs.entry.title='客廳收納櫃與客衛隱藏門';configs.entry.sub='從客廳看向客衛前方立面';configs.entry.text='從客廳看向客用衛浴前方的連續收納立面：橡木平板門整合約 80 cm 齊平隱藏門，門片無外露把手並向衛浴內開；旁側封閉櫃體整合清潔用品收納，背向客廳的一側保留 14 cm 深的走道備品格。';
+configs.entry.target=[1020,650];configs.entry.yaw=2.65;configs.entry.radius=350;configs.entry.pitch=.65;configs.entry.title='客廳全景與客衛隱藏門';configs.entry.sub='窗戶・大門・電視牆・隱藏門';configs.entry.text='按 3D 配置由客廳查看窗戶、主大門及側向電視牆；客衛隱藏門位在大門旁的短收納立面，門後即客用衛浴。清潔櫃與大門旁 130 cm 工作檯依模型位置保留；隱藏門與主大門是兩扇不同的門。';
 configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約275 × 55 × 260 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做 275 cm 長木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；260 cm高度為模型暫定值。'};
 configs.guest={target:[580,430],radius:570,yaw:.7,pitch:.85,title:'清空次臥櫃體，保留彈性',sub:'次臥 / 只保留客床與完整動線',text:'移除原本的衣櫃、書桌與零散櫃體，留下150×188 cm客床及完整門口動線。後續可依實際需求再放入活動式家具，不先以固定櫃體壓縮空間。'};
 configs.laundry.text='LG WD-S15NDB 15公斤洗脫烘（65 × 64.5 × 95 cm）放在既有陽台位置，依270度後再轉90度設定為360度；門面朝室內。現場仍需確認開門深度、給排水與插座。';

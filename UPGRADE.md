@@ -93,4 +93,4 @@ iPhone/Android hardware validation. Publish existing Pages repo and refresh loca
 - Replace the laundry placeholder with LG WD-S15NDB geometry at 65 x 64.5 x 95 cm. Set its final orientation to 360 degrees (270 + 90), equivalent to the original inward-facing direction, and update the high-resolution balcony render.
 - Kitchen render and 3D specification use the Panasonic NR-D505XGS-W cloud-rock white four-door refrigerator (72.1 × 69.5 × 183.4 cm), with the cooktop on the left and sink on the right.
 - Recreate the kitchen render against Panasonic's official NR-D505XGS-W product image: two upper hinged doors (asymmetric split) and two full-width drawers, in white stone-glass finish.
-- Add a living-room-facing render of the continuous storage wall and flush guest-bath hidden door; the hidden door itself remains interactable in the measured model.
+- Add a living-room-wide view grounded in the 3D model: exterior window, main entry, perpendicular TV wall, and the short guest-bath hidden-door storage run in their modeled positions. Keep the guest-bath hidden door interactable in the measured model.
