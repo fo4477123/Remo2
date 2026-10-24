@@ -12,7 +12,7 @@
   const roomPicker=document.createElement('select');roomPicker.className='room-picker';roomPicker.setAttribute('aria-label','前往房間');
   document.querySelector('.workspace').insertBefore(roomPicker,controls);
   // Add a direct bathroom stop and keep all room choices available on small screens.
-  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'洗手台・馬桶・方形浴缸・乾濕分離',text:'依 CAD 圖元重新落位：上左洗手台、下左馬桶、右上 110 × 100 cm 方形浴缸，右下為獨立淋浴區；玻璃線沿 I-BATH 分隔。尺寸仍須現場放樣複核。'};
+  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'馬桶・洗手台・方形浴缸・乾濕分離',text:'依你的要求互換乾區位置：上左為馬桶、下左為洗手台；右上保留 110 × 100 cm 方形浴缸，右下為獨立淋浴區。玻璃線沿 I-BATH 分隔，尺寸仍須現場放樣複核。'};
   configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴',text:'已依你指出的方向互換設備：入口側為洗手台，淋浴前為馬桶，保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
   stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
   const bathButton=document.createElement('button');bathButton.dataset.room='bath';bathButton.textContent='09　浴室';bathButton.onclick=()=>{select('bath');if(walking){[walkX,walkY,walkYaw]=stops.bath;lookPitch=-.48;}};document.querySelector('.rooms').append(bathButton);
@@ -23,9 +23,9 @@
   const walkPicker=roomPicker.cloneNode(true);walkPicker.className='walk-picker';walkPicker.setAttribute('aria-label','漫遊中切換房間');walkPicker.onchange=()=>{roomPicker.value=walkPicker.value;roomPicker.onchange();};view.append(walkPicker);
   const selectBefore=select;select=function(name){selectBefore(name);roomPicker.value=walkPicker.value=name;};
   configs.master.text='床頭靠左、150 × 188 cm雙人床向左微移17 cm，床尾至滑門面約66 cm；整牆衣櫥及浴室入口保留。這仍是偏緊的通道，須現場複核。';
-  configs.living.text='77 吋電視置中於連續奶油色電視牆，尺寸約170.4 × 95.9 cm；兩側各保留約46 cm。洗白橡木SPC、亞麻與暖光維持溫馨氛圍，主要入口通道保持暢通。';
-  configs.media.text='右側改為180 × 65 cm升降桌，配置雙螢幕工作區與Enjoy101網布人體工學椅；60 cm窗邊臥榻與桌端保留中央動線。窗台離地50 cm。';
-  B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=29;B1_REVIEW.clearances.tableToTV=55;B1_REVIEW.clearances.mediaDeskLength=180;B1_REVIEW.clearances.mediaDeskToBench=30;
+  configs.living.text='77 吋電視置中於連續奶油色電視牆，搭配弧背模組沙發與圓角石材升降茶几；洗白橡木、礦物石材、織品與暖光統一成安靜的暖日式質感，花台端不放植栽，入口通道保持留白。';
+  configs.media.text='右側為200 × 65 cm升降桌，搭配高階網布人體工學椅與雙螢幕工作區；60 cm窗邊臥榻與桌端保留約30 cm。窗台離地50 cm。';
+  B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=37;B1_REVIEW.clearances.tableToTV=51;B1_REVIEW.clearances.mediaDeskLength=200;B1_REVIEW.clearances.mediaDeskToBench=30;
   B1_REVIEW.windows=windowSpecs;
 
   // Geometry instancing reduces hundreds of floor draw calls to a handful.

@@ -1,7 +1,9 @@
 /* B1: shared centimetre coordinates for CAD, furniture and WebGL. */
 const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tourStyles.href='studio-tour.css';document.head.append(tourStyles);
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261024-home';detailScript.defer=true;document.head.append(detailScript);
+// Appended after the base scene below: dynamic scripts otherwise can race a
+// fast local response before `configs` / `B1_REVIEW` are initialized.
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261024-home';detailScript.async=false;
 const T=THREE,canvas=document.querySelector('#scene'),view=document.querySelector('#viewport');
 const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 const scene=new T.Scene();scene.background=new T.Color('#dedfd5');const camera=new T.PerspectiveCamera(42,1,1,8000);
@@ -15,10 +17,15 @@ function box(x,y,w,d,h,material,z=0,parent=scene){const m=new T.Mesh(new T.BoxGe
 function cyl(x,y,r,h,material,z=0){const m=new T.Mesh(new T.CylinderGeometry(r,r,h,48),material);m.position.copy(W(x,y,z+h/2));m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 function item(name,x,y,w,d,fn){
   // Apply the same placement correction to the model and plan footprint.
-  const shift=name==='220 cm 木框沙發'?[0,65]:name==='180 cm 升降工作桌'?[135,0]:name==='島語升降茶几／收納茶几'?[25,0]:name==='主臥雙人床／轉向90度'?[-17,0]:[0,0];
+  const shift=name==='180 cm 升降工作桌'?[135,0]:name==='主臥雙人床／轉向90度'?[-17,0]:[0,0];
   const start=scene.children.length;fn();
   for(const mesh of scene.children.slice(start)){mesh.position.x+=shift[0];mesh.position.z-=shift[1];mesh.userData.furnitureName=name;}
   furniture.push({name,x:x+shift[0],y:y+shift[1],w,d});
+}
+function softBox(x,y,w,d,h,material,z=0,parent=scene,curve=.42){
+  const g=new T.SphereGeometry(1,28,20),p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const px=p.getX(i),py=p.getY(i),pz=p.getZ(i);p.setXYZ(i,Math.sign(px)*Math.pow(Math.abs(px),curve)*w/2,Math.sign(py)*Math.pow(Math.abs(py),curve)*h/2,Math.sign(pz)*Math.pow(Math.abs(pz),curve)*d/2);}
+  g.computeVertexNormals();const m=new T.Mesh(g,material);m.position.copy(W(x+w/2,y+d/2,z+h/2));m.castShadow=m.receiveShadow=true;parent.add(m);return m;
 }
 const rooms=[[399,740,320,320],[729,765,220,295],[959,520,300,475],[399,300,360,255],[769,300,275,210],[399,565,560,175],[239,565,160,165],[239,300,145,250],[239,740,150,250]];
 for(const [x,y,w,d]of rooms){box(x,y,w,d,4,cream,-4,floorGroup);for(let j=0;j<d;j+=18){const shade=mat(j%36?'#ceb48c':'#d8bd96');box(x,y+j,w,17.6,.6,shade,.1,floorGroup)}box(x,y,w,d,8,cream,260,ceilingGroup)}ceilingGroup.visible=false;
@@ -71,14 +78,22 @@ for(const spec of windowSpecs){
 // These exterior returns were stored on the CAD's 3F layer, not WALL.
 for(const [x,y,w,d]of [[396,989.7,5,77.5],[398.6,292.2,30,15],[1223.6,994.7,35,15]])box(x,y,w,d,260,cream,0,wallGroup);
 for(const m of wallGroup.children)m.userData.fullHeightY=m.position.y;
-item('220 cm 木框沙發',970,700,92,220,()=>{box(970,700,92,220,10,oak,17);box(972,705,15,210,55,oak,27);box(985,705,72,103,18,linen,28);box(985,812,72,103,18,linen,28);box(986,705,14,102,35,linen,44);box(986,813,14,102,35,linen,44);for(const yy of [700,910])box(970,yy,90,9,34,oak,27);box(998,718,25,38,12,sage,46);for(const yy of [710,900])for(const xx of [980,1040])box(xx,yy,4,4,20,oak)});
-item('羊毛地毯',1020,680,210,250,()=>box(1020,680,210,250,1.5,mat('#ded8c7'),1));
-item('島語升降茶几／收納茶几',1066,768,82,125,()=>{
-  // Isle Whisper reference: warm rounded island table with lift top and two stools.
-  box(1069,771,76,119,8,oak,38);box(1074,776,66,109,18,mat('#b99970',.52),46);
-  box(1077,779,60,103,5,mat('#d8c4a8',.45),64);box(1081,783,52,95,3,oak,69);
-  for(const [x,y]of [[1088,800],[1128,850]]){cyl(x,y,16,5,linen,8);cyl(x,y,6,8,oak,13)}
-  box(1078,829,58,12,3,mat('#e0d3bc',.6),72);box(1080,831,54,8,2,oak,75);
+item('奶油弧背模組沙發',970,750,90,210,()=>{
+  // The low walnut plinth, rounded arms and separate down cushions read as a
+  // tailored Italian-style sofa, not a generic imported asset.
+  const boucle=mat('#d8d0c1',.95),walnut=mat('#6f5540',.52),piping=mat('#aa9880',.9);
+  box(975,755,78,200,7,walnut,16);softBox(973,758,18,194,58,boucle,31);softBox(978,751,76,16,48,boucle,31);softBox(978,946,76,16,48,boucle,31);
+  softBox(987,766,65,84,19,boucle,38);softBox(987,857,65,84,19,boucle,38);
+  softBox(980,770,18,78,42,boucle,57);softBox(980,861,18,78,42,boucle,57);
+  for(const yy of [781,872]){box(1000,yy,2,52,1.2,piping,58);box(1000,yy+67,2,52,1.2,piping,58);}
+  for(const yy of [770,936])for(const xx of [980,1040])cyl(xx,yy,2.5,12,walnut,8);
+});
+item('羊毛地毯',1025,690,205,235,()=>box(1025,690,205,235,1.5,mat('#ded8c7'),1));
+item('圓角石材升降茶几',1097,785,72,110,()=>{
+  const stone=mat('#c7baaa',.32),bronze=mat('#8e745b',.28,{metalness:.6}),warmOak=mat('#a98a69',.58);
+  softBox(1099,787,68,106,10,stone,43);box(1104,792,58,96,6,warmOak,34);
+  for(const [x,y]of [[1112,805],[1152,805],[1112,870],[1152,870]])cyl(x,y,3.5,33,bronze,5);
+  box(1122,831,22,20,3,stone,57);box(1124,833,18,16,2,mat('#7f907d',.86),60);
 });
 item('延伸電視牆／單扇玻璃門',1220,505,38,490,()=>{
   // One continuous timber plane and floating base run to the planter; no tall cabinet at the end.
@@ -97,21 +112,22 @@ item('延伸電視牆／單扇玻璃門',1220,505,38,490,()=>{
   // Slippers remain below the suspended cabinet, nearest the entrance.
   for(const yy of [540,553,580,593]){box(1224,yy,25,10,3,sage,1);box(1234,yy,8,10,5,linen,4)}
 });
-item('收納折疊餐桌 90×40',820,685,90,40,()=>{
-  box(820,685,90,40,4,oak,73);box(820,685,90,35,70,cream,3);
-  for(const xx of [822,867]){box(xx,684,42,2,64,oak,5);box(xx+33,682,3,2,12,dark,47)}
+item('圓角岩板折疊餐桌 90×40',820,685,90,40,()=>{
+  softBox(821,686,88,38,4,mat('#d9d0c2',.24),73);box(820,685,90,35,70,cream,3);
+  for(const xx of [824,866]){box(xx,687,4,32,66,dark,5);box(xx+31,687,4,32,66,dark,5);}
   box(820,680,90,3,32,oak,39);
 });
 item('60 cm 收納臥榻',739,1000,200,60,()=>{box(739,1000,200,60,37,oak);box(739,1000,200,60,7,linen,37);for(let x=740;x<930;x+=65){box(x,999,62,1,31,cream,3)}box(755,1020,45,30,10,sage,44)});
-item('180 cm 升降工作桌',739,790,65,180,()=>{
-  // 180 × 65 cm desktop along the right wall; open centre remains the route to the window bench.
-  box(739,790,65,180,4,oak,73);
-  for(const yy of [804,940]){box(750,yy,45,7,4,dark,6);box(770,yy,6,6,70,dark,6);}
+item('200 cm 升降工作桌',739,775,65,200,()=>{
+  // 200 × 65 cm desktop along the right wall; its northern start and the 30 cm
+  // gap before the window bench preserve a clear central route.
+  box(739,775,65,200,4,oak,73);
+  for(const yy of [789,940]){box(750,yy,45,7,4,dark,6);box(770,yy,6,6,70,dark,6);}
   // Dual monitor / laptop zone, cable tray and a slim side drawer integrated below the top.
-  for(const yy of [824,890]){box(796,yy,3,48,30,black,77);box(780,yy+5,16,34,2,dark,77);}
-  box(742,798,4,164,3,dark,64);box(742,798,18,46,38,cream,20);
+  for(const yy of [810,885]){box(796,yy,3,48,30,black,77);box(780,yy+5,16,34,2,dark,77);}
+  box(742,783,4,184,3,dark,64);box(742,783,18,46,38,cream,20);
 });
-item('Enjoy101 人體工學椅',805,850,66,65,()=>{
+item('高階網布人體工學椅',805,850,66,65,()=>{
   // Mesh back, adjustable headrest, lumbar pad, 4D armrests and five-star base.
   const frame=mat('#2e3534',.36,{metalness:.38}),mesh=mat('#55615c',.72),accent=mat('#92a28b',.68);
   box(812,858,52,48,7,mesh,45);box(814,860,48,44,3,frame,42);
@@ -124,7 +140,7 @@ item('Enjoy101 人體工學椅',805,850,66,65,()=>{
   for(const yy of [854,908]){box(823,yy,16,5,4,frame,67);box(828,yy,5,5,15,frame,49);}
   cyl(837,882,5,43,frame,2);for(const [x,y]of [[808,882],[828,852],[858,856],[858,908],[828,912]]){box(Math.min(837,x),Math.min(882,y),Math.abs(x-837)+4,Math.abs(y-882)+4,3,frame,3);cyl(x,y,4,5,dark,0);}
 });
-const designSpecs={tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:180,depth:65},chair:{model:'Enjoy101',width:66,depth:65},guestBath:{vanity:[798,318,84,40],toilet:[772,432,42,66],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,42,66]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
+const designSpecs={style:'warm-japandi-premium',tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:200,depth:65},chair:{model:'PremiumMesh',width:66,depth:65},living:{sofa:[970,750,90,210],table:[1097,785,72,110],sofaToTable:37,tableToTvWall:51},guestBath:{vanity:[772,432,84,40],toilet:[798,318,42,66],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,42,66]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
 // Shortened to 70 cm so the desk chair has an unobstructed side route.
 item('影音輕量低櫃 70 cm',739,915,30,70,()=>{box(739,915,30,70,60,oak,8);for(const y of [917,951])box(768,y,2,32,54,cream,11);box(739,930,24,40,3,oak,122);cyl(751,940,6,15,cream,125);cyl(753,965,7,15,sage,68)});
 // Cabinet follows the bathroom north wall; door opening x829..909 stays clear.
@@ -162,17 +178,17 @@ function vessel(x,y,w,d,h,z,material){
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();
   const m=new T.Mesh(g,material);m.material.side=T.DoubleSide;m.position.copy(W(x,y,z));m.castShadow=m.receiveShadow=true;scene.add(m);return m;
 }
-// Guest bathroom: positions follow the CAD symbols, rather than the former generic layout.
-// Clockwise from the entrance: vanity at upper-left, toilet at lower-left, then a square tub
+// Guest bathroom: the dry fixtures are deliberately swapped at the owner's request.
+// Clockwise from the entrance: toilet at upper-left, vanity at lower-left, then a square tub
 // and the separate shower bay on the right, divided by the existing I-BATH glass line.
-item('客用衛浴洗手台／上左',798,318,84,40,()=>{
-  box(798,318,84,40,43,oak,30);box(796,316,88,44,4,ceramic,73);
-  vessel(840,338,52,30,13,77,ceramic);box(863,334,3,3,20,chrome,77);box(851,334,15,3,3,chrome,95);
-  box(798,315,84,1.5,78,mat('#bac5c5',.08,{metalness:.85}),105);
+item('客用衛浴馬桶／上左',798,318,42,66,()=>{
+  const base=cyl(819,356,14,28,ceramic,3);base.scale.z=1.35;
+  vessel(819,355,42,55,15,27,ceramic);box(801,318,36,14,65,ceramic,3);cyl(818,324,2,1,chrome,68);
 });
-item('客用衛浴馬桶／下左',772,432,42,66,()=>{
-  const base=cyl(793,470,14,28,ceramic,3);base.scale.z=1.35;
-  vessel(793,469,42,55,15,27,ceramic);box(775,432,36,14,65,ceramic,3);cyl(792,438,2,1,chrome,68);
+item('客用衛浴洗手台／下左',772,432,84,40,()=>{
+  box(772,432,84,40,43,oak,30);box(770,430,88,44,4,ceramic,73);
+  vessel(814,452,52,30,13,77,ceramic);box(837,448,3,3,20,chrome,77);box(825,448,15,3,3,chrome,95);
+  box(772,429,84,1.5,78,mat('#bac5c5',.08,{metalness:.85}),105);
 });
 item('客用衛浴方形浴缸 110×100',924,310,110,100,()=>{
   vessel(979,360,110,100,55,0,ceramic);cyl(1008,328,3,1,chrome,8);
@@ -220,9 +236,9 @@ item('陽台直條格柵欄',220,300,12,250,()=>{
   for(let x=240;x<=335;x+=11)box(x,295,3,3,115,rail,0);
   box(230,293,108,7,4,rail,0);box(230,293,108,7,4,rail,112);
 });
-item('主臥雙人床／轉向90度',425,890,188,150,()=>{box(425,890,188,150,25,oak);box(425,890,188,150,20,linen,25);box(417,890,8,150,85,oak);for(const yy of [900,970])box(438,yy,35,60,12,cream,45);box(538,890,75,150,3,sage,45)});
+item('主臥飯店級軟包雙人床／轉向90度',425,890,188,150,()=>{box(425,890,188,150,12,oak,14);softBox(425,890,188,150,22,linen,24);softBox(417,890,12,150,82,mat('#c2b4a3',.94),18);for(const yy of [902,972])softBox(438,yy,35,58,11,cream,46);box(538,890,75,150,3,sage,47)});
 item('主臥整牆頂天滑門衣櫥',664,765,55,295,()=>{box(664,765,55,295,260,oak);for(let y=767;y<1058;y+=73){box(662,y,2,71,254,oak,3);box(660,y+61,2,2,35,dark,100)}});
-item('次臥客床 150×188',415,320,150,188,()=>{box(415,320,150,188,25,oak);box(415,320,150,188,20,linen,25);box(415,508,150,8,75,oak);box(430,465,110,35,12,cream,45)});
+item('次臥飯店級客床 150×188',415,320,150,188,()=>{box(415,320,150,188,12,oak,14);softBox(415,320,150,188,22,linen,24);softBox(415,508,150,10,76,mat('#c2b4a3',.94),16);softBox(430,465,110,35,12,cream,46)});
 item('原圖橫向廚具 235×60',239,670,235,60,()=>{
   // Cabinet shell and split counter leave an actual recess for the stainless sink.
   box(239,670,235,60,7,oak,3);box(239,670,3,60,75,oak,10);box(471,670,3,60,75,oak,10);
@@ -252,8 +268,8 @@ item('頂天電器櫃 80 cm',546.1,670,80,70,()=>{
 const nightLights=[];for(const [x,y]of [[1100,800],[840,900],[860,640],[1070,580]]){const l=new T.PointLight(0xffc17d,0,440,2);l.position.copy(W(x,y,220));scene.add(l);nightLights.push(l);cyl(x,y,6,2,mat('#fff3cd',.2,{emissive:0xffdba3,emissiveIntensity:.5}),255)}
 const configs={all:{target:[750,690],radius:1650,yaw:.6,pitch:.8,title:'全室配置',sub:'依 DWG 房間位置配置',text:'客廳在右側、最小臥室位於上方中央；將其規劃為影音工作室。淨高暫定 260 cm，牆體顯示為可切換剖面。'},living:{target:[1110,790],radius:560,yaw:1.2,pitch:.46,title:'木框沙發 × 玻璃收藏牆',sub:'客廳 / 暖木與留白',text:'220 cm 沙發沿影音室外牆擺放，朝向右側電視。展示櫃集中於電視兩端，以封閉底櫃收整日常雜物；淺色地毯統一客廳範圍。'},media:{target:[840,900],radius:490,yaw:.8,pitch:.65,title:'一間房，三種日常',sub:'影音 / 工作 / 收藏',text:'最小房暫採上方中央約 220 × 300 cm 臥室。60 cm 深臥榻沿窗、升降桌靠左牆、展示收納靠右牆。影音設備與座位視線待選型調整。'},entry:{target:[1080,570],radius:500,yaw:1,pitch:.6,title:'以同一片立面迎接回家',sub:'玄關 / 隱藏門概念',text:'玄關以淺橡木與奶油白櫃門串連入口。廁所隱藏門須依原門洞位置及開門方向確認；目前展示櫃體語彙與預留範圍。'},laundry:{target:[310,420],radius:500,yaw:-1,pitch:.7,title:'清爽的洗衣陽台',sub:'洗脫烘 / 耐潮工作檯',text:'LG 15 kg 機器先預留 65 × 75 cm 示意體積，並非已核對型號尺寸。陽台安排獨立洗衣檯面，後續依實際型號確認管線與維修空間。'}};
 configs.living.yaw=-1.12;configs.living.radius=700;
-configs.living.text='由大門一路延伸至花台端：490 cm連續木背板與懸浮下櫃形成完整電視牆。花台端不做高牆櫃，維持立面留白；僅保留一扇55 cm展示玻璃門。電視上方不做頂櫃，底下淨高25 cm可放拖鞋。';
-configs.media.text='右牆升降桌保留；左側展示改為 110 cm 長、30 cm 深的低櫃，僅搭配一片短層板。低櫃離開原門弧，窗邊 60 cm 臥榻維持不變。';
+configs.living.title='弧背沙發 × 石材茶几';configs.living.text='奶油色弧背模組沙發改採低矮、柔和的飯店式比例，搭配圓角石材升降茶几；桌緣至沙發保留約37 cm、至電視牆約51 cm。花台端不放植栽或高櫃，讓採光與主要動線保持留白。';
+configs.media.text='右牆改為 200 cm × 65 cm 升降桌；左側展示為 110 cm 長、30 cm 深的低櫃，僅搭配一片短層板。桌端至窗邊 60 cm 臥榻保留約30 cm，低櫃離開原門弧。';
 configs.entry.target=[935,560];configs.entry.yaw=.15;configs.entry.pitch=.4;configs.entry.text='隱藏門兩側為完整櫃體：浴室走道側保留 14 cm 淺挖備品格，並整合掃把／拖把的直立收納；面向客廳的立面則是平整封閉櫃門，沒有開孔。右側下方保留掃地機器人高度，上方為置物與封閉收納。隱藏門與櫃體切平、往廁所內開。';
 configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約295 × 55 × 260 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做滿木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；260 cm高度為模型暫定值。'};
 configs.guest={target:[580,430],radius:570,yaw:.7,pitch:.85,title:'清空次臥櫃體，保留彈性',sub:'次臥 / 只保留客床與完整動線',text:'移除原本的衣櫃、書桌與零散櫃體，留下150×188 cm客床及完整門口動線。後續可依實際需求再放入活動式家具，不先以固定櫃體壓縮空間。'};
@@ -296,4 +312,4 @@ function distanceToSegment(x,y,a,b){const dx=b[0]-a[0],dy=b[1]-a[1],l=dx*dx+dy*d
 function canStand(x,y){if(!rooms.some(([rx,ry,w,d])=>x>=rx&&x<=rx+w&&y>=ry&&y<=ry+d))return false;for(const f of furniture){if(/地毯|隱藏門/.test(f.name))continue;if(x>f.x-12&&x<f.x+f.w+12&&y>f.y-12&&y<f.y+f.d+12)return false}for(const p of B1_PLAN.walls)for(let i=1;i<p.points.length;i++)if(distanceToSegment(x,y,p.points[i-1],p.points[i])<12)return false;for(const w of windowSpecs){const a=w.axis==='h'?[w.from,w.line]:[w.line,w.from],b=w.axis==='h'?[w.to,w.line]:[w.line,w.to];if(distanceToSegment(x,y,a,b)<16)return false;}if(leaf.visible&&x>808&&x<922&&y>638&&y<697)return false;return true}
 svg.style.cursor='crosshair';svg.addEventListener('click',e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse()),y=1100-q.y;if(canStand(q.x,y)){if(!walking)setTour(true);walkX=q.x;walkY=y}});
 window.B1_REVIEW.canStand=canStand;window.B1_REVIEW.setTour=setTour;
-let lastTime=performance.now();function frame(now=performance.now()){if(!window.B1_REVIEW?.ready){lastTime=now;requestAnimationFrame(frame);return;}const dt=Math.min((now-lastTime)/1000,.05);lastTime=now;const stacked=compare&&matchMedia('(max-width:650px)').matches;const w=compare&&!stacked?view.clientWidth/2:view.clientWidth,h=stacked?view.clientHeight/2:view.clientHeight;if(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio())){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}if(walking){let forward=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0),side=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0);const speed=95*dt/Math.max(1,Math.hypot(forward,side)),dx=(Math.sin(walkYaw)*forward+Math.cos(walkYaw)*side)*speed,dy=(Math.cos(walkYaw)*forward-Math.sin(walkYaw)*side)*speed;if(canStand(walkX+dx,walkY))walkX+=dx;if(canStand(walkX,walkY+dy))walkY+=dy;camera.position.copy(W(walkX,walkY,160));camera.lookAt(W(walkX+Math.sin(walkYaw)*100,walkY+Math.cos(walkYaw)*100,160+Math.tan(lookPitch)*100));}else{camera.position.set(target.x+radius*Math.cos(pitch)*Math.sin(yaw),target.y+radius*Math.sin(pitch),target.z+radius*Math.cos(pitch)*Math.cos(yaw));camera.lookAt(target)}visitor.setAttribute('transform',`translate(${walkX} ${1100-walkY}) rotate(${walkYaw*180/Math.PI})`);visitor.style.display=walking?'':'none';renderer.render(scene,camera);requestAnimationFrame(frame)}select(configs[location.hash.slice(1)]?location.hash.slice(1):'all');if(new URLSearchParams(location.search).has('tour'))setTour(true);if(new URLSearchParams(location.search).has('compare'))compareButton.click();frame();
+let lastTime=performance.now();function frame(now=performance.now()){if(!window.B1_REVIEW?.ready){lastTime=now;requestAnimationFrame(frame);return;}const dt=Math.min((now-lastTime)/1000,.05);lastTime=now;const stacked=compare&&matchMedia('(max-width:650px)').matches;const w=compare&&!stacked?view.clientWidth/2:view.clientWidth,h=stacked?view.clientHeight/2:view.clientHeight;if(canvas.width!==Math.round(w*renderer.getPixelRatio())||canvas.height!==Math.round(h*renderer.getPixelRatio())){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}if(walking){let forward=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0),side=(keys.has('d')||keys.has('arrowright')?1:0)-(keys.has('a')||keys.has('arrowleft')?1:0);const speed=95*dt/Math.max(1,Math.hypot(forward,side)),dx=(Math.sin(walkYaw)*forward+Math.cos(walkYaw)*side)*speed,dy=(Math.cos(walkYaw)*forward-Math.sin(walkYaw)*side)*speed;if(canStand(walkX+dx,walkY))walkX+=dx;if(canStand(walkX,walkY+dy))walkY+=dy;camera.position.copy(W(walkX,walkY,160));camera.lookAt(W(walkX+Math.sin(walkYaw)*100,walkY+Math.cos(walkYaw)*100,160+Math.tan(lookPitch)*100));}else{camera.position.set(target.x+radius*Math.cos(pitch)*Math.sin(yaw),target.y+radius*Math.sin(pitch),target.z+radius*Math.cos(pitch)*Math.cos(yaw));camera.lookAt(target)}visitor.setAttribute('transform',`translate(${walkX} ${1100-walkY}) rotate(${walkYaw*180/Math.PI})`);visitor.style.display=walking?'':'none';renderer.render(scene,camera);requestAnimationFrame(frame)}select(configs[location.hash.slice(1)]?location.hash.slice(1):'all');if(new URLSearchParams(location.search).has('tour'))setTour(true);if(new URLSearchParams(location.search).has('compare'))compareButton.click();frame();document.head.append(detailScript);

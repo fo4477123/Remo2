@@ -99,8 +99,6 @@
   decoBox(1108,796,21,28,1.8,mat('#b7a58d',.88),73);decoBox(1109,798,19,25,1.6,mat('#6d7b69',.82),74.7);
   const tray=decoCyl(1132,864,12,1.8,mat('#c8b596',.9),72);
   const mug=decoCyl(1132,864,3.8,7.5,mat('#f1eadc',.9),74);
-  // A floor plant is placed by the window, away from the continuous TV wall.
-  // No plant intrudes into the sofa or the owner's continuous TV wall.
   // Soft throw at the end of the sofa and a small entry catch-all dish.
   decoBox(1000,903,50,37,2,mat('#b7a995',.98),47.5);
   const catchAll=decoCyl(1038,538,11,2.2,mat('#c7ad83',.86),94);
@@ -123,43 +121,43 @@
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode!=='render'&&document.pointerLockElement)document.exitPointerLock();}));
   // A small instrumentation hook for browser QA without placing technical data in the UI.
   let previous=performance.now(),samples=[];function measure(now){samples.push(now-previous);previous=now;if(samples.length>90)samples.shift();window.B1_REVIEW.frameMs=samples.reduce((a,b)=>a+b,0)/samples.length;requestAnimationFrame(measure);}requestAnimationFrame(measure);
-  // Optional photoreal glTF dressing.  The local, measured furniture remains as a
-  // fallback, so the plan and walkthrough keep working when a visitor is offline.
+  // Selected CC0 furniture GLBs become the visible, detailed model only after
+  // they are fully loaded. The measured local item remains the offline fallback
+  // and keeps plan collisions stable regardless of network availability.
   const gltfAssets={};
   function showMeasuredFallback(name,visible){scene.traverse(o=>{if(o.userData?.furnitureName===name)o.visible=visible;});}
   function placeGLB(root,{x,y,width,depth,height,rotate=0}){
-    // glTF is Y-up. Fit the source model before rotating so its long axis maps
-    // precisely to the centimetre-based furniture footprint in the floor plan.
     root.updateMatrixWorld(true);const before=new T.Box3().setFromObject(root),size=before.getSize(new T.Vector3());
     root.scale.set(width/Math.max(size.x,.001),height/Math.max(size.y,.001),depth/Math.max(size.z,.001));
     root.rotation.y=rotate;root.position.copy(W(x,y,0));root.updateMatrixWorld(true);
     const after=new T.Box3().setFromObject(root);root.position.y-=after.min.y;root.updateMatrixWorld(true);
   }
-  function loadPhotorealAsset(loader,id,url,placement,fallbackName){
+  function loadPremiumAsset(loader,{id,url,placement,fallbackName}){
     loader.load(url,gltf=>{
-      const model=gltf.scene;placeGLB(model,placement);
-      model.traverse(child=>{
-        if(child.isMesh){
-          child.castShadow=true;child.receiveShadow=true;
-          if(child.material){child.material.needsUpdate=true;}
-        }
-      });
-      scene.add(model);if(fallbackName)showMeasuredFallback(fallbackName,false);
-      gltfAssets[id]={loaded:true,url};renderer.shadowMap.needsUpdate=true;
+      const model=gltf.scene;placeGLB(model,placement);model.name=`premium-${id}`;
+      model.traverse(child=>{if(child.isMesh){child.castShadow=true;child.receiveShadow=true;if(child.material)child.material.needsUpdate=true;}});
+      scene.add(model);showMeasuredFallback(fallbackName,false);gltfAssets[id]={loaded:true,url};renderer.shadowMap.needsUpdate=true;
     },undefined,()=>{gltfAssets[id]={loaded:false,url};});
   }
-  function attachGLTFAssets(){
-    if(attachGLTFAssets.done||!window.B1_GLTFLoader)return;attachGLTFAssets.done=true;
-    const loader=new window.B1_GLTFLoader();
-    // Khronos sample assets are pinned to a public CDN and retain their PBR maps.
-    loadPhotorealAsset(loader,'sofa','https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/SheenWoodLeatherSofa/glTF-Binary/SheenWoodLeatherSofa.glb',{x:1016,y:810,width:220,depth:92,height:88,rotate:-Math.PI/2},'220 cm 木框沙發');
-    loadPhotorealAsset(loader,'windowPlant','https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/DiffuseTransmissionPlant/glTF-Binary/DiffuseTransmissionPlant.glb',{x:1178,y:960,width:68,depth:68,height:155});
-    window.B1_REVIEW.gltfAssets=gltfAssets;
+  const premiumAssets=[
+    // CC0, detailed piped two-seat sofa — warm timber and upholstery suit the living room.
+    {id:'livingSofa',url:'https://cdn.3dassets.dev/assets/16990/v1/model.glb',placement:{x:970,y:750,width:90,depth:210,height:82,rotate:Math.PI/2},fallbackName:'奶油弧背模組沙發'},
+    // CC0 platform bed with textured bedding, used in the two bedroom footprints.
+    {id:'masterBed',url:'https://www.innerscene.com/api/library/platform-bed-with-bedding-original-interior-furnishing-d69cf237/download',placement:{x:408,y:890,width:188,depth:150,height:105},fallbackName:'主臥飯店級軟包雙人床／轉向90度'},
+    {id:'guestBed',url:'https://www.innerscene.com/api/library/platform-bed-with-bedding-original-interior-furnishing-d69cf237/download',placement:{x:415,y:320,width:150,depth:188,height:92},fallbackName:'次臥飯店級客床 150×188'},
+    // The locally modelled mesh chair stays in place: the externally available
+    // showcase chair is saturated red and would break the home's quiet palette.
+    {id:'deskChair',disabled:true,url:null,fallbackName:'高階網布人體工學椅'},
+    {id:'refrigerator',url:'https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/CommercialRefrigerator/glTF-Binary/CommercialRefrigerator.glb',placement:{x:474,y:670,width:72.1,depth:69.5,height:183.4},fallbackName:'Panasonic NR-D505XGS 冰箱'},
+    // The desk model is rescaled to the approved 200 × 65 cm footprint.
+    {id:'sitStandDesk',url:'https://cdn.3dassets.dev/assets/27886/v1/model.glb',placement:{x:874,y:775,width:65,depth:200,height:75,rotate:Math.PI/2},fallbackName:'200 cm 升降工作桌'}
+  ];
+  window.B1_REVIEW.assetPolicy={remoteModels:true,plant:false,localFurnitureFallback:true};window.B1_REVIEW.premiumAssets=premiumAssets.map(({id,url,fallbackName})=>({id,url,fallbackName}));window.B1_REVIEW.gltfAssets=gltfAssets;
+  function attachPremiumAssets(){
+    if(attachPremiumAssets.done||!window.B1_GLTFLoader)return;attachPremiumAssets.done=true;const loader=new window.B1_GLTFLoader();premiumAssets.filter(asset=>!asset.disabled).forEach(asset=>loadPremiumAsset(loader,asset));
   }
-  if(window.B1_GLTFLoader)attachGLTFAssets();else{
-    window.addEventListener('b1-gltf-loader-ready',attachGLTFAssets,{once:true});
-    // GLTFLoader is an ES module and imports the bare specifier `three`; install
-    // its import map before executing the loader bridge so r160 stays aligned.
+  if(window.B1_GLTFLoader)attachPremiumAssets();else{
+    window.addEventListener('b1-gltf-loader-ready',attachPremiumAssets,{once:true});
     const importMap=document.createElement('script');importMap.type='importmap';importMap.textContent='{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js"}}';document.head.append(importMap);
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
