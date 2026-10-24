@@ -124,7 +124,7 @@ item('Enjoy101 人體工學椅',805,850,66,65,()=>{
   for(const yy of [854,908]){box(823,yy,16,5,4,frame,67);box(828,yy,5,5,15,frame,49);}
   cyl(837,882,5,43,frame,2);for(const [x,y]of [[808,882],[828,852],[858,856],[858,908],[828,912]]){box(Math.min(837,x),Math.min(882,y),Math.abs(x-837)+4,Math.abs(y-882)+4,3,frame,3);cyl(x,y,4,5,dark,0);}
 });
-const designSpecs={tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:180,depth:65},chair:{model:'Enjoy101',width:66,depth:65}};
+const designSpecs={tv:{diagonalInches:77,width:170.4,height:95.9,centerY:863.5},mediaDesk:{width:180,depth:65},chair:{model:'Enjoy101',width:66,depth:65},guestBath:{vanity:[798,318,84,40],toilet:[772,432,42,66],squareTub:[924,310,110,100],shower:[914,420,130,90]},ensuite:{vanity:[241,752,42,62],toilet:[246,837,42,66]},corridorStorage:{nicheDepth:14,nicheWidth:30,cleaningBay:true,livingFace:'closed'}};
 // Shortened to 70 cm so the desk chair has an unobstructed side route.
 item('影音輕量低櫃 70 cm',739,915,30,70,()=>{box(739,915,30,70,60,oak,8);for(const y of [917,951])box(768,y,2,32,54,cream,11);box(739,930,24,40,3,oak,122);cyl(751,940,6,15,cream,125);cyl(753,965,7,15,sage,68)});
 // Cabinet follows the bathroom north wall; door opening x829..909 stays clear.
@@ -134,12 +134,20 @@ item('面向浴室右手側／掃地機器人',769,520,60,35,()=>{
   box(771,522,56,32,3,oak,51);box(771,554,56,2,202,oak,55);
   box(780,524,38,15,37,cream,1);cyl(799,545,16,9,white,1);
 });
-item('面向浴室左手側／掃具高櫃',910,520,64,35,()=>{
-  box(910,520,2,35,260,oak);box(972,520,2,35,260,oak);box(910,520,64,2,260,oak);box(910,520,64,35,3,oak,257);
-  cleaningDoors.push(box(912,554,60,2,174,oak,3));
-  for(const z of [178,214,254])box(912,522,60,32,2,oak,z);
-  box(926,535,3,3,150,dark,8);box(918,532,20,12,5,sage,5);box(953,535,3,3,130,oak,8);
-  for(const x of [924,941,956])cyl(x,538,4,13,cream,180);
+item('浴室走道側淺挖備品／清潔櫃',910,520,64,35,()=>{
+  // The 14-cm-deep niche opens only toward the bathroom corridor (west face).
+  // The living-room face remains a continuous, closed cabinet front.
+  box(924,520,50,35,260,oak);box(910,520,64,2,260,oak);box(910,520,64,35,3,oak,257);
+  box(923,522,2,30,118,cream,70);box(910,520,14,2,188,oak,3);box(910,553,14,2,188,oak,3);
+  for(const z of [80,114,148,182])box(910,522,14,30,2,oak,z);
+  // Bathroom consumables stay shallow and visible from the corridor.
+  for(const [y,z,col]of [[529,92,'#e9e5dc'],[540,126,'#b7c1ad'],[530,160,'#d4c5b0']]){cyl(916,y,3,13,mat(col,.65),z);}
+  // Broom / mop handles are stored in the same corridor-accessible bay.
+  box(914,546,3,3,150,dark,8);box(919,548,3,3,136,oak,8);box(912,542,9,6,5,sage,5);
+  // South face toward the living room: flush, ordinary cabinet doors with no notch.
+  cleaningDoors.push(box(912,553,60,2,174,oak,3));
+  for(const x of [926,949]){box(x,553,21,2,80,cream,176);box(x,553,21,2,80,cream,94);}
+  for(const z of [178,214,254])box(925,522,47,30,2,oak,z);
 });
 const hiddenDoorHinge=new T.Group();hiddenDoorHinge.position.copy(W(829,555));scene.add(hiddenDoorHinge);
 // Independent fixtures leave a navigable bathroom, instead of one room-sized collider.
@@ -154,19 +162,29 @@ function vessel(x,y,w,d,h,z,material){
   const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();
   const m=new T.Mesh(g,material);m.material.side=T.DoubleSide;m.position.copy(W(x,y,z));m.castShadow=m.receiveShadow=true;scene.add(m);return m;
 }
-item('浴缸 140×70',774,307,140,70,()=>{
-  vessel(844,342,140,70,55,0,ceramic);cyl(895,340,3,1,chrome,8);
-  box(779,311,3,3,96,chrome);box(779,311,16,3,3,chrome,93);
-  box(780,312,2,2,210,chrome);cyl(796,330,10,2,chrome,208);
+// Guest bathroom: positions follow the CAD symbols, rather than the former generic layout.
+// Clockwise from the entrance: vanity at upper-left, toilet at lower-left, then a square tub
+// and the separate shower bay on the right, divided by the existing I-BATH glass line.
+item('客用衛浴洗手台／上左',798,318,84,40,()=>{
+  box(798,318,84,40,43,oak,30);box(796,316,88,44,4,ceramic,73);
+  vessel(840,338,52,30,13,77,ceramic);box(863,334,3,3,20,chrome,77);box(851,334,15,3,3,chrome,95);
+  box(798,315,84,1.5,78,mat('#bac5c5',.08,{metalness:.85}),105);
 });
-item('馬桶',945,313,42,66,()=>{
-  const base=cyl(966,351,14,28,ceramic,3);base.scale.z=1.35;
-  vessel(966,350,42,55,15,27,ceramic);box(948,313,36,14,65,ceramic,3);cyl(965,319,2,1,chrome,68);
+item('客用衛浴馬桶／下左',772,432,42,66,()=>{
+  const base=cyl(793,470,14,28,ceramic,3);base.scale.z=1.35;
+  vessel(793,469,42,55,15,27,ceramic);box(775,432,36,14,65,ceramic,3);cyl(792,438,2,1,chrome,68);
 });
-item('浴室洗手台',961,432,44,68,()=>{
-  box(961,432,44,68,43,oak,30);box(959,430,48,72,4,ceramic,73);
-  vessel(982,466,40,54,15,77,ceramic);box(999,462,3,3,20,chrome,77);box(987,462,15,3,3,chrome,95);
-  box(1006,434,1.5,64,78,mat('#bac5c5',.08,{metalness:.85}),105);
+item('客用衛浴方形浴缸 110×100',924,310,110,100,()=>{
+  vessel(979,360,110,100,55,0,ceramic);cyl(1008,328,3,1,chrome,8);
+  box(1025,316,3,3,96,chrome);box(1012,316,16,3,3,chrome,93);
+  box(1027,317,2,2,210,chrome);cyl(1017,340,10,2,chrome,208);
+});
+item('客用衛浴乾濕分離淋浴區／右下',914,420,130,90,()=>{
+  box(914,420,130,90,3,ceramic,1);
+  // CAD I-BATH line at x≈914 separates the shower from dry fixtures.
+  box(912,420,2,90,195,glass,4);box(1018,420,2,70,195,glass,4);
+  box(1030,442,2,2,205,chrome,4);cyl(1020,452,9,2,chrome,206);
+  box(1018,495,20,3,1,chrome,4);cyl(1026,500,3,1,chrome,5);
 });
 // The second wet room in the CAD also needs fixtures, not an empty tiled rectangle.
 item('主臥衛浴淋浴區',277,914,106,72,()=>{
@@ -174,13 +192,14 @@ item('主臥衛浴淋浴區',277,914,106,72,()=>{
   box(378,930,2,2,205,chrome,4);cyl(367,943,9,2,chrome,206);
   box(283,975,92,3,1,chrome,4);
 });
-item('主臥衛浴馬桶',246,752,42,66,()=>{
-  const pedestal=cyl(267,790,14,28,ceramic,3);pedestal.scale.z=1.3;
-  vessel(267,789,42,55,15,27,ceramic);box(249,752,36,14,65,ceramic,3);
+// Swap these two fixtures so the ensuite matches the CAD orientation.
+item('主臥衛浴洗手台／入口側',241,752,42,62,()=>{
+  box(241,752,42,62,45,oak,30);vessel(263,783,42,60,12,77,ceramic);
+  box(243,776,3,3,20,chrome,79);box(243,776,14,3,3,chrome,96);
 });
-item('主臥衛浴洗手台',241,837,42,62,()=>{
-  box(241,837,42,62,45,oak,30);vessel(263,868,42,60,12,77,ceramic);
-  box(243,861,3,3,20,chrome,79);box(243,861,14,3,3,chrome,96);
+item('主臥衛浴馬桶／淋浴前',246,837,42,66,()=>{
+  const pedestal=cyl(267,875,14,28,ceramic,3);pedestal.scale.z=1.3;
+  vessel(267,874,42,55,15,27,ceramic);box(249,837,36,14,65,ceramic,3);
 });
 item('隱藏門 80 cm／齊平內開',829,553,80,3,()=>{const leaf=box(829,553,80,3,230,cream);hiddenDoorHinge.attach(leaf);box(829,553,80,3,30,oak,230)});
 item('連續工作平台／延伸至大門',974,520,130,35,()=>{
@@ -235,7 +254,7 @@ const configs={all:{target:[750,690],radius:1650,yaw:.6,pitch:.8,title:'全室�
 configs.living.yaw=-1.12;configs.living.radius=700;
 configs.living.text='由大門一路延伸至花台端：490 cm連續木背板與懸浮下櫃形成完整電視牆。花台端不做高牆櫃，維持立面留白；僅保留一扇55 cm展示玻璃門。電視上方不做頂櫃，底下淨高25 cm可放拖鞋。';
 configs.media.text='右牆升降桌保留；左側展示改為 110 cm 長、30 cm 深的低櫃，僅搭配一片短層板。低櫃離開原門弧，窗邊 60 cm 臥榻維持不變。';
-configs.entry.target=[935,560];configs.entry.yaw=.15;configs.entry.pitch=.4;configs.entry.text='隱藏門兩側改為完整櫃體：左側下段收納掃具，上段朝走道開放可放浴室物品；右側下方預留掃地機器人高度，上方為置物與封閉收納。櫃體正面與隱藏門切平，門往廁所內開。';
+configs.entry.target=[935,560];configs.entry.yaw=.15;configs.entry.pitch=.4;configs.entry.text='隱藏門兩側為完整櫃體：浴室走道側保留 14 cm 淺挖備品格，並整合掃把／拖把的直立收納；面向客廳的立面則是平整封閉櫃門，沒有開孔。右側下方保留掃地機器人高度，上方為置物與封閉收納。隱藏門與櫃體切平、往廁所內開。';
 configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約295 × 55 × 260 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做滿木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；260 cm高度為模型暫定值。'};
 configs.guest={target:[580,430],radius:570,yaw:.7,pitch:.85,title:'清空次臥櫃體，保留彈性',sub:'次臥 / 只保留客床與完整動線',text:'移除原本的衣櫃、書桌與零散櫃體，留下150×188 cm客床及完整門口動線。後續可依實際需求再放入活動式家具，不先以固定櫃體壓縮空間。'};
 configs.laundry.text='LG 15 kg洗脫烘已移到原位置對面並旋轉180度，門面朝室內；仍須確認給排水、插座、散熱與維修空間。';

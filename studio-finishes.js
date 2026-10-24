@@ -19,7 +19,7 @@
     for(let i=0;i<16;i++){q.strokeStyle='rgba(112,93,68,.07)';q.lineWidth=.5;q.beginPath();q.ellipse(500,130,80+i*24,8+i*2.8,.04,0,Math.PI*2);q.stroke();}
     for(let i=0;i<3500;i++){q.fillStyle='rgba(91,78,62,.055)';q.fillRect(random()*1024,random()*256,2+random()*8,.5);}
     const map=texture(c),bump=texture(c,false);
-    boards.push(new T.MeshStandardMaterial({color:0xffffff,map,bumpMap:bump,bumpScale:.018,roughness:.76,metalness:0,envMapIntensity:.32}));
+    boards.push(new T.MeshStandardMaterial({color:0xffffff,map,bumpMap:bump,bumpScale:.018,roughness:.4,metalness:.1,envMapIntensity:.32}));
   }
   // Replace room-wide strips with individual 122 x 18 cm staggered planks.
   for(const mesh of [...floorGroup.children])if(mesh.geometry.parameters.height<1){floorGroup.remove(mesh);mesh.geometry.dispose();}
@@ -37,7 +37,7 @@
   // Subtle plaster bump, not a flat uniform paint shader.
   const plaster=document.createElement('canvas');plaster.width=plaster.height=256;const p=plaster.getContext('2d'),pixels=p.createImageData(256,256);
   for(let i=0;i<pixels.data.length;i+=4){const value=120+random()*16;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;pixels.data[i+3]=255;}p.putImageData(pixels,0,0);
-  cream.bumpMap=texture(plaster,false);cream.bumpMap.repeat.set(4,4);cream.bumpScale=.025;cream.roughness=.94;cream.needsUpdate=true;
+  cream.bumpMap=texture(plaster,false);cream.bumpMap.repeat.set(4,4);cream.bumpScale=.025;cream.roughness=.9;cream.metalness=0;cream.needsUpdate=true;
   // Soft furniture grounding: transparent radial contact shadows, no baked scene image.
   const shadowCanvas=document.createElement('canvas');shadowCanvas.width=shadowCanvas.height=128;const s=shadowCanvas.getContext('2d');const gradient=s.createRadialGradient(64,64,8,64,64,64);gradient.addColorStop(0,'rgba(39,29,18,.3)');gradient.addColorStop(.6,'rgba(39,29,18,.18)');gradient.addColorStop(1,'rgba(39,29,18,0)');s.fillStyle=gradient;s.fillRect(0,0,128,128);
   const shadowMaterial=new T.MeshBasicMaterial({map:texture(shadowCanvas),transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1});
@@ -62,7 +62,7 @@
   for(const [x,y,z,w,h]of [[0,80,-490,380,260],[-490,60,0,260,230],[0,290,0,300,300]]){const panel=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(2,1.92,1.78),side:T.DoubleSide}));panel.position.set(x,y,z);panel.lookAt(0,0,0);envScene.add(panel);}
   const generator=new T.PMREMGenerator(renderer);const environment=generator.fromScene(envScene,.06);scene.environment=environment.texture;generator.dispose();
   scene.traverse(m=>{if(m.isMesh&&m.material?.isMeshStandardMaterial){m.material.envMapIntensity=m.material===black?.65:.28;m.material.needsUpdate=true;}});
-  sun.shadow.normalBias=.25;sun.shadow.radius=3;sun.shadow.mapSize.set(2048,2048);renderer.toneMappingExposure=1.08;
+  sun.shadow.normalBias=.25;sun.shadow.radius=3;sun.shadow.mapSize.set(2048,2048);renderer.toneMappingExposure=1.2;
   // Light entering each actual north-facing window gives the room directional form.
   const daylight=[];
   for(const [x,y,z,tx,ty]of [[1100,970,230,1120,700],[545,1040,235,550,820],[850,1040,235,850,860]]){
@@ -123,5 +123,45 @@
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode!=='render'&&document.pointerLockElement)document.exitPointerLock();}));
   // A small instrumentation hook for browser QA without placing technical data in the UI.
   let previous=performance.now(),samples=[];function measure(now){samples.push(now-previous);previous=now;if(samples.length>90)samples.shift();window.B1_REVIEW.frameMs=samples.reduce((a,b)=>a+b,0)/samples.length;requestAnimationFrame(measure);}requestAnimationFrame(measure);
+  // Optional photoreal glTF dressing.  The local, measured furniture remains as a
+  // fallback, so the plan and walkthrough keep working when a visitor is offline.
+  const gltfAssets={};
+  function showMeasuredFallback(name,visible){scene.traverse(o=>{if(o.userData?.furnitureName===name)o.visible=visible;});}
+  function placeGLB(root,{x,y,width,depth,height,rotate=0}){
+    // glTF is Y-up. Fit the source model before rotating so its long axis maps
+    // precisely to the centimetre-based furniture footprint in the floor plan.
+    root.updateMatrixWorld(true);const before=new T.Box3().setFromObject(root),size=before.getSize(new T.Vector3());
+    root.scale.set(width/Math.max(size.x,.001),height/Math.max(size.y,.001),depth/Math.max(size.z,.001));
+    root.rotation.y=rotate;root.position.copy(W(x,y,0));root.updateMatrixWorld(true);
+    const after=new T.Box3().setFromObject(root);root.position.y-=after.min.y;root.updateMatrixWorld(true);
+  }
+  function loadPhotorealAsset(loader,id,url,placement,fallbackName){
+    loader.load(url,gltf=>{
+      const model=gltf.scene;placeGLB(model,placement);
+      model.traverse(child=>{
+        if(child.isMesh){
+          child.castShadow=true;child.receiveShadow=true;
+          if(child.material){child.material.needsUpdate=true;}
+        }
+      });
+      scene.add(model);if(fallbackName)showMeasuredFallback(fallbackName,false);
+      gltfAssets[id]={loaded:true,url};renderer.shadowMap.needsUpdate=true;
+    },undefined,()=>{gltfAssets[id]={loaded:false,url};});
+  }
+  function attachGLTFAssets(){
+    if(attachGLTFAssets.done||!window.B1_GLTFLoader)return;attachGLTFAssets.done=true;
+    const loader=new window.B1_GLTFLoader();
+    // Khronos sample assets are pinned to a public CDN and retain their PBR maps.
+    loadPhotorealAsset(loader,'sofa','https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/SheenWoodLeatherSofa/glTF-Binary/SheenWoodLeatherSofa.glb',{x:1016,y:810,width:220,depth:92,height:88,rotate:-Math.PI/2},'220 cm 木框沙發');
+    loadPhotorealAsset(loader,'windowPlant','https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Assets@main/Models/DiffuseTransmissionPlant/glTF-Binary/DiffuseTransmissionPlant.glb',{x:1178,y:960,width:68,depth:68,height:155});
+    window.B1_REVIEW.gltfAssets=gltfAssets;
+  }
+  if(window.B1_GLTFLoader)attachGLTFAssets();else{
+    window.addEventListener('b1-gltf-loader-ready',attachGLTFAssets,{once:true});
+    // GLTFLoader is an ES module and imports the bare specifier `three`; install
+    // its import map before executing the loader bridge so r160 stays aligned.
+    const importMap=document.createElement('script');importMap.type='importmap';importMap.textContent='{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js"}}';document.head.append(importMap);
+    const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
+  }
   const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261024';document.head.append(homeScript);
 })();

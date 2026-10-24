@@ -47,3 +47,9 @@ iPhone/Android hardware validation. Publish existing Pages repo and refresh loca
   table/TV cabinet about 55 cm. These are explicitly shown as tight in the UI. Retained purchased
   sofa and table footprints; no claim that these are approved circulation or installation sizes.
 - Not a laser scan, construction plan, fully photoreal path-traced scene, or physical-phone benchmark.
+
+## Current render pipeline extension
+- Preserve the existing single-page entry point, DWG-coordinate room plan, sidebar, day/night mode, camera reset, plan comparison and mobile walkthrough. No Unity or replacement UI is introduced.
+- Keep the real-time renderer on local Three r160; add an optional ES-module GLTFLoader bridge pinned to Three 0.160.1. It lazily loads a PBR sofa and window plant from the public Khronos sample-asset CDN. Measured local geometry remains as an offline fallback and is only hidden after the respective model succeeds.
+- Final material targets: whitewashed oak SPC planks roughness 0.4 / metalness 0.1; cream mineral walls roughness 0.9 / metalness 0.0; ACES filmic output exposure 1.2; 2048px PCF soft directional shadows plus hemisphere bounce light.
+- Acceptance: loader failure cannot produce runtime exceptions or remove measured furniture; imported meshes cast and receive shadows; existing desktop and touch QA still passes; bathroom corridor storage reports a 14 cm niche and closed living-room face.

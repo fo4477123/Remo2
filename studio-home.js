@@ -12,8 +12,8 @@
   const roomPicker=document.createElement('select');roomPicker.className='room-picker';roomPicker.setAttribute('aria-label','前往房間');
   document.querySelector('.workspace').insertBefore(roomPicker,controls);
   // Add a direct bathroom stop and keep all room choices available on small screens.
-  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'暖石色浴室',sub:'浴缸・陶瓷・霧面五金',text:'浴缸有實際內槽、馬桶與洗手台分別建立碰撞範圍。入口保持通行；設備尺寸為提案，未經現場放樣。'};
-  configs.ensuite={target:[310,855],radius:370,yaw:.8,pitch:.7,title:'主臥衛浴',sub:'淋浴・馬桶・洗手台',text:'補上原圖第二間衛浴，淋浴區玻璃、排水槽及陶瓷設備；尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
+  configs.bath={target:[887,433],radius:420,yaw:.7,pitch:.7,title:'客用四件式衛浴',sub:'洗手台・馬桶・方形浴缸・乾濕分離',text:'依 CAD 圖元重新落位：上左洗手台、下左馬桶、右上 110 × 100 cm 方形浴缸，右下為獨立淋浴區；玻璃線沿 I-BATH 分隔。尺寸仍須現場放樣複核。'};
+  configs.ensuite={target:[310,855],radius:310,yaw:-1.9,pitch:.85,title:'主臥衛浴',sub:'洗手台・馬桶・淋浴',text:'已依你指出的方向互換設備：入口側為洗手台，淋浴前為馬桶，保留末端乾濕分離淋浴區。尺寸為設計示意。'};stops.ensuite=[339,825,Math.PI];
   stops.bath=[880,470,-2.92];stops.living=[1175,718,-.37];stops.master=[639,825,-.75];stops.media=[760,805,.88];stops.kitchen=[490,604,-.92];stops.laundry=[292,478,2.85];
   const bathButton=document.createElement('button');bathButton.dataset.room='bath';bathButton.textContent='09　浴室';bathButton.onclick=()=>{select('bath');if(walking){[walkX,walkY,walkYaw]=stops.bath;lookPitch=-.48;}};document.querySelector('.rooms').append(bathButton);
   const ensuiteButton=document.createElement('button');ensuiteButton.dataset.room='ensuite';ensuiteButton.textContent='10　主臥衛浴';ensuiteButton.onclick=()=>{select('ensuite');if(walking){[walkX,walkY,walkYaw]=stops.ensuite;lookPitch=-.35;}};document.querySelector('.rooms').append(ensuiteButton);
@@ -61,7 +61,7 @@
   const throwGeo=new T.PlaneGeometry(66,149,28,48),tp=throwGeo.attributes.position;
   for(let i=0;i<tp.count;i++){const x=tp.getX(i),y=tp.getY(i);tp.setZ(i,Math.sin(y*.12+x*.08)*.8+Math.sin(y*.4)*.25);}throwGeo.computeVertexNormals();const runner=new T.Mesh(throwGeo,throwMat);runner.rotation.x=-Math.PI/2;runner.position.copy(W(558,965,49));runner.castShadow=runner.receiveShadow=true;scene.add(runner);
   // Brushed metal mixer and towel bar make the wet area read at human scale.
-  box(941,498,45,2,2,chrome,112);box(952,497,24,1,35,linen,77);
+  box(1016,496,22,2,2,chrome,112);box(1031,468,1,24,35,linen,77);
   // Subtle ceramic tile joints on the bath wall and splashback.
   const joint=mat('#bab6ae',.95);
   for(let z=60;z<260;z+=60)box(770,300.2,273,.3,.13,joint,z);
@@ -79,7 +79,7 @@
   const retained=new Set();
   for(const [x,y]of wanted){let best=null,d=Infinity;for(const l of points){if(retained.has(l))continue;const v=l.position.distanceTo(W(x,y,235));if(v<d){d=v;best=l;}}if(best)retained.add(best);}
   for(const l of points){l.castShadow=false;if(!retained.has(l))l.removeFromParent();}
-  const night=document.querySelector('#night');const ambience=()=>{hemi.intensity=night.checked?.3:1.05;hemi.groundColor.set('#8b8175');sun.intensity=night.checked?.08:2.1;renderer.toneMappingExposure=1.15;};night.addEventListener('change',ambience);ambience();
+  const night=document.querySelector('#night');const ambience=()=>{hemi.intensity=night.checked?.3:1.05;hemi.groundColor.set('#8b8175');sun.intensity=night.checked?.08:2.1;renderer.toneMappingExposure=1.2;};night.addEventListener('change',ambience);ambience();
   let highQuality=!mobile;
   const quality=document.querySelector('select[aria-label="畫質"]');
   function setQuality(){highQuality=quality.value==='high';renderer.setPixelRatio(highQuality?Math.min(devicePixelRatio,1.75):Math.min(devicePixelRatio,1));scene.traverse(o=>{if(o.isSpotLight)o.castShadow=highQuality;});renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;}
