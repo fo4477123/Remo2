@@ -1,6 +1,6 @@
 /* Warm-home walkthrough: phone input, rendering budget, and design validation. */
 (() => {
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261025-shower1';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261025-gpu1';document.head.append(css);
   const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<850;
   document.body.classList.add('home-ready');
   // Full-height walls and real windows are the default; cutaway is opt-in.
@@ -83,10 +83,11 @@
   for(const [x,y]of wanted){let best=null,d=Infinity;for(const l of points){if(retained.has(l))continue;const v=l.position.distanceTo(W(x,y,235));if(v<d){d=v;best=l;}}if(best)retained.add(best);}
   for(const l of points){l.castShadow=false;if(!retained.has(l))l.removeFromParent();}
   const night=document.querySelector('#night');const ambience=()=>{hemi.intensity=night.checked?.3:1.05;hemi.groundColor.set('#8b8175');sun.intensity=night.checked?.08:2.1;renderer.toneMappingExposure=1.2;};night.addEventListener('change',ambience);ambience();
-  let highQuality=!mobile;
-  const quality=document.querySelector('select[aria-label="畫質"]');
-  function setQuality(){highQuality=quality.value==='high';renderer.setPixelRatio(highQuality?Math.min(devicePixelRatio,1.75):Math.min(devicePixelRatio,1));scene.traverse(o=>{if(o.isSpotLight)o.castShadow=highQuality;});renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;B1_ENGINE.status.textContent=(B1_ENGINE.webgpu?'WebGPU':'WebGL2')+' / '+(highQuality?'電影光影':'流暢模式');}
-  quality.value=mobile?'balanced':'high';quality.onchange=setQuality;setQuality();
+  let quality=document.querySelector('select[aria-label="畫質"]');
+  if(!quality){const label=document.createElement('label');label.className='gpu-quality-control';label.append(document.createTextNode('GPU 調校 '));quality=document.createElement('select');quality.setAttribute('aria-label','畫質');for(const [value,text]of [['auto','自動省電'],['low','整合顯示卡'],['balanced','平衡'],['high','畫質優先']]){const option=document.createElement('option');option.value=value;option.textContent=text;quality.append(option);}label.append(quality);document.querySelector('.toolbar').append(label);}
+  const automaticQuality=mobile||!B1_ENGINE.webgpu||B1_ENGINE.gpuProfile.tier==='integrated'?'low':'high';
+  function setQuality(){const selected=quality.value,effective=selected==='auto'?automaticQuality:selected;B1_ENGINE.quality=effective;const ratio=effective==='high'?Math.min(devicePixelRatio,1.5):effective==='low'?Math.min(devicePixelRatio,.82):Math.min(devicePixelRatio,1);renderer.setPixelRatio(ratio);scene.traverse(o=>{if(o.isSpotLight)o.castShadow=effective==='high';});renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;const name=effective==='low'?'整合 GPU 省電':effective==='balanced'?'平衡畫質':'畫質優先';B1_ENGINE.status.textContent=`${B1_ENGINE.webgpu?'WebGPU':'WebGL2'} · ${name}`;B1_ENGINE.status.title=B1_ENGINE.webgpu?`WebGPU ${B1_ENGINE.gpuProfile.tier==='integrated'?'整合 GPU':''}；目前畫質設定：${name}`:B1_ENGINE.reason;quality.title=`自動建議：${automaticQuality==='low'?'整合顯示卡省電':'畫質優先'}；可手動調整`}
+  try{quality.value=localStorage.getItem('b1-gpu-quality-v1')||'auto';}catch{quality.value='auto';}if(!['auto','low','balanced','high'].includes(quality.value))quality.value='auto';quality.onchange=()=>{setQuality();try{localStorage.setItem('b1-gpu-quality-v1',quality.value);}catch{}};setQuality();
   // Refresh static shadows when any geometry-changing UI is used.
   document.addEventListener('click',()=>{renderer.shadowMap.needsUpdate=true;});
   document.addEventListener('change',()=>{renderer.shadowMap.needsUpdate=true;});
@@ -113,7 +114,7 @@
   const capture=document.createElement('button');capture.id='capture-view';capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{renderer.render(scene,camera);const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Curated photoreal render gallery: these are high-detail design views, while
   // the canvas above remains the measured interactive model.
-  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261025-shower1'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
+  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261025-gpu1'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
   const gallery=document.createElement('section');gallery.className='render-gallery';gallery.innerHTML='<div class="render-gallery__head"><div><p class="overline">PREMIUM RENDER COLLECTION</p><b>高級空間渲染</b></div><label>選擇空間 <select aria-label="選擇高級渲染空間"></select></label></div><figure><img alt="高級室內設計渲染"><figcaption></figcaption></figure>';
   const gallerySelect=gallery.querySelector('select'),galleryImage=gallery.querySelector('img'),galleryCaption=gallery.querySelector('figcaption');
   for(const [key,[label]] of Object.entries(premiumRenders)){const option=document.createElement('option');option.value=key;option.textContent=label;gallerySelect.append(option);}
@@ -136,10 +137,10 @@
   else if(mobile&&!location.hash&&!location.search){renderButton.click();}
   select(selected);
   B1_REVIEW.audit=()=>({roomHeight:ROOM_HEIGHT,kitchenHeight:KITCHEN_HEIGHT,windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
-  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261025-shower1';
+  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261025-gpu1';
   const loadGame=()=>{
     const modules=['studio-models.js','studio-refine.js','studio-shell.js','studio-life.js','studio-activities.js','studio-community.js','studio-remake.js','studio-owned.js','studio-music.js','studio-game.js'];let index=0;
-    const next=async()=>{if(index===modules.length){try{await B1_ENGINE.prepare();}catch(error){console.error(error);loadFailure('WebGPU');return;}B1_REVIEW.ready=true;document.querySelector('footer span:last-child').textContent='室內 280 cm／廚房 245 cm';if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261025-shower1';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
+    const next=async()=>{if(index===modules.length){try{await B1_ENGINE.prepare();}catch(error){console.error(error);loadFailure('WebGPU');return;}B1_REVIEW.ready=true;document.querySelector('footer span:last-child').textContent='室內 280 cm／廚房 245 cm';if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261025-gpu1';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
   };
   renderScript.onload=loadGame;renderScript.onerror=loadGame;document.head.append(renderScript);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clearMovement();loading.textContent='圖形記憶體暫時不足，請重新載入頁面。';view.append(loading);});

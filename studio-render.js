@@ -21,8 +21,8 @@
   };
   engine.prepare=async()=>{window.B1_MUSIC?.attachGame();await setup;await window.B1_REMAKE?.ready;await window.B1_OWNED?.ready;await B1_MODELS.pbrReady;renderer.setSize(view.clientWidth,view.clientHeight,false);camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();
     if(engine.webgpu){loading.textContent='正在編譯 WebGPU 材質與柔光…';await renderer.compileAsync(scene,camera);}
-    engine.ready=true;engine.status.textContent=engine.webgpu?(document.querySelector('select[aria-label="畫質"]').value==='high'?'WebGPU · 電影光影':'WebGPU · 流暢模式'):'WebGL2 · 相容模式';
-    engine.status.title=engine.webgpu?'原生 WebGPU · SSGI 間接光 · 接觸陰影 · 時間抗鋸齒':engine.reason;
+    engine.ready=true;engine.status.textContent=engine.webgpu?`WebGPU · ${engine.quality==='low'?'整合 GPU 省電':engine.quality==='balanced'?'平衡畫質':'畫質優先'}`:'WebGL2 · 相容模式';
+    engine.status.title=engine.webgpu?`原生 WebGPU · ${engine.quality==='high'?'SSGI 間接光與時間抗鋸齒':'低負載畫質，適合整合 GPU'}`:engine.reason;
   };
-  B1_REVIEW.rendering=engine.webgpu?'WebGPU · PBR / SSGI / temporal AA':'WebGL2 · PBR compatibility';B1_REVIEW.renderProfile=engine.webgpu?'webgpu-remake':'webgl2-compatible';B1_REVIEW.backend=engine.backend;
+  B1_REVIEW.rendering=engine.webgpu?(engine.quality==='high'?'WebGPU · PBR / SSGI / temporal AA':'WebGPU · PBR integrated-GPU profile'):'WebGL2 · PBR compatibility';B1_REVIEW.renderProfile=engine.webgpu?(engine.quality==='high'?'webgpu-remake':'webgpu-low-power'):'webgl2-compatible';B1_REVIEW.backend=engine.backend;
 })();
