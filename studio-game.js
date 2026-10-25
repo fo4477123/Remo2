@@ -1,7 +1,7 @@
 /* Warm-home exploration. Measured geometry stays authoritative; state is local. */
 (() => {
   'use strict';
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261025-owned2';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261025-quests1';document.head.append(css);
   const SAVE_KEY='b1-warm-home-exploration-v1', reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const roomList=[
     {id:'entry',name:'迎接日常',label:'大門與隱藏門',bounds:[769,510,445,190],tip:'沿電視牆轉角是大門，再接客衛隱藏門櫃；室內走道通往其他房間。'},
@@ -19,7 +19,10 @@
     {id:'work',title:'換個姿勢工作',body:'到多功能室，把工作桌升到站姿高度。',needs:['desk'],room:'media'},
     {id:'home',title:'準備回家時光',body:'開啟客廳電視，展開小餐桌。',needs:['tv','table'],room:'living'},
     {id:'evening',title:'留一盞暖光',body:'切換夕暮或夜間，看看光如何改變空間。',needs:['mood'],room:'living'},
-    {id:'morning',title:'讓家動起來',body:'拉上客廳窗簾、打開冰箱、試試水龍頭與洗衣機。',needs:['curtain-living','fridge','faucet','washer'],room:'living'}
+    {id:'morning',title:'讓家動起來',body:'拉上客廳窗簾、打開冰箱、試試水龍頭與洗衣機。',needs:['curtain-living','fridge','faucet','washer'],room:'living'},
+    {id:'fresh-air',title:'把春光請進家',body:'拉開客廳窗簾，再為次臥打開百葉，讓兩個空間都迎進日光。',needs:['curtain-living','guest-blind'],room:'guest'},
+    {id:'weekend-reset',title:'週末整理日',body:'收好主臥寢具、打開床下收納，再把多功能室臥榻整理好。',needs:['master-bed-lift','master-bed-store','bench-storage'],room:'master'},
+    {id:'winter-ready',title:'雪季裝備歸位',body:'把寶藍雪板拉出檢視，並點亮次臥閱讀燈，準備好出發。',needs:['snowboard-rack','guest-reading'],room:'guest'}
   ];
   const knownActions=new Set(['hidden','cleaning','wardrobe','desk','tv','table','mood','entrance','appliance','lobby-mail',...(window.B1_LIFE?.actors||[]).map(a=>a.id),...(window.B1_MODELS?.actors||[]).map(a=>a.id),'memory-wall']);
   let visited=new Set(),actions=new Set(),sceneMode='day',sound=false,saveOK=true,communityState={},storageState={};
@@ -31,10 +34,10 @@
   const button=(text,action,cls='')=>{const b=el('button',cls,text);b.type='button';b.onclick=action;return b;};
   const workspace=document.querySelector('.workspace');document.body.classList.add('game-ready');
   const intro=el('section','explore-intro');intro.setAttribute('aria-label','暖木日常探索');
-  intro.innerHTML='<div><p class="explore-eyebrow">B1 · QINGPU 8TH × 9TH STREET</p><h2>走進暖木日常</h2><p>九個空間，五個生活任務。拉開窗簾看看高鐵站方向，讓家隨你的日常動起來。</p></div>';
+  intro.innerHTML=`<div><p class="explore-eyebrow">B1 · QINGPU 8TH × 9TH STREET</p><h2>走進暖木日常</h2><p>九個空間，${missions.length}個生活任務。拉開窗簾看看高鐵站方向，讓家隨你的日常動起來。</p></div>`;
   const introActions=el('div','explore-intro-actions'),start=button('開始探索',()=>goRoom('living'),'explore-primary');
   const journalButton=button('探索手札',()=>openJournal());introActions.append(start,journalButton);intro.append(introActions);workspace.prepend(intro);
-  const progress=el('div','explore-progress');progress.innerHTML='<span class="explore-progress-label"></span><progress max="14" value="0" aria-label="探索完成進度"></progress><span class="explore-save"></span>';intro.append(progress);
+  const progress=el('div','explore-progress');progress.innerHTML=`<span class="explore-progress-label"></span><progress max="${9+missions.length}" value="0" aria-label="探索完成進度"></progress><span class="explore-save"></span>`;intro.append(progress);
   const hud=el('div','explore-hud');hud.innerHTML='<span class="explore-eyebrow">WARM HOME / EXPLORE</span><strong>暖木日常</strong><small>隨意走走，或打開探索手札</small>';view.append(hud);
   const crosshair=el('span','explore-crosshair');crosshair.setAttribute('aria-hidden','true');view.append(crosshair);
   const quickJournal=button('探索手札',()=>openJournal(),'explore-journal-trigger');view.append(quickJournal);
@@ -43,6 +46,8 @@
   const hint=el('div','explore-hint','WASD 移動 · 拖曳轉頭 · E 操作 · J 手札');view.append(hint);
   const toast=el('div','explore-toast');toast.setAttribute('role','status');toast.setAttribute('aria-live','polite');toast.hidden=true;view.append(toast);let toastUntil=0;
   const notify=message=>{toast.textContent=message;toast.hidden=false;toastUntil=performance.now()+3800;};
+  const burstStyle=el('style');burstStyle.textContent='.quest-celebration{position:absolute;inset:0;z-index:35;display:grid;place-items:center;pointer-events:none;overflow:hidden}.quest-celebration-card{display:grid;gap:5px;text-align:center;padding:17px 26px;border:1px solid #f5e5bb;border-radius:18px;background:linear-gradient(135deg,#fff9e9f5,#e8efddf5);box-shadow:0 12px 45px #26392c55;color:#304c43;animation:quest-pop 1.65s cubic-bezier(.2,.8,.25,1) both}.quest-celebration-card strong{font-size:19px}.quest-celebration-card span{font-size:13px;color:#71805e}.quest-particle{position:absolute;left:50%;top:50%;width:9px;height:14px;border-radius:3px;background:var(--tone);animation:quest-spark 1.35s ease-out both;animation-delay:var(--delay)}@keyframes quest-pop{0%{opacity:0;transform:translateY(18px) scale(.72)}18%{opacity:1;transform:translateY(0) scale(1.05)}35%{transform:scale(1)}83%{opacity:1}100%{opacity:0;transform:translateY(-18px) scale(.98)}}@keyframes quest-spark{0%{opacity:0;transform:translate(0,0) rotate(0) scale(.2)}16%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--turn)) scale(.6)}}@media(prefers-reduced-motion:reduce){.quest-celebration-card,.quest-particle{animation-duration:.01ms}}';document.head.append(burstStyle);
+  const celebrate=(title,detail='新收藏已加入客廳')=>{const burst=el('div','quest-celebration');burst.setAttribute('aria-hidden','true');const card=el('div','quest-celebration-card');card.append(el('strong','',`✦ ${title} 完成`),el('span','',detail));burst.append(card);const palette=['#d6ae64','#809477','#c68d79','#91abb0','#e8d6ac'];if(!reduced.matches)for(let i=0;i<28;i++){const p=el('i','quest-particle');p.style.setProperty('--dx',`${Math.round((Math.random()-.5)*Math.min(view.clientWidth*.8,760))}px`);p.style.setProperty('--dy',`${Math.round((Math.random()-.65)*Math.min(view.clientHeight*.8,520))}px`);p.style.setProperty('--turn',`${Math.round(Math.random()*720-360)}deg`);p.style.setProperty('--delay',`${Math.random()*.13}s`);p.style.setProperty('--tone',palette[i%palette.length]);burst.append(p);}view.append(burst);window.setTimeout(()=>burst.remove(),1900);chime();};
   const journal=el('dialog','explore-journal');journal.setAttribute('aria-labelledby','journal-title');
   journal.innerHTML='<div class="journal-head"><div><p class="explore-eyebrow">YOUR HOME JOURNAL</p><h2 id="journal-title">探索手札</h2></div></div><p class="journal-lead">任務沒有時間限制。走進每個空間，試試那些為日常留下的小設計。</p><div class="journal-missions"></div><h3>空間足跡</h3><div class="journal-rooms"></div><details class="journal-help"><summary>怎麼玩</summary><p>桌面：WASD／方向鍵移動，拖曳畫面轉頭。面向附近的物件，按 E 或點畫面提示。J 開關手札。Esc 釋放滑鼠或結束漫遊。</p><p>手機：左下搖桿移動、另一指拖曳轉頭，點畫面上的操作提示。上方房間選單可以快速前往空間。</p><p>門櫃會擋住行走；靠近並打開再通過。你的足跡與任務成果只儲存在這台裝置。</p></details>';
   const closeJournal=()=>{journal.close();keys.clear();};
@@ -63,7 +68,7 @@
     const roomsEl=journal.querySelector('.journal-rooms');roomsEl.replaceChildren();for(const r of roomList){const b=button(`${visited.has(r.id)?'✓':'○'} ${r.label}`,()=>goRoom(r.id));b.classList.toggle('is-visited',visited.has(r.id));b.title=r.tip;roomsEl.append(b);}
     for(const label of document.querySelectorAll('[data-explore-room]'))label.classList.toggle('is-visited',visited.has(label.dataset.exploreRoom));
   }
-  function award(id){if(actions.has(id))return;const before=completed().length;actions.add(id);persist();updateProgress();if(completed().length>before){notify(`完成手札：${missions.find(m=>m.needs.includes(id)&&m.needs.every(n=>actions.has(n))).title} · +100 經驗 / +30 生活點 / 新收藏已掛上記憶牆`);chime();}}
+  function award(id){if(actions.has(id))return;const before=completed().length;actions.add(id);persist();updateProgress();if(completed().length>before){const mission=missions.find(m=>m.needs.includes(id)&&m.needs.every(n=>actions.has(n)));notify(`完成手札：${mission.title} · +100 經驗 / +30 生活點 / 新收藏已掛上記憶牆`);celebrate(mission.title,'+100 XP · +30 生活點 · 客廳新增一張收藏');}}
   const moodRow=el('div','explore-moods');moodRow.setAttribute('role','group');moodRow.setAttribute('aria-label','光影情境');
   for(const [id,label]of [['day','晨光'],['dusk','夕暮'],['night','夜間']]){const b=button(label,()=>setMood(id,true));b.dataset.mood=id;moodRow.append(b);}introActions.append(moodRow);
   const journalMoods=moodRow.cloneNode(true);journalMoods.querySelectorAll('button').forEach(b=>b.onclick=()=>setMood(b.dataset.mood,true));journal.querySelector('.journal-lead').after(journalMoods);
@@ -138,6 +143,6 @@
     nearby=chooseTarget();prompt.hidden=marker.hidden=!nearby;hint.hidden=!walking||canvas.hidden||journal.open||Boolean(nearby);if(nearby){prompt.textContent=`E · ${nearby.verbs?nearby.verbs[nearby.on?1:0]:`${nearby.on?'關閉':'打開'}${nearby.name}`}`;prompt.setAttribute('aria-label',prompt.textContent);const p=W(nearby.x,nearby.y,nearby.h).project(camera);marker.hidden=Math.abs(p.x)>1||Math.abs(p.y)>1||p.z>1;marker.style.left=`${(p.x+1)*canvas.clientWidth/2}px`;marker.style.top=`${(1-p.y)*canvas.clientHeight/2}px`;}
     if(visited.size===9&&completed().length===missions.length&&!completeNotified){completeNotified=true;notify('暖木日常探索完成！所有空間與日常任務已收集。');chime();}
   }
-  window.B1_GAME={recordAction:award,save:persist,notify,setTour,tick,goRoom,toggle,setMood,visible,chooseTarget:()=>chooseTarget()?.id||null,openJournal,snapshot:()=>({visited:[...visited],actions:[...actions],completed:completed().map(m=>m.id),scene:sceneMode,currentRoom,actors:Object.fromEntries(actors.map(a=>[a.id,{open:a.on,progress:a.p}])),saveOK}),roomList};
+  window.B1_GAME={recordAction:award,save:persist,notify,celebrate,setTour,tick,goRoom,toggle,setMood,visible,chooseTarget:()=>chooseTarget()?.id||null,openJournal,snapshot:()=>({visited:[...visited],actions:[...actions],completed:completed().map(m=>m.id),scene:sceneMode,currentRoom,actors:Object.fromEntries(actors.map(a=>[a.id,{open:a.on,progress:a.p}])),saveOK}),roomList};
   updateProgress();updateLifeControls();setMood(sceneMode);window.B1_COMMUNITY?.attachGame(B1_GAME);B1_REVIEW.gameReady=true;
 })();
