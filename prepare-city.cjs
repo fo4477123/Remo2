@@ -1,0 +1,22 @@
+// OSM's map API XML contains only nodes/ways/tags; extract these finite records.
+const fs=require('node:fs'),path=require('node:path');
+const decode=s=>s.replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&');
+const attrs=s=>Object.fromEntries([...s.matchAll(/([\w:]+)="([^"]*)"/g)].map(m=>[m[1],decode(m[2])]));
+const nodes=new Map(),ways=new Map();
+for(let i=0;i<4;i++){const xml=fs.readFileSync(path.join(__dirname,`qa-output/qingpu-${i}.osm`),'utf8');if(!xml.includes('<osm'))throw Error('Missing OSM tile '+i);for(const m of xml.matchAll(/<node\b([^>]*?)(?:\/>|>([\s\S]*?)<\/node>)/g)){const a=attrs(m[1]),tags=Object.fromEntries([...(m[2]||'').matchAll(/<tag\b([^>]+)\/>/g)].map(t=>{const a=attrs(t[1]);return [a.k,a.v];}));nodes.set(a.id,{lat:Number(a.lat),lon:Number(a.lon),tags});}for(const m of xml.matchAll(/<way\b([^>]*)>([\s\S]*?)<\/way>/g)){const a=attrs(m[1]),tags=Object.fromEntries([...m[2].matchAll(/<tag\b([^>]+)\/>/g)].map(t=>{const a=attrs(t[1]);return [a.k,a.v];}));ways.set(a.id,{nodes:[...m[2].matchAll(/<nd ref="(\d+)"\/>/g)].map(n=>n[1]),tags});}}
+const origin=[121.214,25.012],xy=n=>[Math.round((n.lon-origin[0])*111320*Math.cos(origin[1]*Math.PI/180)*10)/10,Math.round((origin[1]-n.lat)*1113200)/10],roads=[],buildings=[],land=[],rails=[],places=[],shops=[];
+const retail=t=>t.name&&(t.shop||['restaurant','cafe','fast_food','bank','pharmacy','clinic','bar','pub','food_court'].includes(t.amenity));
+const relevant=/領航|高鐵桃園|桃園體育園區|美術館|陽光劇場|IKEA|宜家|書法|環球|青埔八街|青埔九街/;
+for(const [id,n]of nodes)if(relevant.test(n.tags.name||''))places.push({type:'node',id,...n.tags,xy:xy(n),lat:n.lat,lon:n.lon});
+for(const [id,n]of nodes)if(retail(n.tags))shops.push({id:'n'+id,name:n.tags.name,kind:n.tags.shop||n.tags.amenity,xy:xy(n)});
+for(const [id,w]of ways){const t=w.tags,p=w.nodes.filter(n=>nodes.has(n)).map(n=>xy(nodes.get(n)));if(p.length<2)continue;
+ if(t.highway&&!['construction','proposed','steps','motorway','motorway_link'].includes(t.highway))roads.push({id,name:t.name||'',type:t.highway,points:p,oneway:t.oneway||'no'});
+ if(t.building){const xs=p.map(q=>q[0]),ys=p.map(q=>q[1]),x=Math.min(...xs),y=Math.min(...ys),height=parseFloat(t.height)||parseFloat(t['building:levels'])*3.3||16.5;buildings.push({id,name:t.name||'',box:[x,y,Math.max(...xs)-x,Math.max(...ys)-y],height:Math.min(110,Math.max(4,height))});}
+ if(t.natural==='water'||t.leisure==='park')land.push({kind:t.natural==='water'?'water':'park',points:p});
+ if(['rail','light_rail'].includes(t.railway))rails.push({points:p,name:t.name||''});
+ if(relevant.test(t.name||''))places.push({type:'way',id,...t,xy:[0,1].map(i=>p.reduce((s,q)=>s+q[i],0)/p.length)});
+ if(retail(t))shops.push({id:'w'+id,name:t.name,kind:t.shop||t.amenity,xy:[0,1].map(i=>p.reduce((s,q)=>s+q[i],0)/p.length)});
+}
+const wayNodes=name=>new Set([...ways.values()].filter(w=>w.tags.name===name).flatMap(w=>w.nodes)),eight=wayNodes('青埔八街'),nine=wayNodes('青埔九街'),cross=[...eight].filter(n=>nine.has(n)&&nodes.has(n)).map(n=>xy(nodes.get(n)));
+const data={source:'© OpenStreetMap contributors',license:'ODbL-1.0',sourceUrl:'https://www.openstreetmap.org/copyright',fetched:'2026-10-25',origin,bounds:[-1917,-1893,3935,5122],roads,buildings,land,rails,shops,home:cross[0]||null,places};
+fs.mkdirSync('assets/city',{recursive:true});fs.writeFileSync('assets/city/qingpu-map.json',JSON.stringify(data));fs.writeFileSync('qa-output/city-map-report.json',JSON.stringify({roads:roads.length,buildings:buildings.length,shops:shops.length,intersection:cross,places},null,2));console.log(JSON.stringify({roads:roads.length,buildings:buildings.length,shops:shops.length,intersection:cross,places:places.length}));

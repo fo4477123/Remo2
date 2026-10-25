@@ -18,7 +18,11 @@
     actor(id,name,controlX,controlY,shower?106:100,room,['開啟'+name,'關閉'+name],p=>{g.visible=p>.01;g.scale.y=Math.max(.01,p);g.position.y=top*(1-p);if(splash){splash.visible=p>.01;splash.scale.setScalar(.72+.28*Math.sin(performance.now()*.012));}},shower?60:45);
   }
   stream('bath-faucet','客衛水龍頭',788,465,94,80,'bath');stream('ensuite-faucet','主衛水龍頭',254,778,94,80,'ensuite');
-  stream('bath-shower','客衛花灑',1020,452,205,5,'bath',true,1026,499);stream('ensuite-shower','主衛花灑',367,943,205,5,'ensuite',true,367,943);
+  const showerDoor=new T.Group();showerDoor.name='guest-shower-door';showerDoor.position.copy(W(914,448));scene.add(showerDoor);
+  const showerGlass=new T.Mesh(new T.BoxGeometry(61,195,1.4),glass);showerGlass.position.set(30.5,101.5,0);showerGlass.castShadow=false;showerDoor.add(showerGlass);
+  const showerHandle=new T.Mesh(new T.BoxGeometry(1.4,22,4),metal);showerHandle.position.set(50,110,0);showerDoor.add(showerHandle);
+  const showerDoorActor=actor('bath-shower-door','客衛淋浴玻璃門',913,479,115,'bath',['打開淋浴玻璃門','關閉淋浴玻璃門'],p=>showerDoor.rotation.y=Math.PI/2-p*Math.PI/2);showerDoorActor.leaf=showerDoor;showerDoorActor.span=61;showerDoorActor.apply(0);
+  stream('bath-shower','客衛花灑',1020,452,205,5,'bath',true,1030,475);stream('ensuite-shower','主衛花灑',367,943,205,5,'ensuite',true,367,943);
   const flushes=[];
   for(const [id,name,x,y,room]of [['bath-flush','客衛沖水',805,339,'bath'],['ensuite-flush','主衛沖水',279,858,'ensuite']]){
     const g=new T.Group();g.position.copy(W(x,y,29));g.name=id+'-swirl';scene.add(g);const ring=new T.Mesh(new T.TorusGeometry(9,.7,6,40,.0+Math.PI*1.75),waterMat);ring.rotation.x=-Math.PI/2;ring.scale.set(1.4,1,1);g.add(ring);g.visible=false;effects.push(g);flushes.push(g);
@@ -64,7 +68,7 @@
   const standBefore=canStand;canStand=(x,y)=>standBefore(x,y)&&![[435,852],[565,473]].some(([a,b])=>x>a-12&&x<a+36&&y>b-12&&y<b+36);
   // Join the existing controls/state machine instead of maintaining a second save system.
   B1_LIFE.actors.push(...actors);const tickBefore=B1_LIFE.tick,resetBefore=B1_LIFE.reset;
-  B1_LIFE.tick=(dt,now)=>{tickBefore(dt,now);for(const [id,left]of timed){if(left<=0)continue;const next=Math.max(0,left-dt);timed.set(id,next);if(next===0&&actors.find(a=>a.id===id)?.on)B1_GAME.toggle(id);}for(const g of flushes)if(g.visible)g.rotation.y+=dt*4;if(hood.on)fan.rotation.y+=dt*9;if(flames.visible)flames.scale.y=1+Math.sin(now*.015)*.09;};
+  B1_LIFE.tick=(dt,now)=>{tickBefore(dt,now);for(const [id,left]of timed){if(left<=0)continue;const next=Math.max(0,left-dt);timed.set(id,next);if(next===0&&actors.find(a=>a.id===id)?.on)B1_GAME.toggle(id,{stayHere:true});}for(const g of flushes)if(g.visible)g.rotation.y+=dt*4;if(hood.on)fan.rotation.y+=dt*9;if(flames.visible)flames.scale.y=1+Math.sin(now*.015)*.09;};
   B1_LIFE.reset=()=>{resetBefore();timed.clear();fan.rotation.y=0;flushes.forEach(g=>g.rotation.y=0);};
-  window.B1_ACTIVITIES={actors,effects,streams,flames,fan,oven,upper,upperPivots,bench,lid,lamps,upperItems,benchItems,timers:()=>Object.fromEntries(timed),serialize:()=>({upper:upperStore.on,bench:benchStore.on}),restore:s=>{for(const [a,on]of [[upperStore,s?.upper===true],[benchStore,s?.bench===true]]){a.on=on;a.p=on?1:0;a.apply(a.p);}},snapshot:()=>({count:actors.length,active:actors.filter(a=>a.on).map(a=>a.id),timers:Object.fromEntries(timed),benchAngle:lid.rotation.x,upperAngles:upperPivots.map(g=>g.rotation.y)})};
+  window.B1_ACTIVITIES={actors,effects,streams,showerDoor,flames,fan,oven,upper,upperPivots,bench,lid,lamps,upperItems,benchItems,timers:()=>Object.fromEntries(timed),serialize:()=>({upper:upperStore.on,bench:benchStore.on}),restore:s=>{for(const [a,on]of [[upperStore,s?.upper===true],[benchStore,s?.bench===true]]){a.on=on;a.p=on?1:0;a.apply(a.p);}},snapshot:()=>({count:actors.length,active:actors.filter(a=>a.on).map(a=>a.id),timers:Object.fromEntries(timed),benchAngle:lid.rotation.x,upperAngles:upperPivots.map(g=>g.rotation.y)})};
 })();

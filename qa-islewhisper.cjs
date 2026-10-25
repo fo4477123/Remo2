@@ -1,0 +1,36 @@
+// Dependency-free Chromium/CDP verification; no files are uploaded by this script.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{spawn}=require('node:child_process');
+const assert=require('node:assert/strict');
+const root=__dirname,outputRoot=path.join(root,'qa-output');fs.mkdirSync(outputRoot,{recursive:true});const out=fs.mkdtempSync(path.join(outputRoot,'run-'));console.log('QA artifacts: '+out);
+const server=http.createServer((req,res)=>{const target=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!target.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(target,(err,data)=>{if(err){res.writeHead(404).end();return;}const ext=path.extname(target);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.jpg':'image/jpeg','.glb':'model/gltf-binary','.mp3':'audio/mpeg'})[ext]||'application/octet-stream');res.end(data);});});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
+(async()=>{
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const profile=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'b1-browser-'));
+ browser=spawn('C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',['--headless=new','--remote-debugging-port=0','--user-data-dir='+profile,'--no-first-run','--no-default-browser-check','--disable-background-networking','--enable-unsafe-swiftshader','--disable-gpu-vsync','--disable-frame-rate-limit','--disable-renderer-backgrounding','--disable-background-timer-throttling','--disable-features=CalculateNativeWinOcclusion','--enable-unsafe-webgpu','--ignore-gpu-blocklist','--enable-dawn-features=allow_unsafe_apis','--window-size=1440,1000','about:blank'],{windowsHide:true,stdio:'ignore'});
+ let port;for(let i=0;i<100;i++){try{port=fs.readFileSync(path.join(profile,'DevToolsActivePort'),'utf8').split('\n')[0];break;}catch{await sleep(200);}}
+ assert(port,'Chromium debugging port unavailable');
+ const tabs=await (await fetch(`http://127.0.0.1:${port}/json`)).json();ws=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await new Promise(r=>ws.addEventListener('open',r,{once:true}));
+ let id=0;const pending=new Map(),exceptions=[];ws.addEventListener('close',()=>{for(const p of pending.values())p.reject(new Error('Browser connection closed'));pending.clear();});
+ ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result);}}if(m.method==='Runtime.exceptionThrown'){exceptions.push(m.params.exceptionDetails);console.log('RUNTIME',JSON.stringify(m.params.exceptionDetails));}if(m.method==='Runtime.consoleAPICalled'&&m.params.type==='error'){const error=m.params.args.map(x=>x.value||x.description);exceptions.push(error);console.log('RENDER ERROR',JSON.stringify(error));}};
+ const cdp=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}));});
+ const ev=async expression=>{const r=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+ await cdp('Runtime.enable');await cdp('Page.enable');await cdp('Network.enable');
+ await cdp('Network.setBlockedURLs',{urls:['https://*','http://cdn.*']});
+ await cdp('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/index.html?renderer=${process.env.B1_RENDERER||'webgl'}`});
+ const wait=async ex=>{for(let i=0;i<450;i++){if(await ev(ex))return;await sleep(150);}throw Error('Wait failed '+ex);};await wait('Boolean(window.B1_REVIEW?.ready&&window.B1_ENGINE?.ready&&window.B1_ISLE)');
+ await ev('(()=>{const q=document.querySelector("select[aria-label=畫質]");q.value="low";q.dispatchEvent(new Event("change"));})()');await cdp('Page.bringToFront');await cdp('Page.captureScreenshot',{format:'png'});
+ const shot=async name=>{await sleep(350);const s=await cdp('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(s.data,'base64'));};
+ const settle=()=>wait('B1_ISLE.actors.every(a=>a.p===(a.on?1:0))');
+ assert.deepEqual(await ev('B1_ISLE.snapshot().closed'),[80,60,53]);assert.deepEqual(await ev('B1_ISLE.snapshot().open'),[80,120,74]);assert.deepEqual(await ev('designSpecs.living.table'),[1100,800,60,80]);
+ assert(Math.abs(await ev('B1_ISLE.snapshot().cupBottom')-53)<.1,'Cup rests on 53cm top, not floating at old height');
+ await ev('B1_GAME.goRoom("living");walkX=1200;walkY=765;walkYaw=Math.atan2(1130-1200,840-765);lookPitch=-.62');await shot('isle-closed-east');
+ await ev('walkX=1080;walkY=745;walkYaw=Math.atan2(1130-1080,840-745);lookPitch=-.55');await shot('isle-closed-west');
+ await ev('setTour(false)');assert.equal(await ev('B1_GAME.toggle("coffee-expand")'),false,'Cannot unfold with lift down');await ev('B1_GAME.toggle("coffee-lift")');await settle();assert(Math.abs(await ev('B1_ISLE.snapshot().cupBottom')-74)<.1,'Cup follows lift exactly');assert.equal(await ev('B1_GAME.toggle("coffee-expand")'),false,'Clear cup before unfolding');
+ await ev('B1_GAME.toggle("coffee-clear-top");B1_GAME.toggle("coffee-expand")');await settle();assert.equal(await ev('B1_ISLE.snapshot().expand'),1);assert.equal(await ev('B1_GAME.toggle("coffee-lift")'),false,'Cannot lower an unfolded top');
+ const dimensions=await ev('(()=>{const b=new T.Box3().setFromObject(B1_ISLE.carrier),v=b.getSize(new T.Vector3());return {x:v.x,z:v.z,max:b.max.y};})()');assert(Math.abs(dimensions.x-120)<.2&&Math.abs(dimensions.z-80)<.2&&Math.abs(dimensions.max-74)<.2,'Actual open geometry is 120x80 with top height74 '+JSON.stringify(dimensions));
+ await ev('B1_GAME.goRoom("living");walkX=1200;walkY=740;walkYaw=Math.atan2(1130-1200,840-740);lookPitch=-.4');await shot('isle-expanded');await ev('setTour(false);B1_GAME.toggle("coffee-expand")');await settle();await ev('B1_GAME.toggle("coffee-lift");B1_GAME.toggle("coffee-clear-top")');await settle();
+ assert.equal(await ev('B1_GAME.toggle("coffee-stool-lid-0")'),false,'Tucked stools cannot open through cabinet');await ev('B1_GAME.toggle("coffee-stool-0");B1_GAME.toggle("coffee-stool-1")');await settle();await ev('B1_GAME.toggle("coffee-stool-lid-0");B1_GAME.toggle("coffee-drawer-wide");B1_GAME.toggle("coffee-drawer-left");B1_GAME.toggle("coffee-drawer-right")');await settle();assert.equal(await ev('B1_GAME.toggle("coffee-stool-0")'),false,'Close seat before stowing');
+ await ev('B1_GAME.goRoom("living");walkX=1210;walkY=750;walkYaw=Math.atan2(1145-1210,840-750);lookPitch=-.68');await shot('isle-storage-east');await ev('walkX=1078;walkY=744;walkYaw=Math.atan2(1120-1078,840-744);lookPitch=-.6');await shot('isle-storage-west');
+ assert.equal(exceptions.length,0,'No runtime errors');fs.writeFileSync(path.join(out,'isle-report.json'),JSON.stringify({snapshot:await ev('B1_ISLE.snapshot()'),dimensions,exceptions},null,2));console.log('PASS official Isle Whisper dimensions, fold/lift, three drawers, two lift-seat stools, guards and cup support');await cdp('Browser.close');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{ws?.close();browser?.kill();server.close();});

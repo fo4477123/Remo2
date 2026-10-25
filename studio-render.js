@@ -15,11 +15,11 @@
     const value={pipeline:renderPipeline,gi,temporal};pipelines.set(world,value);return value;
   }
   renderer.render=(world,cam)=>{
-    if(nested||!engine.ready||!engine.webgpu||!nodes||cam!==camera||renderer.getRenderTarget()||document.querySelector('select[aria-label="畫質"]')?.value!=='high')return nativeRender(world,cam);
+    if(nested||!engine.ready||!engine.webgpu||!nodes||cam!==camera||renderer.getRenderTarget()||engine.quality!=='high')return nativeRender(world,cam);
     nested=true;try{pipelineFor(world).pipeline.render();}finally{nested=false;}
     B1_REVIEW.sceneCalls=renderer.info.render.drawCalls||renderer.info.render.calls;B1_REVIEW.sceneTriangles=renderer.info.render.triangles;
   };
-  engine.prepare=async()=>{window.B1_MUSIC?.attachGame();await setup;await window.B1_REMAKE?.ready;await window.B1_OWNED?.ready;await B1_MODELS.pbrReady;renderer.setSize(view.clientWidth,view.clientHeight,false);camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();
+  engine.prepare=async()=>{window.B1_MUSIC?.attachGame();await setup;await window.B1_CITY?.ready;await window.B1_REMAKE?.ready;await window.B1_OWNED?.ready;await window.B1_ISLE?.ready;await B1_MODELS.pbrReady;renderer.setSize(view.clientWidth,view.clientHeight,false);camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();
     if(engine.webgpu){loading.textContent='正在編譯 WebGPU 材質與柔光…';await renderer.compileAsync(scene,camera);}
     engine.ready=true;engine.status.textContent=engine.webgpu?`WebGPU · ${engine.quality==='low'?'整合 GPU 省電':engine.quality==='balanced'?'平衡畫質':'畫質優先'}`:'WebGL2 · 相容模式';
     engine.status.title=engine.webgpu?`原生 WebGPU · ${engine.quality==='high'?'SSGI 間接光與時間抗鋸齒':'低負載畫質，適合整合 GPU'}`:engine.reason;

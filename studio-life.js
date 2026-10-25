@@ -48,8 +48,8 @@
   document.querySelector('input[aria-label="氣氛燈亮度"]')?.addEventListener('input',refreshLighting);
   document.querySelector('#night').addEventListener('change',refreshLighting);
   function tick(dt,now){
-    if(washer.on&&washer.p>.1){washSeconds=Math.max(0,washSeconds-dt);drum.rotation.z+=dt*2.8;washerLed.material.emissiveIntensity=.7+Math.sin(now*.004)*.3;if(!washSeconds)window.B1_GAME?.toggle('washer');}
-    if(faucet.on){waterSeconds=Math.max(0,waterSeconds-dt);water.scale.x=.95+Math.sin(now*.02)*.06;if(!waterSeconds)window.B1_GAME?.toggle('faucet');}
+    if(washer.on&&washer.p>.1){washSeconds=Math.max(0,washSeconds-dt);drum.rotation.z+=dt*2.8;washerLed.material.emissiveIntensity=.7+Math.sin(now*.004)*.3;if(!washSeconds)window.B1_GAME?.toggle('washer',{stayHere:true});}
+    if(faucet.on){waterSeconds=Math.max(0,waterSeconds-dt);water.scale.x=.95+Math.sin(now*.02)*.06;if(!waterSeconds)window.B1_GAME?.toggle('faucet',{stayHere:true});}
   }
   window.B1_LIFE={actors,tick,refreshLighting,curtains,zones,fridgePivots,drum,water,fridgeLight,
     reset:()=>{washSeconds=waterSeconds=0;drum.rotation.z=0;},

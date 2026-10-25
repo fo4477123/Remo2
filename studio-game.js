@@ -1,7 +1,7 @@
 /* Warm-home exploration. Measured geometry stays authoritative; state is local. */
 (() => {
   'use strict';
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261025-gpu1';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261026-world1';document.head.append(css);
   const SAVE_KEY='b1-warm-home-exploration-v1', reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const roomList=[
     {id:'entry',name:'迎接日常',label:'大門與隱藏門',bounds:[769,510,445,190],tip:'沿電視牆轉角是大門，再接客衛隱藏門櫃；室內走道通往其他房間。'},
@@ -24,7 +24,7 @@
     {id:'weekend-reset',title:'週末整理日',body:'收好主臥寢具、打開床下收納，再把多功能室臥榻整理好。',needs:['master-bed-lift','master-bed-store','bench-storage'],room:'master'},
     {id:'winter-ready',title:'雪季裝備歸位',body:'把寶藍雪板拉出檢視，並點亮次臥閱讀燈，準備好出發。',needs:['snowboard-rack','guest-reading'],room:'guest'}
   ];
-  const knownActions=new Set(['hidden','cleaning','wardrobe','desk','tv','table','mood','entrance','appliance','lobby-mail',...(window.B1_LIFE?.actors||[]).map(a=>a.id),...(window.B1_MODELS?.actors||[]).map(a=>a.id),'memory-wall']);
+  const knownActions=new Set(['hidden','cleaning','wardrobe','desk','tv','table','mood','entrance','appliance','lobby-mail',...(window.B1_LIFE?.actors||[]).map(a=>a.id),...(window.B1_MODELS?.actors||[]).map(a=>a.id),...(window.B1_COMMUNITY?.actionIds||[]),'memory-wall']);
   let visited=new Set(),actions=new Set(),sceneMode='day',sound=false,saveOK=true,communityState={},storageState={};
   try{const s=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(s?.version===1){visited=new Set((Array.isArray(s.visited)?s.visited:[]).filter(id=>roomList.some(r=>r.id===id)));actions=new Set((Array.isArray(s.actions)?s.actions:[]).filter(id=>knownActions.has(id)));sceneMode=['day','dusk','night'].includes(s.scene)?s.scene:'day';sound=s.sound===true;communityState=s.community||{};storageState=s.storage||{};}}catch{saveOK=false;}
   window.B1_COMMUNITY?.restore(communityState);window.B1_ACTIVITIES?.restore(storageState);
@@ -34,9 +34,9 @@
   const button=(text,action,cls='')=>{const b=el('button',cls,text);b.type='button';b.onclick=action;return b;};
   const workspace=document.querySelector('.workspace');document.body.classList.add('game-ready');
   const intro=el('section','explore-intro');intro.setAttribute('aria-label','暖木日常探索');
-  intro.innerHTML=`<div><p class="explore-eyebrow">B1 · QINGPU 8TH × 9TH STREET</p><h2>走進暖木日常</h2><p>九個空間，${missions.length}個生活任務。拉開窗簾看看高鐵站方向，讓家隨你的日常動起來。</p></div>`;
+  intro.innerHTML=`<div><p class="explore-eyebrow">B1 · QINGPU 8TH × 9TH STREET</p><h2>走進暖木日常</h2><p>九個住宅空間、雙棟社區與青埔街區。開車、騎車或搭捷運，讓每次探索都成為家裡的新收藏。</p></div>`;
   const introActions=el('div','explore-intro-actions'),start=button('開始探索',()=>goRoom('living'),'explore-primary');
-  const journalButton=button('探索手札',()=>openJournal());introActions.append(start,journalButton);intro.append(introActions);workspace.prepend(intro);
+  const journalButton=button('探索手札',()=>openJournal());introActions.append(start,journalButton,button('青埔城市慢遊',()=>B1_CITY.start()));intro.append(introActions);workspace.prepend(intro);
   const progress=el('div','explore-progress');progress.innerHTML=`<span class="explore-progress-label"></span><progress max="${9+missions.length}" value="0" aria-label="探索完成進度"></progress><span class="explore-save"></span>`;intro.append(progress);
   const hud=el('div','explore-hud');hud.innerHTML='<span class="explore-eyebrow">WARM HOME / EXPLORE</span><strong>暖木日常</strong><small>隨意走走，或打開探索手札</small>';view.append(hud);
   const crosshair=el('span','explore-crosshair');crosshair.setAttribute('aria-hidden','true');view.append(crosshair);
@@ -73,9 +73,9 @@
   for(const [id,label]of [['day','晨光'],['dusk','夕暮'],['night','夜間']]){const b=button(label,()=>setMood(id,true));b.dataset.mood=id;moodRow.append(b);}introActions.append(moodRow);
   const journalMoods=moodRow.cloneNode(true);journalMoods.querySelectorAll('button').forEach(b=>b.onclick=()=>setMood(b.dataset.mood,true));journal.querySelector('.journal-lead').after(journalMoods);
   const lifeControls=el('section','journal-life');lifeControls.innerHTML='<h3>生活控制</h3><p>可在這裡直接控制設備，也可以到房間內靠近物件按 E。</p><div class="journal-life-actions"></div><small>窗外：青埔八街 × 青埔九街朝高鐵桃園站，後側為青松街。區域景觀模擬。</small>';journal.querySelector('.journal-rooms').after(lifeControls);
-  const lifeButtons=new Map();
-  for(const a of window.B1_LIFE?.actors||[]){const b=button('',()=>{toggle(a.id);updateLifeControls();});b.dataset.life=a.id;lifeButtons.set(a.id,b);lifeControls.querySelector('.journal-life-actions').append(b);}
-  function updateLifeControls(){for(const a of window.B1_LIFE?.actors||[]){const b=lifeButtons.get(a.id);b.textContent=`${a.name} · ${a.verbs[a.on?1:0]}`;b.setAttribute('aria-pressed',String(a.on));}}
+  const lifeButtons=new Map(),lifeControlActors=[...(window.B1_LIFE?.actors||[]),...(window.B1_MODELS?.actors||[])];
+  for(const a of lifeControlActors){const b=button('',()=>{toggle(a.id);updateLifeControls();});b.dataset.life=a.id;lifeButtons.set(a.id,b);lifeControls.querySelector('.journal-life-actions').append(b);}
+  function updateLifeControls(){for(const a of lifeControlActors){const b=lifeButtons.get(a.id);b.textContent=`${a.name} · ${a.verbs[a.on?1:0]}`;b.setAttribute('aria-pressed',String(a.on));}}
   let changingMood=false;
   function setMood(mode,earned=false){sceneMode=mode;changingMood=true;const n=document.querySelector('#night');n.checked=mode==='night';n.dispatchEvent(new Event('change'));changingMood=false;
     sun.color.set(mode==='dusk'?'#ffc48b':'#fff2da');sun.intensity=mode==='night'?.08:mode==='dusk'?1.05:2.1;hemi.intensity=mode==='night'?.3:mode==='dusk'?.8:1.05;scene.background.set(mode==='night'?'#303b38':mode==='dusk'?'#d5c5b2':'#dedfd5');renderer.toneMappingExposure=1.2;renderer.shadowMap.needsUpdate=true;
@@ -107,11 +107,12 @@
   const leaves=a=>a.leaves||(a.leaf?[a]:[]);
   const segment=a=>{a.leaf.updateWorldMatrix(true,false);const start=a.leaf.localToWorld(new T.Vector3(0,0,0)),end=a.leaf.localToWorld(new T.Vector3(a.span,0,0));return [[start.x+750,700-start.z],[end.x+750,700-end.z]];};
   function doorDistance(a,x,y){return Math.min(...leaves(a).map(l=>{const [s,e]=segment(l);return distanceToSegment(x,y,s,e);}));}
-  function toggle(id){const a=actor(id);if(!a)return false;if(window.B1_COMMUNITY?.inLobby)B1_COMMUNITY.returnHome(a.room||'living');if(a.interact){a.interact();return true;}if(a.guard&&!a.guard()){notify(a.blockedMessage);return false;}if(!a.on&&a.blocked?.()){notify(a.blockedMessage||'請先離開餐桌展開範圍，再展開桌面');return false;}a.on=!a.on;a.motion={from:a.p,at:performance.now()};a.flag?.(a.on);if(reduced.matches){const before=a.p;a.p=a.on?1:0;a.apply(a.p);if(leaves(a).length&&walking&&doorDistance(a,walkX,walkY)<13){a.p=before;a.on=before>.5;a.apply(before);a.flag?.(a.on);notify('門邊有點擠，請退一步再操作');return false;}}if(a.on&&a.p===1)award(id);updateLifeControls();renderer.shadowMap.needsUpdate=true;return true;}
+  function toggle(id,options={}){const a=actor(id);if(!a)return false;if(window.B1_COMMUNITY?.inLobby&&!options.stayHere)B1_COMMUNITY.returnHome(a.room||'living');if(a.interact){a.interact();return true;}if(a.guard&&!a.guard()){notify(a.blockedMessage);return false;}if(!a.on&&a.blocked?.()){notify(a.blockedMessage||'請先離開餐桌展開範圍，再展開桌面');return false;}a.on=!a.on;a.motion={from:a.p,at:performance.now()};a.flag?.(a.on);if(reduced.matches){const before=a.p;a.p=a.on?1:0;a.apply(a.p);if(leaves(a).length&&walking&&doorDistance(a,walkX,walkY)<13){a.p=before;a.on=before>.5;a.apply(before);a.flag?.(a.on);notify('門邊有點擠，請退一步再操作');return false;}}if(a.on&&a.p===1)award(id);updateLifeControls();renderer.shadowMap.needsUpdate=true;return true;}
   mainDoorButton.onclick=()=>toggle('entrance');doorButton.onclick=()=>toggle('hidden');cleaningButton.onclick=()=>toggle('cleaning');foldButton.onclick=()=>toggle('table');
   const staticStand=canStand;canStand=(x,y)=>(window.B1_COMMUNITY?.inLobby?B1_COMMUNITY.canStand(x,y):staticStand(x,y)&&actors.filter(a=>leaves(a).length).every(a=>doorDistance(a,x,y)>=12));B1_REVIEW.canStand=canStand;
   // Rays stop at physical walls, windows and other door leaves, not at rooms' names.
   const walls=B1_PLAN.walls.flatMap(w=>w.points.slice(1).map((p,i)=>[w.points[i],p]));
+  walls.push([[913,420],[913,447]]);
   for(const w of windowSpecs)walls.push(w.axis==='h'?[[w.from,w.line],[w.to,w.line]]:[[w.line,w.from],[w.line,w.to]]);
   function crossing(ax,ay,bx,by,c,d){const rx=bx-ax,ry=by-ay,sx=d[0]-c[0],sy=d[1]-c[1],den=rx*sy-ry*sx;if(Math.abs(den)<.0001)return null;const t=((c[0]-ax)*sy-(c[1]-ay)*sx)/den,u=((c[0]-ax)*ry-(c[1]-ay)*rx)/den;return t>0&&t<1&&u>=0&&u<=1?t:null;}
   function visible(a,x=walkX,y=walkY){const dist=Math.hypot(a.x-x,a.y-y);return !walls.some(([c,d])=>{const t=crossing(x,y,a.x,a.y,c,d);return t!==null&&t*dist>5&&(1-t)*dist>12;})&&!actors.some(b=>b!==a&&b.id!==a.id&&leaves(b).some(l=>crossing(x,y,a.x,a.y,...segment(l))!==null));}
@@ -131,13 +132,14 @@
   const selectBeforeGame=select;select=function(id){window.B1_COMMUNITY?.returnHome(id,false);repairStop(id);selectBeforeGame(id);};
   repairStops();let uiClock=0,currentRoom=null,completeNotified=false;
   function resetHome(){window.B1_COMMUNITY?.reset();setTour(false);for(const a of actors){a.on=Boolean(a.initial);a.p=a.on?1:0;a.motion=null;a.flag?.(a.on);a.apply(a.p);}window.B1_LIFE?.reset();setMood('day');visited.clear();actions.clear();completeNotified=false;persist();resetButton.textContent='重新探索';resetArmedUntil=0;updateProgress();updateLifeControls();renderer.shadowMap.needsUpdate=true;notify('已復原門櫃、設備與晨光，探索紀錄已清除');}
-  function tick(dt,now){window.B1_COMMUNITY?.tick(dt,now);if(window.B1_COMMUNITY?.inLobby)return;
+  function tick(dt,now){window.B1_COMMUNITY?.tick(dt,now);
     for(const a of actors){if(a.on&&!a.blockedMessage&&a.blocked?.()){a.on=false;a.motion={from:a.p,at:now};a.flag?.(false);}const goal=a.on?1:0;if(a.p===goal)continue;a.motion??={from:a.p,at:now};const elapsed=Math.max(0,Math.min(1,(now-a.motion.at)/500)),next=a.motion.from+(goal-a.motion.from)*elapsed,old=a.p,steps=Math.max(1,Math.ceil(Math.abs(next-old)/.025));let blocked=false;
       for(let i=1;i<=steps;i++){const candidate=old+(next-old)*i/steps,previous=a.p;a.p=candidate;a.apply(candidate*candidate*(3-2*candidate));if(leaves(a).length&&walking&&doorDistance(a,walkX,walkY)<12){a.p=previous;a.on=!a.on;a.motion={from:a.p,at:now};a.apply(a.p*a.p*(3-2*a.p));a.flag?.(a.on);updateLifeControls();blocked=true;break;}}
       if(!blocked&&elapsed===1){a.p=goal;a.apply(goal);a.motion=null;if(a.on)award(a.id);}renderer.shadowMap.needsUpdate=true;
     }
     window.B1_LIFE?.tick(dt,now);
     if(toastUntil&&now>toastUntil){toast.hidden=true;toastUntil=0;}if(resetArmedUntil&&now>resetArmedUntil){resetArmedUntil=0;resetButton.textContent='重新探索';}
+    if(window.B1_COMMUNITY?.inLobby){prompt.hidden=marker.hidden=hint.hidden=true;return;}
     if(journal.open)keys.clear();uiClock+=dt;if(uiClock<.12)return;uiClock=0;
     if(walking&&!canvas.hidden){const r=roomList.find(({bounds:[x,y,w,d]})=>walkX>=x&&walkX<=x+w&&walkY>=y&&walkY<=y+d);if(r){currentRoom=r.id;hud.querySelector('strong').textContent=r.name;hud.querySelector('small').textContent=r.label;if(!visited.has(r.id)){visited.add(r.id);persist();updateProgress();notify(`走進 ${r.label} · ${visited.size} / 9`);}}else{currentRoom=null;hud.querySelector('strong').textContent='串起日常的走道';hud.querySelector('small').textContent='前往其他房間，繼續探索';}}
     nearby=chooseTarget();prompt.hidden=marker.hidden=!nearby;hint.hidden=!walking||canvas.hidden||journal.open||Boolean(nearby);if(nearby){prompt.textContent=`E · ${nearby.verbs?nearby.verbs[nearby.on?1:0]:`${nearby.on?'關閉':'打開'}${nearby.name}`}`;prompt.setAttribute('aria-label',prompt.textContent);const p=W(nearby.x,nearby.y,nearby.h).project(camera);marker.hidden=Math.abs(p.x)>1||Math.abs(p.y)>1||p.z>1;marker.style.left=`${(p.x+1)*canvas.clientWidth/2}px`;marker.style.top=`${(1-p.y)*canvas.clientHeight/2}px`;}
