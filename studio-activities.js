@@ -5,14 +5,20 @@
   const metal=mat('#a7afaa',.24,{metalness:.85}),waterMat=mat('#b9e4ed',.12,{transparent:true,opacity:.58}),warm=mat('#fff0bf',.5,{emissive:0xffc766,emissiveIntensity:0});
   const actor=(id,name,x,y,h,room,verbs,apply,seconds=0)=>{const a={id,name,x,y,h,room,range:145,verbs,on:false,p:0,apply,flag:on=>{if(seconds)timed.set(id,on?seconds:0);}};actors.push(a);return a;};
   const streams=[];
-  function stream(id,name,x,y,top,bottom,room,shower=false){
+  function stream(id,name,x,y,top,bottom,room,shower=false,controlX=x,controlY=y){
     const g=new T.Group();g.name=id+'-water';scene.add(g);
-    for(let i=0;i<(shower?9:1);i++){const angle=i*Math.PI*2/9,r=shower?5:0,m=new T.Mesh(new T.CylinderGeometry(shower?.18:.55,shower?.35:.8,top-bottom,6),waterMat);m.position.copy(W(x+Math.cos(angle)*r,y+Math.sin(angle)*r,(top+bottom)/2));g.add(m);}
-    g.visible=false;streams.push(g);effects.push(g);
-    actor(id,name,x,y,shower?120:100,room,['開啟'+name,'關閉'+name],p=>{g.visible=p>.01;g.scale.y=Math.max(.01,p);g.position.y=top*(1-p);},shower?60:45);
+    if(shower){
+      const sprayMat=new T.MeshPhysicalMaterial({color:'#a6e4f4',roughness:.1,transparent:true,opacity:.72,emissive:'#27748b',emissiveIntensity:.12});
+      for(let i=0;i<18;i++){const angle=i*Math.PI*2/18,r=9,m=new T.Mesh(new T.CylinderGeometry(.8,1.55,top-bottom,8),sprayMat);m.position.copy(W(x+Math.cos(angle)*r,y+Math.sin(angle)*r,(top+bottom)/2));g.add(m);}
+      const mist=new T.Mesh(new T.CylinderGeometry(1.5,14,top-bottom-8,24,1,true),new T.MeshBasicMaterial({color:'#b9eaf4',transparent:true,opacity:.13,depthWrite:false,side:T.DoubleSide}));mist.position.copy(W(x,y,(top+bottom)/2));g.add(mist);
+    }else{const m=new T.Mesh(new T.CylinderGeometry(.55,.8,top-bottom,8),waterMat);m.position.copy(W(x,y,(top+bottom)/2));g.add(m);}
+    let splash=null;
+    if(shower){splash=new T.Group();splash.name=id+'-floor-splash';splash.position.copy(W(x,y,1.3));for(const [r,tubeRadius]of [[12,.55],[19,.38]]){const ring=new T.Mesh(new T.TorusGeometry(r,tubeRadius,8,48),new T.MeshBasicMaterial({color:'#a6e4f4',transparent:true,opacity:.62,depthWrite:false}));ring.rotation.x=Math.PI/2;splash.add(ring);}scene.add(splash);splash.visible=false;}
+    g.visible=false;streams.push(g);effects.push(g);if(splash)effects.push(splash);
+    actor(id,name,controlX,controlY,shower?106:100,room,['開啟'+name,'關閉'+name],p=>{g.visible=p>.01;g.scale.y=Math.max(.01,p);g.position.y=top*(1-p);if(splash){splash.visible=p>.01;splash.scale.setScalar(.72+.28*Math.sin(performance.now()*.012));}},shower?60:45);
   }
   stream('bath-faucet','客衛水龍頭',788,465,94,80,'bath');stream('ensuite-faucet','主衛水龍頭',254,778,94,80,'ensuite');
-  stream('bath-shower','客衛花灑',1020,452,205,5,'bath',true);stream('ensuite-shower','主衛花灑',367,943,205,5,'ensuite',true);
+  stream('bath-shower','客衛花灑',1020,452,205,5,'bath',true,1026,499);stream('ensuite-shower','主衛花灑',367,943,205,5,'ensuite',true,367,943);
   const flushes=[];
   for(const [id,name,x,y,room]of [['bath-flush','客衛沖水',805,339,'bath'],['ensuite-flush','主衛沖水',279,858,'ensuite']]){
     const g=new T.Group();g.position.copy(W(x,y,29));g.name=id+'-swirl';scene.add(g);const ring=new T.Mesh(new T.TorusGeometry(9,.7,6,40,.0+Math.PI*1.75),waterMat);ring.rotation.x=-Math.PI/2;ring.scale.set(1.4,1,1);g.add(ring);g.visible=false;effects.push(g);flushes.push(g);
