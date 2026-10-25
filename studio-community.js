@@ -33,7 +33,8 @@
     {id:'welcome',title:'新住戶報到',body:'查看大廳信箱，再走訪客廳、主臥與多功能室。',rooms:['living','master','media'],actions:['lobby-mail'],xp:180,coins:50,card:'鄰里問候'},
     {id:'smart-home',title:'智慧住宅體驗',body:'回家試用升降茶几、工作螢幕、冰箱與客廳窗簾。',rooms:[],actions:['coffee-lift','desk-screen','fridge','curtain-living'],xp:220,coins:60,card:'智慧日常'},
     {id:'daily-care',title:'舒服的一天',body:'體驗兩間衛浴的水龍頭、花灑和沖水，再點亮兩間臥室的閱讀燈。',rooms:[],actions:['bath-faucet','ensuite-faucet','bath-shower','ensuite-shower','bath-flush','ensuite-flush','master-reading','guest-reading'],xp:180,coins:50,card:'舒心日常'},
-    {id:'home-chef',title:'收納與料理',body:'試用爐火、抽油煙機、烤箱與晾衣桿，打開冰箱上櫃和上掀臥榻看看收納。',rooms:[],actions:['cooktop','range-hood','oven','drying-rack','fridge-upper','bench-storage'],xp:200,coins:60,card:'井然有味'}
+    {id:'home-chef',title:'收納與料理',body:'試用爐火、抽油煙機、烤箱與晾衣桿，打開冰箱上櫃和上掀臥榻看看收納。',rooms:[],actions:['cooktop','range-hood','oven','drying-rack','fridge-upper','bench-storage'],xp:200,coins:60,card:'井然有味'},
+    {id:'sweet-routine',title:'R & Y 的舒心日常',body:'調整伴木沙發的兩側靠背與頭枕，掀開主臥床收好寢具，再試試次臥百葉、客衛鏡燈和桌面音響。',rooms:[],actions:['sofa-back-left','sofa-back-right','sofa-headrest','master-bed-lift','master-bed-store','guest-blind','bath-mirror','media-speakers','snowboard-rack'],xp:250,coins:80,card:'好好生活'}
   ];
   const homeRewards=[['secret','收納的秘密','收納小屋',100,30],['work','換個姿勢工作','工作靈感',100,30],['home','準備回家時光','回家咖啡',100,30],['evening','留一盞暖光','暖光夜曲',100,30],['morning','讓家動起來','晨間節奏',100,30]];
   const rewardList=[...homeRewards.map(([id,title,card,xp,coins])=>({id,title,card,xp,coins,community:false})),...quests.map(q=>({...q,community:true}))];
@@ -61,9 +62,9 @@
 
   // Above the sofa: each completed mission adds one physical postcard.
   const memories=new T.Group();memories.name='living-memory-wall';scene.add(memories);
-  rounded(960,752,5,198,114,timber,146,memories,2);
-  sign('生活記憶牆','LITTLE MOMENTS, A RICHER HOME',966,850,245,174,18,memories,Math.PI/2);
-  function drawCard(c,w,h,i,label){const colors=['#9eab89','#aab7bd','#c5ae8f','#84998d','#d0bb8e','#a6afa7','#9aacb1','#a2b4ae','#c1a587'];c.fillStyle='#f7f0df';c.fillRect(0,0,w,h);c.fillStyle=colors[i];c.fillRect(15,15,w-30,h-85);c.strokeStyle='#fff9eb';c.fillStyle='#fff4dc';c.lineWidth=5;c.lineCap='round';
+  rounded(960,752,5,198,130,timber,146,memories,2);
+  sign('生活記憶牆','LITTLE MOMENTS, A RICHER HOME',966,850,265,174,18,memories,Math.PI/2);
+  function drawCard(c,w,h,i,label){const colors=['#9eab89','#aab7bd','#c5ae8f','#84998d','#d0bb8e','#a6afa7','#9aacb1','#a2b4ae','#c1a587','#b7ac94'];c.fillStyle='#f7f0df';c.fillRect(0,0,w,h);c.fillStyle=colors[i];c.fillRect(15,15,w-30,h-85);c.strokeStyle='#fff9eb';c.fillStyle='#fff4dc';c.lineWidth=5;c.lineCap='round';
     if(i===0||i===5){c.beginPath();c.moveTo(65,90);c.lineTo(125,43);c.lineTo(187,90);c.lineTo(187,151);c.lineTo(65,151);c.closePath();c.stroke();c.strokeRect(113,112,24,39);if(i===5){c.beginPath();c.arc(188,50,17,0,Math.PI*2);c.fill();}}
     if(i===1){c.strokeRect(58,50,139,84);c.beginPath();c.moveTo(128,135);c.lineTo(128,155);c.moveTo(91,155);c.lineTo(165,155);c.stroke();c.fillRect(74,69,70,5);c.fillRect(74,87,99,5);}
     if(i===2){c.beginPath();c.moveTo(72,86);c.lineTo(72,133);c.quadraticCurveTo(126,172,171,133);c.lineTo(171,86);c.closePath();c.stroke();c.beginPath();c.arc(174,108,20,-Math.PI/2,Math.PI/2);c.moveTo(100,68);c.quadraticCurveTo(89,52,104,38);c.moveTo(135,68);c.quadraticCurveTo(124,52,139,38);c.stroke();}
@@ -72,13 +73,14 @@
     if(i===6){for(const [x,y]of [[73,57],[183,57],[73,143],[183,143]]){c.beginPath();c.moveTo(128,100);c.lineTo(x,y);c.stroke();c.beginPath();c.arc(x,y,12,0,Math.PI*2);c.fill();}c.strokeRect(104,77,48,46);}
     if(i===7){c.beginPath();c.arc(128,110,46,0,Math.PI*2);c.stroke();for(const x of [110,146]){c.beginPath();c.arc(x,100,4,0,Math.PI*2);c.fill();}c.beginPath();c.arc(128,112,23,.1,Math.PI-.1);c.stroke();}
     if(i===8){c.strokeRect(66,62,124,93);c.beginPath();c.moveTo(66,105);c.lineTo(190,105);c.moveTo(128,62);c.lineTo(128,155);c.stroke();}
+    if(i===9){c.beginPath();c.moveTo(128,147);c.bezierCurveTo(26,95,87,20,128,67);c.bezierCurveTo(169,20,230,95,128,147);c.stroke();}
     c.fillStyle='#354b40';c.font='27px Microsoft JhengHei,sans-serif';c.fillText(label,22,h-32);
   }
   const memoryCards=[];
-  rewardList.forEach((r,i)=>{const row=Math.floor(i/3),col=i%3,y=790+col*58,z=226-row*34;const map=canvasTexture((c,w,h)=>drawCard(c,w,h,i,r.card),256,256);const m=new T.Mesh(new T.PlaneGeometry(43,29),new T.MeshBasicMaterial({map}));m.position.copy(W(966.2,y,z));m.rotation.y=Math.PI/2;m.visible=false;memories.add(m);memoryCards.push({id:r.id,mesh:m});});
-  const rewardPanel=el('section','community-rewards');rewardPanel.innerHTML='<div class="community-player-stats"></div><p>每個任務都會增加收藏貼圖，回到客廳看看生活記憶牆。</p><div class="community-reward-cards"></div>';
+  rewardList.forEach((r,i)=>{const row=Math.floor(i/3),last=Math.ceil(rewardList.length/3)-1,col=i%3+(row===last?(3-(rewardList.length%3||3))/2:0),y=790+col*58,z=244-row*27;const map=canvasTexture((c,w,h)=>drawCard(c,w,h,i,r.card),256,256);const m=new T.Mesh(new T.PlaneGeometry(43,23),new T.MeshBasicMaterial({map}));m.position.copy(W(966.2,y,z));m.rotation.y=Math.PI/2;m.visible=false;memories.add(m);memoryCards.push({id:r.id,mesh:m});});
+  const rewardPanel=el('section','community-rewards');rewardPanel.innerHTML='<div class="community-player-stats"></div><p>任務會讓客廳增加收藏與立體擺飾；全部完成後，電視櫃右端出現 R & Y Sweet Home 公仔。</p><div class="community-reward-cards"></div>';
   const memoryActor={id:'memory-wall',name:'生活記憶牆',x:968,y:850,h:211,range:180,on:false,p:0,verbs:['查看生活記憶牆','查看生活記憶牆'],interact:()=>api?.openJournal(),apply:()=>{}};
-  function sync(next){progress={visited:[...(next.visited||[])],actions:[...(next.actions||[])],completed:[...(next.completed||[])]};const s=stats();for(const c of memoryCards)c.mesh.visible=s.cards.includes(c.id);rewardPanel.querySelector('.community-player-stats').textContent=`Lv.${s.level} 鄰里生活家 · ${s.xp} 經驗 · ${s.coins} 生活點 · ${s.cards.length}/${rewardList.length} 收藏`;const cards=rewardPanel.querySelector('.community-reward-cards');cards.replaceChildren();for(const r of rewardList){const n=el('span',s.cards.includes(r.id)?'is-earned':'',s.cards.includes(r.id)?`✓ ${r.card}`:`○ ${r.card}`);cards.append(n);}if(board.open)renderBoard();}
+  function sync(next){progress={visited:[...(next.visited||[])],actions:[...(next.actions||[])],completed:[...(next.completed||[])]};const s=stats();for(const c of memoryCards)c.mesh.visible=s.cards.includes(c.id);rewardPanel.querySelector('.community-player-stats').textContent=`Lv.${s.level} 鄰里生活家 · ${s.xp} 經驗 · ${s.coins} 生活點 · ${s.cards.length}/${rewardList.length} 收藏`;const cards=rewardPanel.querySelector('.community-reward-cards');cards.replaceChildren();for(const r of rewardList){const n=el('span',s.cards.includes(r.id)?'is-earned':'',s.cards.includes(r.id)?`✓ ${r.card}`:`○ ${r.card}`);cards.append(n);}if(board.open)renderBoard();window.B1_OWNED?.updateRewards(s,rewardList.length);}
   function showLobbyUI(){const values={'#title':'1F 社區大廳','#subtitle':'一樓接待・信箱・住戶電梯','#description':'這裡是一樓社區大廳。到看板接取委託，完成後回來領獎；住戶電梯通往五樓住宅。','.intro':'一樓・暖木社區大廳。從街道人行道進入社區，在接待區查看任務，搭電梯前往五樓住宅。','.status':'1F 社區大廳遊戲提案｜可步行、查看信箱及接取委託，電梯往返 5F 住宅。'};homeUI=[];for(const [selector,text]of Object.entries(values)){const n=document.querySelector(selector);if(n){homeUI.push([n,n.textContent]);n.textContent=text;}}}
   function restoreHomeUI(){for(const [n,text]of homeUI||[])n.textContent=text;homeUI=null;}
   function enterLobby(){if(!api||inLobby)return;homePosition=[walkX,walkY,walkYaw,lookPitch];document.querySelector('dialog[open]')?.close();if(document.pointerLockElement)document.exitPointerLock();if(canvas.hidden||compare||!walking)renderButton.click();api.setTour(true);inLobby=true;walkX=2450;walkY=1130;walkYaw=Math.PI;lookPitch=0;keys.clear();document.body.classList.add('community-active');showLobbyUI();lobbyButton.textContent='返回五樓住宅';document.querySelector('#viewname').textContent='1F / COMMUNITY LOBBY';renderer.shadowMap.needsUpdate=true;view.scrollIntoView({block:'center',behavior:'auto'});}

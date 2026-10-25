@@ -2,10 +2,10 @@
 
 ## WebGPU 重製素材
 
-- `assets/models/glam-velvet-sofa.glb`：Khronos Sample Assets 的 [GlamVelvetSofa](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/GlamVelvetSofa)，©2021 Wayfair, LLC／Eric Chadwick，CC BY 4.0。本案調整朝向、尺寸、奶油色及絨布光澤；來源GLB原檔不變。著作標示亦置於網頁素材說明。
+- 客廳為使用者確認的[暖嶼家居伴木沙發](https://www.nuanyu.tw/treemate)，依官方照片本地重建，長220 × 深106 cm為使用者確認的客製尺寸。原通用弧背沙發已移除；沒有宣稱取得原廠CAD。官方照片只存於忽略的本機QA目錄作造型參考，未放上網站轉載。雙靠背、插銷頭枕、拉點、扶手與木腳為本案幾何。
 - `assets/models/sheen-chair.glb`：[SheenChair](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/SheenChair)，©2020 Wayfair／Eric Chadwick，CC0，調整為大廳的現代暖色單椅。
 - `assets/models/porcelain-teacup.glb`：[DiffuseTransmissionTeacup](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DiffuseTransmissionTeacup)，Poly Haven／Eric Chadwick，CC0，調整為茶几上的實際瓷杯與杯碟，隨茶几升降。
-- 逐項來源、雜湊與授權見 `assets/models/sources.json` 及相鄰原始授權文件。床品、櫃體、家電與其他家具為本案細化模型，並非宣稱全數外部掃描或FF7遊戲資產。
+- 逐項外部模型來源、雜湊與授權見 `assets/models/sources.json` 及相鄰原始授權文件。上掀床、雪板收納、任務立體獎品與「R & Y Sweet Home」公仔為本案原創幾何。雪板依使用者指定，參考 [GRAY 26–27 DESPE WOOD](https://graysnowboards.co.jp/product/) 和 [Nidecker 白色 LT Supermatic](https://www.nidecker.com/products/lt-supermatic?variant=47139286679727) 本地重建，品牌字樣僅識別指定設備，非原廠授權模型；參考照片不發布。其他床品、櫃體及家電為本案細化模型，並非宣稱全數外部掃描或FF7遊戲資產。
 - 配樂為Scott Buckley的 [Reverie](https://www.scottbuckley.com.au/library/reverie/) 與 [Childhood](https://www.scottbuckley.com.au/library/childhood/)，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。原始MP3錄音保存在 `assets/audio/`，來源及著作標示見 `assets/audio/LICENSE.md`，亦顯示於播放器與網頁素材說明。只作為可選背景音樂，未剪輯或混音；執行時調整音量及循環。
 - 渲染依賴為Three.js 0.186.1／MIT，從官方npm壓縮檔保留必要執行檔及授權文件；完整性雜湊及版本見 `vendor/three/VERSION.json`，授權見 `vendor/three/LICENSE`。
 

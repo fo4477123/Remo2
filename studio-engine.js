@@ -1,7 +1,7 @@
 import * as GPU from 'three/webgpu';
 import { WebGLRenderer, WebGLRenderTarget, PMREMGenerator as GLPMREM } from './vendor/three/build/three.module.js';
 
-const version='20261025-webgpu1',forced=new URLSearchParams(location.search).get('renderer');
+const version='20261025-owned2',forced=new URLSearchParams(location.search).get('renderer');
 let canvas=document.querySelector('#scene'),renderer,reason='',backend='webgl2',adapterInfo=null;
 const status=document.createElement('div');status.className='engine-status';status.setAttribute('role','status');status.textContent='正在啟動繪圖引擎…';document.querySelector('.toolbar').append(status);
 try {

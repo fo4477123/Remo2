@@ -19,7 +19,7 @@
     nested=true;try{pipelineFor(world).pipeline.render();}finally{nested=false;}
     B1_REVIEW.sceneCalls=renderer.info.render.drawCalls||renderer.info.render.calls;B1_REVIEW.sceneTriangles=renderer.info.render.triangles;
   };
-  engine.prepare=async()=>{window.B1_MUSIC?.attachGame();await setup;await window.B1_REMAKE?.ready;await B1_MODELS.pbrReady;renderer.setSize(view.clientWidth,view.clientHeight,false);camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();
+  engine.prepare=async()=>{window.B1_MUSIC?.attachGame();await setup;await window.B1_REMAKE?.ready;await window.B1_OWNED?.ready;await B1_MODELS.pbrReady;renderer.setSize(view.clientWidth,view.clientHeight,false);camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();
     if(engine.webgpu){loading.textContent='正在編譯 WebGPU 材質與柔光…';await renderer.compileAsync(scene,camera);}
     engine.ready=true;engine.status.textContent=engine.webgpu?(document.querySelector('select[aria-label="畫質"]').value==='high'?'WebGPU · 電影光影':'WebGPU · 流暢模式'):'WebGL2 · 相容模式';
     engine.status.title=engine.webgpu?'原生 WebGPU · SSGI 間接光 · 接觸陰影 · 時間抗鋸齒':engine.reason;

@@ -61,5 +61,5 @@
   configs.living.text='依參考圖調整淡橡木、奶油色連續電視立面、櫃底與展示層板暖光。可用滑鼠轉頭、WASD行走，或用小地圖換位置。';
   configs.entry.text='沿電視牆轉角看向大門，再接客衛隱藏門收納；右側室內動線延伸到主臥、多功能室、次臥與廚房。130 cm 工作檯與短收納立面保留原配置。';
   if(new URLSearchParams(location.search).has('realistic')){renderButton.click();}
-  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js?v=20261025-webgpu1';finishScript.onerror=()=>loadFailure('材質');document.head.append(finishScript);
+  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js?v=20261025-owned2';finishScript.onerror=()=>loadFailure('材質');document.head.append(finishScript);
 })();
