@@ -1,10 +1,19 @@
-# 青埔八街環景
+# 模型、配樂、材質與青埔環景
+
+## WebGPU 重製素材
+
+- `assets/models/glam-velvet-sofa.glb`：Khronos Sample Assets 的 [GlamVelvetSofa](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/GlamVelvetSofa)，©2021 Wayfair, LLC／Eric Chadwick，CC BY 4.0。本案調整朝向、尺寸、奶油色及絨布光澤；來源GLB原檔不變。著作標示亦置於網頁素材說明。
+- `assets/models/sheen-chair.glb`：[SheenChair](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/SheenChair)，©2020 Wayfair／Eric Chadwick，CC0，調整為大廳的現代暖色單椅。
+- `assets/models/porcelain-teacup.glb`：[DiffuseTransmissionTeacup](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DiffuseTransmissionTeacup)，Poly Haven／Eric Chadwick，CC0，調整為茶几上的實際瓷杯與杯碟，隨茶几升降。
+- 逐項來源、雜湊與授權見 `assets/models/sources.json` 及相鄰原始授權文件。床品、櫃體、家電與其他家具為本案細化模型，並非宣稱全數外部掃描或FF7遊戲資產。
+- 配樂為Scott Buckley的 [Reverie](https://www.scottbuckley.com.au/library/reverie/) 與 [Childhood](https://www.scottbuckley.com.au/library/childhood/)，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。原始MP3錄音保存在 `assets/audio/`，來源及著作標示見 `assets/audio/LICENSE.md`，亦顯示於播放器與網頁素材說明。只作為可選背景音樂，未剪輯或混音；執行時調整音量及循環。
+- 渲染依賴為Three.js 0.186.1／MIT，從官方npm壓縮檔保留必要執行檔及授權文件；完整性雜湊及版本見 `vendor/three/VERSION.json`，授權見 `vendor/three/LICENSE`。
 
 ## 一樓街景與全室材質增補
 
 `assets/qingpu-ground-panorama.jpg` 為 1F 社區大廳獨立街景，鏡頭約離人行道160 cm；住宅仍用五樓環景與朝站景片。模式為 builtin imagegen 參考圖重構，原始輸出 `C:/Users/style/.codex/generated_images/01a16b99-3dc7-7470-84e3-db257abb3e22/exec-b168516e-db0c-4d28-9412-98c92999aa19.png`。三張景觀的本地恢復資料位於 `exterior-texture.js`，僅在圖片失敗時載入。
 
-全室掃描材質保存於 `assets/pbr/`，來源為 Poly Haven，採 [CC0 授權](https://polyhaven.com/license)。使用 [Rough Linen](https://polyhaven.com/a/rough_linen)、[Oak Veneer 01](https://polyhaven.com/a/oak_veneer_01)、[Marble 01](https://polyhaven.com/a/marble_01)、[Painted Plaster Wall](https://polyhaven.com/a/painted_plaster_wall) 的1K法線、粗糙度與部分色彩貼圖。織物維持室內指定色彩，木皮維持淺橡木色；石材取單片區域以避開磁磚縫。逐檔下載網址及授權紀錄見 `assets/pbr/sources.json`。
+全室掃描材質保存於 `assets/pbr/`，來源為 Poly Haven，採 [CC0 授權](https://polyhaven.com/license)。使用 [Rough Linen](https://polyhaven.com/a/rough_linen)、[Oak Veneer 01](https://polyhaven.com/a/oak_veneer_01)、[Marble 01](https://polyhaven.com/a/marble_01)、[Painted Plaster Wall](https://polyhaven.com/a/painted_plaster_wall) 的2K法線、粗糙度與部分色彩貼圖。織物維持室內指定色彩，木皮維持淺橡木色；石材取單片區域以避開磁磚縫。逐檔下載網址及授權紀錄見 `assets/pbr/sources.json`。
 
 家具幾何為本案本地重建與細化，沒有將其宣稱為整批外部掃描模型。Panasonic NR-D505XGS-W 的外尺寸依 [原廠商品頁](https://www.panasonic.com/tw/consumer/refrigerator/four-door/nr-d505xgs.html) 校正為183.4高 × 72.1寬 × 69.5深 cm，門片包括在總深度內。
 

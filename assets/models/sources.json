@@ -1,0 +1,26 @@
+[
+  {
+    "file": "assets/models/glam-velvet-sofa.glb",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/GlamVelvetSofa",
+    "license": "CC-BY-4.0",
+    "author": "2021 Wayfair, LLC / Eric Chadwick",
+    "modifications": "Display scale, orientation, material color and runtime lighting adjusted; source GLB unmodified",
+    "sha256": "67202c74a1a33377771f162dc7fad612a6c9bd51ee15124c488e9851d9ac5266"
+  },
+  {
+    "file": "assets/models/sheen-chair.glb",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/SheenChair",
+    "license": "CC0-1.0",
+    "author": "2020 Wayfair, LLC / Eric Chadwick",
+    "modifications": "Display scale, orientation, material color and runtime lighting adjusted; source GLB unmodified",
+    "sha256": "f0af2a2b102d28d540236306ae19f8fb36842df76bd38cf76f063f9bd2853399"
+  },
+  {
+    "file": "assets/models/porcelain-teacup.glb",
+    "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/DiffuseTransmissionTeacup",
+    "license": "CC0-1.0",
+    "author": "2023 Poly Haven / Eric Chadwick",
+    "modifications": "Display scale, orientation, material color and runtime lighting adjusted; source GLB unmodified",
+    "sha256": "d4f567186fea262819aac6664cb9d7cef7f4600406038046771a69e10363935b"
+  }
+]

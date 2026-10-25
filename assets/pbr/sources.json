@@ -1,60 +1,60 @@
 {
   "license": "CC0-1.0",
   "licenseURL": "https://polyhaven.com/license",
-  "resolution": "1k",
+  "resolution": "2k",
   "assets": [
     {
       "id": "oak_veneer_01",
       "key": "nor_gl",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/oak_veneer_01/oak_veneer_01_nor_gl_2k.jpg",
       "path": "assets/pbr/oak_veneer_01-nor_gl.jpg"
     },
     {
       "id": "oak_veneer_01",
       "key": "Rough",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/oak_veneer_01/oak_veneer_01_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/oak_veneer_01/oak_veneer_01_rough_2k.jpg",
       "path": "assets/pbr/oak_veneer_01-rough.jpg"
     },
     {
       "id": "marble_01",
       "key": "Diffuse",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/marble_01/marble_01_diff_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/marble_01/marble_01_diff_2k.jpg",
       "path": "assets/pbr/marble_01-diffuse.jpg"
     },
     {
       "id": "marble_01",
       "key": "nor_gl",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/marble_01/marble_01_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/marble_01/marble_01_nor_gl_2k.jpg",
       "path": "assets/pbr/marble_01-nor_gl.jpg"
     },
     {
       "id": "marble_01",
       "key": "Rough",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/marble_01/marble_01_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/marble_01/marble_01_rough_2k.jpg",
       "path": "assets/pbr/marble_01-rough.jpg"
     },
     {
       "id": "painted_plaster_wall",
       "key": "nor_gl",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/painted_plaster_wall/painted_plaster_wall_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/painted_plaster_wall/painted_plaster_wall_nor_gl_2k.jpg",
       "path": "assets/pbr/painted_plaster_wall-nor_gl.jpg"
     },
     {
       "id": "painted_plaster_wall",
       "key": "Rough",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/painted_plaster_wall/painted_plaster_wall_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/painted_plaster_wall/painted_plaster_wall_rough_2k.jpg",
       "path": "assets/pbr/painted_plaster_wall-rough.jpg"
     },
     {
       "id": "rough_linen",
       "key": "nor_gl",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rough_linen/rough_linen_nor_gl_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rough_linen/rough_linen_nor_gl_2k.jpg",
       "path": "assets/pbr/rough_linen-nor_gl.jpg"
     },
     {
       "id": "rough_linen",
       "key": "Rough",
-      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/rough_linen/rough_linen_rough_1k.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/rough_linen/rough_linen_rough_2k.jpg",
       "path": "assets/pbr/rough_linen-rough.jpg"
     }
   ]

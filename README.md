@@ -1,10 +1,13 @@
 # B1 暖木日常
 
-以 B1 公分座標平面為基礎的 Three.js 室內設計與居家探索。線上版本：<https://fo4477123.github.io/Remo2/>。
+以 B1 公分座標平面為基礎的 WebGPU 室內設計與居家探索。線上版本：<https://fo4477123.github.io/Remo2/>。
+
+本輪依使用者選擇採WebGPU網頁路線：Three.js 0.186.1原生WebGPU、SSGI間接光／接觸陰影、時間抗鋸齒、2K本地掃描材質、外部現代家具及更細緻床品。無WebGPU裝置時明確切換WebGL2相容模式；頁首及顯示設定會標示實際後端。完整範圍與品質界線見 [WEBGPU-REMAKE.md](WEBGPU-REMAKE.md)。
 
 ## 操作
 
 - 按「開始探索」，或從房間選單前往空間。
+- 「♫ 舒心配樂」可播放Scott Buckley的Reverie／Childhood、切換曲目與音量。預設不自動播放；離開分頁暫停、回來恢復，手札亦可開關配樂。曲目與授權標示均可見。
 - 桌面用 WASD／方向鍵移動、拖曳轉頭；靠近並面向物件後按 E。J 開啟手札，Esc 釋放滑鼠／退出漫遊。
 - 手機用左下搖桿與另一指轉頭，點畫面提示操作；沉浸模式內可直接打開手札。
 - 可操作大門、客衛隱藏門、清潔櫃、主臥滑門衣櫥、電器櫃、升降桌、電視及餐桌。
@@ -19,16 +22,18 @@
 
 ## 執行與驗證
 
-純靜態網站，不需要打包。使用靜態 HTTP 伺服器提供本目錄，開啟 `index.html`。`nordic-studio.html` 使用同一套程式。
+純靜態網站，不需要打包。使用靜態HTTP伺服器提供本目錄，從localhost或HTTPS開啟 `index.html`；ES modules需要HTTP載入，不支援直接開啟file網址。`nordic-studio.html` 使用同一套程式。`?renderer=webgl` 可明確選用相容模式。
 
 `node qa-home.cjs` 使用 Node 22 與 Windows Edge，啟動本機伺服器及隔離的無頭瀏覽器，驗證配置、碰撞、連通路徑、互動、任務存取、外站素材封鎖、手機雙指與版面。截圖和報告寫入已忽略的 `qa-output/run-*`。
+
+`node qa-render.cjs` 必須實際初始化WebGPU後端，驗證三個外部GLB、37個互動、兩個樓層、兩首配樂及穩態幀時間；無adapter時測試明確失敗，不將WebGL2當成成功。測試旗標僅用於隔離的本機測試瀏覽器，不會修改使用者瀏覽器設定。
 
 核心模型、材質與渲染不依賴外站。`?assets=remote` 為原有外部床具與木地板素材的選用預覽；可用性取決於供應站，載入失敗會保留本地模型。沒有將網站內的模型宣稱為全數外部高精細資產。
 
 ## 結構與界線
 
-`studio.js` 建立幾何與公分座標；`studio-detail.js` 補充空間；`studio-finishes.js` 建立材質與環景；`studio-home.js` 處理手機、圖庫與效能；`studio-render.js` 使用原生 PBR 渲染；`studio-models.js` 重建現代家具；`studio-refine.js` 升級全室材質與細節；`studio-shell.js` 補齊封閉結構；`studio-life.js` 提供家電與燈光；`studio-community.js` 提供一樓大廳、委託與收藏；`studio-game.js` 統一互動與探索狀態。
+`studio-engine.js` 初始化實際繪圖後端；`studio.js` 建立幾何與公分座標；`studio-detail.js` 補充空間；`studio-finishes.js` 建立材質與環景；`studio-home.js` 處理手機、圖庫與效能；`studio-render.js` 提供WebGPU的TSL／SSGI／抗鋸齒管線與相容PBR；`studio-models.js`、`studio-refine.js`、`studio-remake.js` 建立及細化模型、材質與LOD；`studio-shell.js` 補齊封閉結構；`studio-life.js`、`studio-activities.js` 提供居家設備；`studio-community.js` 提供一樓大廳、委託與收藏；`studio-game.js` 統一互動與探索狀態；`studio-music.js` 控制本地授權配樂。
 
-畫質為 WebGL PBR，不是 DLSS。圖庫的生成圖是材質／氣氛提案，不能取代平面圖或施工放樣。已確認的第一張客廳圖保留；第二張的室內走道修正詳見 [RENDER-CORRECTION.md](RENDER-CORRECTION.md)。功能範圍與驗收條件見 [GAMEPLAY.md](GAMEPLAY.md)。
+WebGPU高畫質與WebGL2相容模式各自有明確後端標示。FF7 Remake是美術方向參考，不代表已取得該遊戲資產或達到同等製作規模；本案沒有使用UE4、DLSS或原遊戲配樂。圖庫的生成圖是材質／氣氛提案，不能取代平面圖或施工放樣。第一張客廳圖保留；第二張走道修正詳見 [RENDER-CORRECTION.md](RENDER-CORRECTION.md)。
 
 推送 `master` 後由 GitHub Pages 自動部署；應確認該次 Pages 工作流程成功及線上資源版本。

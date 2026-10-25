@@ -82,7 +82,7 @@
   const envScene=new T.Scene();envScene.background=new T.Color('#b8b7b0');
   const room=new T.Mesh(new T.BoxGeometry(1000,600,1000),new T.MeshBasicMaterial({color:'#b6afa2',side:T.BackSide}));envScene.add(room);
   for(const [x,y,z,w,h]of [[0,80,-490,380,260],[-490,60,0,260,230],[0,290,0,300,300]]){const panel=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(2,1.92,1.78),side:T.DoubleSide}));panel.position.set(x,y,z);panel.lookAt(0,0,0);envScene.add(panel);}
-  const generator=new T.PMREMGenerator(renderer);const environment=generator.fromScene(envScene,.06);scene.environment=environment.texture;generator.dispose();
+  const generator=new T.PMREMGenerator(renderer);const environment=generator.fromScene(envScene,.06,.1,2000);scene.environment=environment.texture;generator.dispose();
   scene.traverse(m=>{if(m.isMesh&&m.material?.isMeshStandardMaterial){m.material.envMapIntensity=m.material===black?.65:.28;m.material.needsUpdate=true;}});
   sun.shadow.normalBias=.25;sun.shadow.radius=3;sun.shadow.mapSize.set(2048,2048);renderer.toneMappingExposure=1.2;
   // Light entering each actual north-facing window gives the room directional form.
@@ -111,13 +111,13 @@
   const setExteriorMood=B1_EXTERIOR.setMood;B1_EXTERIOR.setMood=mode=>{setExteriorMood(mode);detailMaterial.color.copy(exteriorMaterial.color);groundMaterial.color.copy(exteriorMaterial.color);};
   let backupPromise,generation=0;
   const reloadView=document.createElement('button');reloadView.type='button';reloadView.textContent='重新載入窗景';reloadView.onclick=()=>loadStreetViews();document.querySelector('.toolbar').append(reloadView);
-  function backup(){if(!backupPromise)backupPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='exterior-texture.js?v=20261025-daily2';s.onload=()=>window.B1_EXTERIOR_CACHE?resolve(B1_EXTERIOR_CACHE):reject(new Error('No backup'));s.onerror=reject;document.head.append(s);}).catch(e=>{backupPromise=null;throw e;});return backupPromise;}
+  function backup(){if(!backupPromise)backupPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='exterior-texture.js?v=20261025-webgpu1';s.onload=()=>window.B1_EXTERIOR_CACHE?resolve(B1_EXTERIOR_CACHE):reject(new Error('No backup'));s.onerror=reject;document.head.append(s);}).catch(e=>{backupPromise=null;throw e;});return backupPromise;}
   function loadStreetViews(){const current=++generation;reloadView.textContent='窗景載入中…';
     for(const [id,url,material]of [['panorama','assets/qingpu-8th-9th-panorama.jpg',exteriorMaterial],['station','assets/qingpu-station-facing.jpg',detailMaterial],['ground','assets/qingpu-ground-panorama.jpg',groundMaterial]]){
       let fallbackStarted=false,timer;
       const applyMap=map=>{if(current!==generation){map.dispose();return;}clearTimeout(timer);map.colorSpace=T.SRGBColorSpace;map.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());if(id!=='station')map.wrapS=T.RepeatWrapping;const old=material.map;material.map=map;material.needsUpdate=true;if(old&&old!==map)old.dispose();if(id==='panorama'){exterior.visible=true;B1_REVIEW.exteriorLoaded=true;}else if(id==='station'){stationDetail.visible=true;B1_REVIEW.exteriorDetailLoaded=true;}else B1_REVIEW.exteriorGroundLoaded=true;B1_EXTERIOR.setMood(window.B1_GAME?.snapshot().scene||(nightControl.checked?'night':'day'));if(B1_REVIEW.exteriorLoaded&&B1_REVIEW.exteriorDetailLoaded&&B1_REVIEW.exteriorGroundLoaded)reloadView.textContent='重新載入窗景';};
       const rescue=()=>{if(fallbackStarted||current!==generation)return;fallbackStarted=true;backup().then(cache=>new T.TextureLoader().load(cache[id],map=>{B1_REVIEW.exteriorFallbackUsed=true;applyMap(map);},undefined,()=>reloadView.textContent='點此重新載入窗景')).catch(()=>reloadView.textContent='點此重新載入窗景');};
-      timer=setTimeout(rescue,12000);new T.TextureLoader().load(url+'?v=20261025-daily2',applyMap,undefined,()=>new T.TextureLoader().load(url+'?retry='+Date.now(),applyMap,undefined,rescue));
+      timer=setTimeout(rescue,12000);new T.TextureLoader().load(url+'?v=20261025-webgpu1',applyMap,undefined,()=>new T.TextureLoader().load(url+'?retry='+Date.now(),applyMap,undefined,rescue));
     }
   }
   exterior.frustumCulled=stationDetail.frustumCulled=false;
@@ -205,5 +205,5 @@
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
   }
-  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261025-daily2';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261025-webgpu1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
 })();

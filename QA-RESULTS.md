@@ -1,6 +1,10 @@
 # 2026-10-25 驗收紀錄
 
-`node qa-home.cjs` 全部通過。截圖與 JSON 報告位於本機 `qa-output/run-nF1Gy1/`，不提交產生檔。之後新增的收納存取限制以 `node qa-output/storage-check.cjs` 聚焦驗證。
+`node qa-home.cjs`（明確選用WebGL2相容模式）全部通過，報告與桌面／手機截圖位於本機 `qa-output/run-DGdqEe/`。`node qa-render.cjs`（必須真正WebGPU）全部通過，報告與畫面位於 `qa-output/run-nOGZXl/`。產生檔不提交。
+
+- WebGPU使用Windows Edge 155與實際NVIDIA Ampere adapter，確認 `renderer.backend.isWebGPUBackend`，不是只檢查navigator.gpu。PBR／SSGI／時間抗鋸齒、住宅與大廳切換、37個目標操作及兩首配樂均正常；WebGPU驗證錯誤與JS例外為0。
+- 本輪加入三個本地外部GLB、24組軟包／床品高低細節幾何、25組額外PhysicalMaterial轉換，九組既有地板實例保留。四類2K掃描材質載入正常。已目視檢查沙發朝向、瓷杯位置、臥榻與配樂控制。
+- WebGPU客廳指定視角的30幀rAF取樣中位約16.7 ms；多階段管線累計2,423 draw calls、874,114 triangles。這是指定測試機與視角的取樣，非GPU執行時間測量或所有裝置60 FPS保證。
 
 - 一般室內淨高 280 cm、廚房245 cm；電器櫃頂高同步為245 cm。連續天花、基底、門楣與窗邊接縫射線檢查通過，原有窗洞及入口保留。
 - Panasonic 冰箱實際模型外尺寸為 72.1 × 69.5 × 183.4 cm；電器櫃為 58.5 × 60 cm，含把手的深度約 60.25 cm。模型包圍盒確認不穿越廚房背牆與側牆。
@@ -10,8 +14,8 @@
 - 五項居家任務及四項社區委託共可取得 1,280 XP、370 生活點和九張記憶牆收藏；重複領獎、重載保存及重設檢查通過。
 - 1F 大廳與 5F 住宅往返、介面樓層、獨立一樓街景及五樓窗景正常；圖片請求失敗時本地備援可恢復窗外環境。
 - 桌面、390 × 844 手機與橫向布局、雙指移動與轉向、觸控取消、鍵盤互動均通過。執行例外為 0。
-- 本次桌面取樣為 456 draw calls、148,664 triangles；手機取樣為 120 draw calls、48,438 triangles。數值依視角而異，並非所有裝置的效能保證。
+- WebGL2回歸桌面取樣為440 draw calls、217,144 triangles；手機取樣為112 draw calls、80,854 triangles。畫質與視角影響統計，不與WebGPU多階段管線直接比較。
 
 已目視檢查客廳、廚房、臥室、衛浴、大廳及街景恢復截圖。第一張客廳靜態渲染 `renders/living-premium.png` 保留。
 
-環境：Windows Edge headless / 軟體繪圖。大型連線社區與多人玩法仍屬 `COMMUNITY-GAME.md` 的後續規畫，本次交付為可玩的單人社區章節。
+環境：Windows Edge headless；WebGPU使用實際NVIDIA adapter，另一條路徑明確強制WebGL2。FF7 Remake為美術方向參考，未宣稱同等整體資產製作規模。大型連線社區與多人玩法仍屬 `COMMUNITY-GAME.md` 的後續規畫。

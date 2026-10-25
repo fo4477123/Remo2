@@ -1,0 +1,37 @@
+// Dependency-free Chromium/CDP verification; no files are uploaded by this script.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{spawn}=require('node:child_process');
+const assert=require('node:assert/strict');
+const root=__dirname,outputRoot=path.join(root,'qa-output');fs.mkdirSync(outputRoot,{recursive:true});const out=fs.mkdtempSync(path.join(outputRoot,'run-'));console.log('QA artifacts: '+out);
+const server=http.createServer((req,res)=>{const target=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!target.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(target,(err,data)=>{if(err){res.writeHead(404).end();return;}const ext=path.extname(target);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.jpg':'image/jpeg','.glb':'model/gltf-binary','.mp3':'audio/mpeg'})[ext]||'application/octet-stream');res.end(data);});});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
+(async()=>{
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const profile=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'b1-browser-'));
+ browser=spawn('C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',['--headless=new','--remote-debugging-port=0','--user-data-dir='+profile,'--no-first-run','--no-default-browser-check','--disable-background-networking','--enable-unsafe-swiftshader','--enable-unsafe-webgpu','--ignore-gpu-blocklist','--enable-dawn-features=allow_unsafe_apis','--window-size=1440,1000','about:blank'],{windowsHide:true,stdio:'ignore'});
+ let port;for(let i=0;i<100;i++){try{port=fs.readFileSync(path.join(profile,'DevToolsActivePort'),'utf8').split('\n')[0];break;}catch{await sleep(200);}}
+ assert(port,'Chromium debugging port unavailable');
+ const tabs=await (await fetch(`http://127.0.0.1:${port}/json`)).json();ws=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await new Promise(r=>ws.addEventListener('open',r,{once:true}));
+ let id=0;const pending=new Map(),exceptions=[];
+ ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result);}}if(m.method==='Runtime.exceptionThrown'){exceptions.push(m.params.exceptionDetails);console.log('EXCEPTION',JSON.stringify(m.params.exceptionDetails));}if(m.method==='Runtime.consoleAPICalled'&&m.params.type==='error')exceptions.push(m.params.args.map(x=>x.value||x.description));};
+ const cdp=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}));});
+ const ev=async expression=>{const r=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+ await cdp('Runtime.enable');await cdp('Page.enable');await cdp('Network.enable');
+ await cdp('Network.setBlockedURLs',{urls:['https://*','http://cdn.*']});
+ await cdp('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/index.html?renderer=${process.env.B1_RENDERER||'webgpu'}`});
+ let ready=false;for(let i=0;i<420;i++){ready=await ev('Boolean(window.B1_REVIEW?.ready)');if(ready)break;await sleep(300);}assert(ready,'Home module must load');
+ const screenshot=async name=>{await sleep(600);const shot=await cdp('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(shot.data,'base64'));};
+ const settle=async()=>{for(let i=0;i<120;i++){if(await ev('Object.values(B1_GAME.snapshot().actors).every(a=>a.progress===(a.open?1:0))'))return;await sleep(100);}throw Error('Animation did not settle');};
+
+ const state=await ev('({engine:{backend:B1_ENGINE.backend,webgpu:B1_ENGINE.webgpu,reason:B1_ENGINE.reason,revision:B1_ENGINE.revision,ready:B1_ENGINE.ready},review:B1_REVIEW.rendering,remake:B1_REMAKE.report,targets:B1_REVIEW.interaction.targets.length,load:loading.textContent})');console.log(JSON.stringify(state));
+ assert(await ev('floorGroup.children.filter(m=>m.isInstancedMesh).reduce((n,m)=>n+m.count,0)>200'),'Original floor planks remain instanced and visible');
+ assert(state.engine.ready,'Engine ready: '+state.load);if(process.env.B1_RENDERER!=='webgl')assert(state.engine.webgpu,'Actual WebGPU backend required');assert.equal(state.targets,37);assert.equal(state.remake.external.filter(a=>a.loaded).length,3);assert(state.remake.softSurfaces>5);
+ await ev('B1_GAME.goRoom("living");view.scrollIntoView({block:"center"})');await screenshot('living');await sleep(1300);await screenshot('living-converged');
+ await ev('B1_COMMUNITY.enterLobby()');await sleep(1200);assert.equal(await ev('B1_COMMUNITY.snapshot().floor'),1);await screenshot('lobby');await ev('B1_COMMUNITY.returnHome("media");B1_GAME.toggle("bench-storage")');await settle();await screenshot('bench');
+ const play=await cdp('Runtime.evaluate',{expression:'B1_MUSIC.play()',userGesture:true,awaitPromise:true,returnByValue:true});assert.equal(play.result.value,true,'Selected soundtrack can play');await sleep(1400);assert(await ev('B1_MUSIC.audio.currentTime>0&&!B1_MUSIC.audio.paused'),'Music time advances');await ev('B1_MUSIC.pause()');assert(await ev('B1_MUSIC.audio.paused'),'Pause stops music');
+ await ev('B1_MUSIC.selectTrack("childhood")');const p2=await cdp('Runtime.evaluate',{expression:'B1_MUSIC.play()',userGesture:true,awaitPromise:true,returnByValue:true});assert.equal(p2.result.value,true);await ev('B1_MUSIC.pause()');assert(await ev('B1_MUSIC.snapshot().credit.includes("CC BY 4.0")'),'License credit visible');
+ await ev('setTour(false);if(B1_GAME.snapshot().actors["bench-storage"].open)B1_GAME.toggle("bench-storage")');await settle();
+ await ev('for(const id of B1_REVIEW.interaction.targets.map(a=>a.id))if(id!=="memory-wall")B1_GAME.toggle(id)');await settle();assert(await ev('B1_ACTIVITIES.upperItems.visible&&B1_ACTIVITIES.benchItems.visible'),'Storage works on selected backend');await ev('for(const id of [...B1_REVIEW.interaction.targets].reverse().map(a=>a.id))if(id!=="memory-wall")B1_GAME.toggle(id)');await settle();
+ await ev('B1_GAME.goRoom("living")');await sleep(1000);const frames=await ev('(async()=>{const a=[];let last=performance.now();for(let i=0;i<30;i++){const now=await new Promise(requestAnimationFrame);a.push(now-last);last=now;}return a.sort((a,b)=>a-b)[15];})()');console.log('Median steady frame (ms): '+frames);
+ await ev('document.querySelector(".soundtrack-panel").open=true;document.querySelector(".soundtrack-panel").scrollIntoView({block:"center"})');await screenshot('music-controls');
+ const summary=await ev('({backend:B1_ENGINE.backend,rendering:B1_REVIEW.rendering,models:B1_REMAKE.report,music:B1_MUSIC.snapshot(),dimensions:B1_REVIEW.audit()})');fs.writeFileSync(path.join(out,'render-report.json'),JSON.stringify({summary,frameMedianMs:frames,exceptions},null,2));assert.equal(exceptions.length,0,'No browser runtime errors');console.log('PASS '+JSON.stringify(summary));await cdp('Browser.close');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{ws?.close();browser?.kill();server.close();});

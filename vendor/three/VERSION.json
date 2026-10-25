@@ -1,0 +1,20 @@
+{
+  "name": "three",
+  "version": "0.186.1",
+  "license": "MIT",
+  "source": "https://registry.npmjs.org/three/-/three-0.186.1.tgz",
+  "distributionSHA512": "blFeqb49wRCSGUGj7gtpfnSGHy2lwDk94RhUmS1c/hTby70kvChbWpkJ4Pm1390LqzzvTmzgXKHPEafJwCb8jA==",
+  "files": [
+    "build\\three.webgpu.js",
+    "build\\three.core.js",
+    "build\\three.module.js",
+    "build\\three.tsl.js",
+    "examples\\jsm\\loaders\\GLTFLoader.js",
+    "examples\\jsm\\utils\\BufferGeometryUtils.js",
+    "examples\\jsm\\utils\\SkeletonUtils.js",
+    "examples\\jsm\\tsl\\display\\SSGINode.js",
+    "examples\\jsm\\tsl\\display\\TRAANode.js",
+    "examples\\jsm\\tsl\\utils\\TAAUtils.js",
+    "LICENSE"
+  ]
+}

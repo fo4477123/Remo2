@@ -3,13 +3,13 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-daily2';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-webgpu1';detailScript.async=false;
 function loadFailure(name){if(window.B1_REVIEW)B1_REVIEW.ready=true;loading.replaceChildren(document.createTextNode(`${name}載入未完成。`));const retry=document.createElement('button');retry.textContent='重新載入';retry.onclick=()=>location.reload();loading.append(retry);}
 detailScript.onerror=()=>loadFailure('空間細節');
-setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},20000);
+setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},120000);
 const ROOM_HEIGHT=280;
 const T=THREE,canvas=document.querySelector('#scene'),view=document.querySelector('#viewport');
-const renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+const renderer=B1_ENGINE.renderer;renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
 const scene=new T.Scene();scene.background=new T.Color('#dedfd5');const camera=new T.PerspectiveCamera(42,1,1,8000);
 const hemi=new T.HemisphereLight(0xfff9eb,0x858b76,2.3);scene.add(hemi);const sun=new T.DirectionalLight(0xfff2da,3);sun.position.set(-300,1300,-600);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-1300,right:1300,top:1300,bottom:-1300,far:4000});sun.shadow.bias=-0.0002;scene.add(sun);
 function mat(color,roughness=.8,extra={}){return new T.MeshStandardMaterial({color,roughness,...extra})}
