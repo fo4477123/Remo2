@@ -51,13 +51,34 @@
   }
   bed('主臥飯店級軟包雙人床／轉向90度',408,890,188,150,'x');bed('次臥飯店級客床 150×188',415,320,150,188,'y');
 
-  const coffee=replace('圓角石材升降茶几'),top=group('coffee-lift-top');coffee.add(top);
-  const stone=mat('#d8d1c5',.3,{metalness:.03});const stoneCanvas=document.createElement('canvas');stoneCanvas.width=stoneCanvas.height=256;const sc=stoneCanvas.getContext('2d');sc.fillStyle='#ddd6ca';sc.fillRect(0,0,256,256);for(let i=0;i<18;i++){sc.strokeStyle=`rgba(129,122,108,${.025+i%3*.012})`;sc.beginPath();for(let x=0;x<256;x+=4){const y=i*17+Math.sin(x*.025+i)*9;x?sc.lineTo(x,y):sc.moveTo(x,y);}sc.stroke();}const stoneMap=new T.CanvasTexture(stoneCanvas);stoneMap.colorSpace=T.SRGBColorSpace;stone.map=stoneMap;
-  rounded(1097,785,72,110,5,stone,68,top,2.4);rounded(1101,790,64,100,4,oak,60,top,2);
-  rounded(1110,800,46,80,4,bronze,2,coffee,2);
-  for(const x of [1115,1151]){rod([x,803,6],[x,877,61],1.7,graphite,coffee);rod([x,877,6],[x,803,61],1.7,graphite,coffee);}
+  const coffee=replace('暖嶼家居島語升降茶几'),top=group('isle-whisper-lift-top');coffee.add(top);
+  const isleOak=oak.clone();isleOak.color.set('#c5a77c');isleOak.roughness=.64;isleOak.bumpScale=.018;
+  const innerOak=oak.clone();innerOak.color.set('#d4bb91');innerOak.roughness=.72;
+  const darkPull=mat('#544a3d',.32,{metalness:.52}),liftMetal=mat('#77766d',.3,{metalness:.7});
+  // 72 × 110 cm pale-oak lift top, sized to the existing approved living-room fit.
+  rounded(1097,785,72,110,4,isleOak,55,top,1.8);
+  rounded(1099,787,68,106,1.2,innerOak,52.9,top,.6);
+  // Cabinet shell, open cubby, and two broad drawers face the sofa on the west side.
+  rounded(1101,787,64,106,4,isleOak,29,coffee,1.3);
+  rounded(1100,787,2,106,38,isleOak,8,coffee,.6);rounded(1164,787,2,106,38,isleOak,8,coffee,.6);
+  rounded(1102,787,62,2,38,isleOak,8,coffee,.5);rounded(1102,787,62,2,38,isleOak,44,coffee,.5);
+  rounded(1102,787,2,106,8,innerOak,8,coffee,.4);
+  // Two drawer fronts and a recessed open shelf above them.
+  for(const y of [790,840]){
+    rounded(1099.5,y,1.5,47,14,innerOak,11,coffee,.35);
+    rounded(1098.5,y+22,1,8,1.4,darkPull,18,coffee,.25);
+  }
+  rounded(1100,817,3,40,1.5,isleOak,32,coffee,.3);
+  // Four compact swivel casters; wheel and bracket details stay tucked within the footprint.
+  for(const x of [1105,1160])for(const y of [791,889]){
+    const swivel=new T.Mesh(new T.CylinderGeometry(1.5,1.5,1.5,16),liftMetal);swivel.position.copy(W(x,y,6));coffee.add(swivel);
+    const wheel=new T.Mesh(new T.CylinderGeometry(3.1,3.1,2.2,20),graphite);wheel.rotation.z=Math.PI/2;wheel.position.copy(W(x,y,3.8));wheel.castShadow=true;coffee.add(wheel);
+  }
+  // Twin crossed lift arms rise with the top, echoing the real lift-up mechanism.
+  const liftArms=[];for(const y of [800,880])for(const direction of [1,-1])liftArms.push({y,direction,mesh:rod([1110,y,35],[1156,y,51],1.25,liftMetal,coffee)});
+  const placeLiftArms=p=>{for(const a of liftArms){const low=a.direction>0?1110:1156,high=a.direction>0?1156:1110;const z1=34,z2=48+p*19;const from=W(low,a.y,z1),to=W(high,a.y,z2),delta=to.clone().sub(from);a.mesh.position.copy(from).add(to).multiplyScalar(.5);a.mesh.scale.y=delta.length()/Math.max(1,a.mesh.geometry.parameters.height);a.mesh.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),delta.normalize());}};
   const accessories=scene.children.filter(o=>o.isMesh&&o.position.x+750>1097&&o.position.x+750<1169&&700-o.position.z>785&&700-o.position.z<895&&o.position.y>=70).map(mesh=>({mesh,y:mesh.position.y}));
-  actors.push({id:'coffee-lift',name:'石材升降茶几',x:1168,y:842,h:80,range:130,on:false,p:0,verbs:['升高茶几','降低茶几'],apply:p=>{top.position.y=p*18;for(const a of accessories)a.mesh.position.y=a.y+p*18;}});
+  actors.push({id:'coffee-lift',name:'暖嶼家居・島語升降茶几',x:1168,y:842,h:54,range:130,on:false,p:0,verbs:['升起島語茶几桌板','收合島語茶几桌板'],apply:p=>{top.position.y=p*19;for(const a of accessories)a.mesh.position.y=a.y+p*19;placeLiftArms(p);}});
   const deskScreens=[];scene.traverse(o=>{if(o.isMesh&&o.userData.furnitureName==='160 cm 升降工作桌／對面實牆'&&o.geometry.parameters?.height===30)deskScreens.push(o);});
   const screenCanvas=document.createElement('canvas');screenCanvas.width=512;screenCanvas.height=320;const dc=screenCanvas.getContext('2d');dc.fillStyle='#30483e';dc.fillRect(0,0,512,320);dc.fillStyle='#bdd0b0';dc.font='28px sans-serif';dc.fillText('QINGPU / STUDIO',34,57);dc.fillStyle='#f4efe4';for(let i=0;i<7;i++)dc.fillRect(34,93+i*24,220+(i%3)*58,7);dc.fillStyle='#8dada0';dc.fillRect(360,95,110,175);const screenMap=new T.CanvasTexture(screenCanvas);screenMap.colorSpace=T.SRGBColorSpace;const screenOn=new T.MeshBasicMaterial({map:screenMap}),screenOff=black;
   actors.push({id:'desk-screen',name:'工作螢幕',x:930,y:856,h:100,range:125,on:false,p:0,verbs:['開啟工作螢幕','關閉工作螢幕'],apply:p=>deskScreens.forEach(m=>m.material=p>.5?screenOn:screenOff)});

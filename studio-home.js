@@ -26,7 +26,7 @@
   const selectBefore=select;select=function(name){selectBefore(name);roomPicker.value=walkPicker.value=name;};
   configs.kitchen.sub='245 cm / Panasonic NR-D505XGS-W';
   configs.master.text='床頭靠左、150 × 188 cm雙人床向左微移17 cm，床尾至滑門面約66 cm；衣櫥由275 cm減少20 cm，改為255 cm，入口端位置保留、靠窗端縮短。這仍是偏緊的通道，須現場複核。';
-  configs.living.text='77 吋電視置中於連續奶油色電視牆，搭配弧背模組沙發與圓角石材升降茶几；洗白橡木、礦物石材、織品與暖光統一成安靜的暖日式質感，花台端不放植栽，入口通道保持留白。';
+  configs.living.text='77 吋電視置中於連續奶油色電視牆，搭配暖嶼伴木沙發與島語淺橡木升降收納茶几；暖木、織品與暖光統一成安靜的暖日式質感，花台端不放植栽，入口通道保持留白。';
   configs.media.text='160 × 65 cm升降桌移到對面實牆，搭配高階網布人體工學椅與雙螢幕工作區；窗邊維持臥榻與採光，不再讓螢幕面對窗戶。';
   B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=37;B1_REVIEW.clearances.tableToTV=51;B1_REVIEW.clearances.mediaDeskLength=160;B1_REVIEW.clearances.mediaDeskToBench=50;
   B1_REVIEW.windows=windowSpecs;
@@ -137,10 +137,10 @@
   else if(mobile&&!location.hash&&!location.search){renderButton.click();}
   select(selected);
   B1_REVIEW.audit=()=>({roomHeight:ROOM_HEIGHT,kitchenHeight:KITCHEN_HEIGHT,windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
-  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261025-gpu1';
+  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261025-isle1';
   const loadGame=()=>{
     const modules=['studio-models.js','studio-refine.js','studio-shell.js','studio-life.js','studio-activities.js','studio-community.js','studio-remake.js','studio-owned.js','studio-music.js','studio-game.js'];let index=0;
-    const next=async()=>{if(index===modules.length){try{await B1_ENGINE.prepare();}catch(error){console.error(error);loadFailure('WebGPU');return;}B1_REVIEW.ready=true;document.querySelector('footer span:last-child').textContent='室內 280 cm／廚房 245 cm';if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261025-gpu1';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
+    const next=async()=>{if(index===modules.length){try{await B1_ENGINE.prepare();}catch(error){console.error(error);loadFailure('WebGPU');return;}B1_REVIEW.ready=true;document.querySelector('footer span:last-child').textContent='室內 280 cm／廚房 245 cm';if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261025-isle1';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
   };
   renderScript.onload=loadGame;renderScript.onerror=loadGame;document.head.append(renderScript);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clearMovement();loading.textContent='圖形記憶體暫時不足，請重新載入頁面。';view.append(loading);});

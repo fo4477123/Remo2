@@ -3,7 +3,7 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-rug1';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-isle1';detailScript.async=false;
 function loadFailure(name){if(window.B1_REVIEW)B1_REVIEW.ready=true;loading.replaceChildren(document.createTextNode(`${name}載入未完成。`));const retry=document.createElement('button');retry.textContent='重新載入';retry.onclick=()=>location.reload();loading.append(retry);}
 detailScript.onerror=()=>loadFailure('空間細節');
 setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},120000);
@@ -94,11 +94,21 @@ item('奶油弧背模組沙發',970,750,90,210,()=>{
   for(const yy of [770,936])for(const xx of [980,1040])cyl(xx,yy,2.5,12,walnut,8);
 });
 item('羊毛地毯',1025,690,205,235,()=>box(1025,690,205,235,1.5,mat('#a99d8b'),1));
-item('圓角石材升降茶几',1097,785,72,110,()=>{
-  const stone=mat('#c7baaa',.32),bronze=mat('#8e745b',.28,{metalness:.6}),warmOak=mat('#a98a69',.58);
-  softBox(1099,787,68,106,10,stone,43);box(1104,792,58,96,6,warmOak,34);
-  for(const [x,y]of [[1112,805],[1152,805],[1112,870],[1152,870]])cyl(x,y,3.5,33,bronze,5);
-  box(1122,831,22,20,3,stone,57);box(1124,833,18,16,2,mat('#7f907d',.86),60);
+item('暖嶼家居島語升降茶几',1097,785,72,110,()=>{
+  const warmOak=mat('#c4a77f',.58),paleOak=mat('#d9c49f',.66),bronze=mat('#655b4e',.3,{metalness:.58}),linen=mat('#b4a88f',.92);
+  // Island Whisper: pale oak mobile cabinet, front storage niche and two drawers.
+  box(1101,787,64,106,5,warmOak,27);box(1102,788,62,2,102,paleOak,30);
+  box(1099,788,2,102,39,warmOak,8);box(1165,788,2,102,39,warmOak,8);
+  box(1101,788,64,2,39,warmOak,8);box(1101,788,64,2,39,warmOak,45);
+  box(1098.5,790,1.5,98,14,paleOak,11);box(1098.5,790,1.5,98,14,paleOak,27);
+  box(1098,790,2,98,1.5,warmOak,29);
+  for(const y of [790,840])box(1098.5,y,1.5,47,14,paleOak,12);
+  box(1097.5,811,2,2,6,bronze,19);box(1097.5,861,2,2,6,bronze,19);
+  box(1100,818,3,40,2,warmOak,33);
+  for(const y of [791,890])for(const x of [1105,1160]){
+    const wheel=new T.Mesh(new T.CylinderGeometry(3,3,2.5,20),bronze);wheel.rotation.z=Math.PI/2;wheel.position.copy(W(x,y,4));wheel.castShadow=true;scene.add(wheel);
+  }
+  softBox(1124,835,7,18,3,linen,48);
 });
 item('延伸電視牆／單扇玻璃門',1220,505,38,490,()=>{
   // One continuous timber plane and floating base run to the planter; no tall cabinet at the end.
@@ -317,7 +327,7 @@ const nightLights=[];for(const [x,y]of [[1100,800],[840,900],[860,640],[1070,580
 Object.assign(designSpecs.kitchen,{counter:[239,669.5,230,60],cooktop:[255,679.5,60,43],sink:[421,699.5,52,36],fridge:[530.5,655.2,72.1,69.5],ceilingHeight:KITCHEN_HEIGHT,fridgeHeight:183.4,fridgeBackClearance:5,applianceCabinet:[470.5,669,58.5,60],usableWallRight:603.6,backWallFace:729.7});
 const configs={all:{target:[750,690],radius:1650,yaw:.6,pitch:.8,title:'全室配置',sub:'依 DWG 房間位置配置',text:'客廳在右側、最小臥室位於上方中央；將其規劃為影音工作室。淨高暫定 280 cm，牆體顯示為可切換剖面。'},living:{target:[1110,790],radius:560,yaw:1.2,pitch:.46,title:'木框沙發 × 玻璃收藏牆',sub:'客廳 / 暖木與留白',text:'220 cm 沙發沿影音室外牆擺放，朝向右側電視。展示櫃集中於電視兩端，以封閉底櫃收整日常雜物；淺色地毯統一客廳範圍。'},media:{target:[840,900],radius:490,yaw:.8,pitch:.65,title:'一間房，三種日常',sub:'影音 / 工作 / 收藏',text:'最小房暫採上方中央約 220 × 300 cm 臥室。60 cm 深臥榻沿窗、升降桌靠左牆、展示收納靠右牆。影音設備與座位視線待選型調整。'},entry:{target:[1080,570],radius:500,yaw:1,pitch:.6,title:'以同一片立面迎接回家',sub:'玄關 / 隱藏門概念',text:'玄關以淺橡木與奶油白櫃門串連入口。廁所隱藏門須依原門洞位置及開門方向確認；目前展示櫃體語彙與預留範圍。'},laundry:{target:[310,420],radius:500,yaw:-1,pitch:.7,title:'清爽的洗衣陽台',sub:'洗脫烘 / 耐潮工作檯',text:'LG 15 kg 機器先預留 65 × 75 cm 示意體積，並非已核對型號尺寸。陽台安排獨立洗衣檯面，後續依實際型號確認管線與維修空間。'}};
 configs.living.yaw=-1.12;configs.living.radius=700;
-configs.living.title='弧背沙發 × 石材茶几';configs.living.text='奶油色弧背模組沙發改採低矮、柔和的飯店式比例，搭配圓角石材升降茶几；桌緣至沙發保留約37 cm、至電視牆約51 cm。花台端不放植栽或高櫃，讓採光與主要動線保持留白。';
+configs.living.title='暖嶼伴木沙發 × 島語升降茶几';configs.living.text='暖嶼家居島語淺橡木升降收納茶几，配有雙抽屜、開放收納格與腳輪，桌板可升起；現場保留既有動線。';
 configs.media.text='160 × 65 cm升降桌移到對面實牆，椅子面向桌面；窗邊只保留 60 cm 臥榻與採光，中央通道保持開闊。';
 configs.entry.target=[1020,650];configs.entry.yaw=2.65;configs.entry.radius=350;configs.entry.pitch=.65;configs.entry.title='客廳全景與客衛隱藏門';configs.entry.sub='窗戶・大門・電視牆・隱藏門';configs.entry.text='按 3D 配置由客廳查看窗戶、主大門及側向電視牆；客衛隱藏門位在大門旁的短收納立面，門後即客用衛浴。清潔櫃與大門旁 130 cm 工作檯依模型位置保留；隱藏門與主大門是兩扇不同的門。';
 configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾滑門衣櫥，頂天收納',sub:'主臥 / 衣櫥255 × 55 × 280 cm',text:'維持床頭朝左、150 × 188 cm雙人床。木質滑門衣櫥由275 cm減少20 cm，改為255 cm，入口端不動，靠窗端縮短；淨高280 cm。'};
