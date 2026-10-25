@@ -1,29 +1,29 @@
 /* User-owned furniture, measured placement and earned physical home decorations. */
 (() => {
   const {rounded,rod,tube}=B1_MODELS,actors=[],clothMaterials=[];
-  const fabric=new T.MeshPhysicalMaterial({color:'#d4c6b0',roughness:.94,sheen:.55,sheenColor:'#e9decb',sheenRoughness:.9}),buttonFabric=fabric.clone();buttonFabric.color.set('#c3b49d');clothMaterials.push(fabric,buttonFabric);
-  const stitch=mat('#b7a997',.92),wood=new T.MeshPhysicalMaterial({color:'#9c7950',roughness:.48,clearcoat:.12}),joinery=new T.MeshPhysicalMaterial({color:'#ece1cf',roughness:.6,map:oak.map}),metal=mat('#aeb2a9',.24,{metalness:.88}),ink=mat('#47584c',.7);
+  const fabric=new T.MeshPhysicalMaterial({color:'#d4c6b0',roughness:.94,sheen:.55,sheenColor:'#e9decb',sheenRoughness:.9}),sofaFabric=new T.MeshPhysicalMaterial({color:'#969895',roughness:.94,sheen:.55,sheenColor:'#d0d0cc',sheenRoughness:.9}),buttonFabric=sofaFabric.clone();buttonFabric.color.set('#858783');clothMaterials.push(sofaFabric,buttonFabric);
+  const stitch=mat('#777975',.92),wood=new T.MeshPhysicalMaterial({color:'#9c7950',roughness:.48,clearcoat:.12}),joinery=new T.MeshPhysicalMaterial({color:'#ece1cf',roughness:.6,map:oak.map}),metal=mat('#aeb2a9',.24,{metalness:.88}),ink=mat('#47584c',.7);
   const group=name=>{const g=new T.Group();g.name=name;scene.add(g);return g;};
   const action=(id,name,x,y,h,room,verbs,apply)=>{const a={id,name,x,y,h,room,verbs,range:155,on:false,p:0,apply};actors.push(a);return a;};
-  function cushion(x,y,w,d,h,z,parent,tuft=false){
+  function cushion(x,y,w,d,h,z,parent,tuft=false,material=fabric){
     const make=segments=>{const g=new T.SphereGeometry(1,segments,Math.round(segments*.65)),p=g.attributes.position;
       for(let i=0;i<p.count;i++){const u=p.getX(i),v=p.getY(i),t=p.getZ(i),yy=Math.sign(v)*Math.pow(Math.abs(v),.32)*h/2,zz=Math.sign(t)*Math.pow(Math.abs(t),.26)*d/2;let xx=Math.sign(u)*Math.pow(Math.abs(u),.28)*w/2;if(tuft&&u>0){for(const k of [-d/6,d/6])xx-=1.6*Math.exp(-((zz-k)**2+yy**2)/16)*Math.pow(u,.15);}p.setXYZ(i,xx,yy,zz);}g.computeVertexNormals();return g;};
-    const high=make(64),low=make(30),m=new T.Mesh(high,fabric);m.position.copy(W(x+w/2,y+d/2,z+h/2));m.castShadow=m.receiveShadow=true;parent.add(m);B1_REMAKE.lod.push({mesh:m,high,low});return m;
+    const high=make(64),low=make(30),m=new T.Mesh(high,material);m.position.copy(W(x+w/2,y+d/2,z+h/2));m.castShadow=m.receiveShadow=true;parent.add(m);B1_REMAKE.lod.push({mesh:m,high,low});return m;
   }
   const oldSofa=B1_MODELS.groups['奶油弧背模組沙發'];oldSofa.visible=false;
   for(let i=B1_REMAKE.lod.length-1;i>=0;i--){let p=B1_REMAKE.lod[i].mesh;while(p&&p!==oldSofa)p=p.parent;if(p===oldSofa)B1_REMAKE.lod.splice(i,1);}
   const sofa=group('nuanyu-treemate-220');sofa.userData.furnitureName='暖嶼家居伴木沙發 220×106';
-  rounded(959,745,106,220,3,wood,11,sofa,1);cushion(959,745,106,220,19,14,sofa);
+  rounded(959,745,106,220,3,wood,11,sofa,1);cushion(959,745,106,220,19,14,sofa,false,sofaFabric);
   for(const y of [753,957])for(const x of [970,1054]){const leg=new T.Mesh(new T.CylinderGeometry(3.2,2.3,11,32),wood);leg.position.copy(W(x,y,5.5));leg.castShadow=true;sofa.add(leg);}
-  for(const y of [745,948]){const arm=cushion(963,y,98,17,36,28,sofa),detail=B1_REMAKE.lod.find(l=>l.mesh===arm);for(const g of [detail.high,detail.low]){const p=g.attributes.position;for(let i=0;i<p.count;i++)if(p.getY(i)>0)p.setY(i,p.getY(i)-Math.max(0,p.getX(i)/98+.5)*10);g.computeVertexNormals();}}
+  for(const y of [745,948]){const arm=cushion(963,y,98,17,36,28,sofa,false,sofaFabric),detail=B1_REMAKE.lod.find(l=>l.mesh===arm);for(const g of [detail.high,detail.low]){const p=g.attributes.position;for(let i=0;i<p.count;i++)if(p.getY(i)>0)p.setY(i,p.getY(i)-Math.max(0,p.getX(i)/98+.5)*10);g.computeVertexNormals();}}
   const backs=[];
   for(const y of [762,856]){
-    cushion(982,y,81,92,15,32,sofa);const back=new T.Group();sofa.add(back);backs.push(back);cushion(963,y,24,92,46,46,back,true);
+    cushion(982,y,81,92,15,32,sofa,false,sofaFabric);const back=new T.Group();sofa.add(back);backs.push(back);cushion(963,y,24,92,46,46,back,true,sofaFabric);
     tube([[1062,y+3,39],[1062,y+89,39]],.12,stitch,sofa);
     for(const yy of [y+92/3,y+184/3]){tube([[986,yy,48],[987.1,yy,58],[985.7,yy,69],[987.1,yy,81],[986,yy,90]],.095,stitch,back);const b=new T.Mesh(new T.SphereGeometry(.55,16,12),buttonFabric);b.scale.x=.35;b.position.copy(W(985.8,yy,69));back.add(b);}
     tube([[986,y+2,69],[985.7,y+30.7,69],[987.1,y+46,69],[985.7,y+61.3,69],[986,y+90,69]],.095,stitch,back);
   }
-  const headrest=new T.Group();sofa.add(headrest);for(const y of [887,917])rod([973,y,86],[973,y,99],.65,metal,headrest);cushion(965,873,16,58,16,92,headrest);
+  const headrest=new T.Group();sofa.add(headrest);for(const y of [887,917])rod([973,y,86],[973,y,99],.65,metal,headrest);cushion(965,873,16,58,16,92,headrest,false,sofaFabric);
   let headSide=0;const syncHead=()=>{headrest.position.z=94*headSide;headrest.position.x=backs[1].position.x*(1-headSide)+backs[0].position.x*headSide;};
   action('sofa-back-left','伴木左側靠背',987,808,79,'living',['左側靠背前移','左側靠背後移'],p=>{backs[0].position.x=12*p;syncHead();});
   action('sofa-back-right','伴木右側靠背',987,902,79,'living',['右側靠背前移','右側靠背後移'],p=>{backs[1].position.x=12*p;syncHead();});
@@ -97,6 +97,7 @@
   B1_LIFE.actors.push(...actors);
   const ready=B1_MODELS.pbrReady.then(async()=>{let source;oldSofa.traverse(m=>{if(!source&&m.material?.userData.surface==='fabric'&&m.material.normalMap)source=m.material;});if(source)for(const m of clothMaterials){m.normalMap=source.normalMap;m.normalScale.set(.18,.18);m.roughnessMap=source.roughnessMap;m.needsUpdate=true;}const woodSource=wardrobeDoors.find(m=>m.material.normalMap)?.material;if(woodSource)for(const m of [wood,joinery]){m.normalMap=woodSource.normalMap;m.normalScale.set(.1,.1);m.roughnessMap=woodSource.roughnessMap;m.needsUpdate=true;}const {mergeVertices}=await import('three/addons/utils/BufferGeometryUtils.js'),smoothBoard=mergeVertices(boardGeometry);smoothBoard.computeVertexNormals();board.geometry=smoothBoard;boardGeometry.dispose();return true;});
   configs.master.title='上掀收納床 × 滑門衣櫥';configs.master.text='150 × 188 cm床面維持原位置，床墊與底板可一起上掀，內有支撐桿及寢具收納。衣櫥長255 cm，床尾至門面約66 cm。';configs.guest.title='客房 × 雪板收納';configs.guest.sub='右側實牆 / 40 × 108 cm立式雪板區';configs.guest.text='保留150 × 188 cm客床，右側實牆新增約190 cm高的立式雪板收納，附固定架與護具格；雪板可拉出查看，床與南側門口動線保留。';
+  configs.living.text='暖嶼伴木沙發改為溫潤中灰色，保留木腳、縫線與靠背互動；沙發尺寸220 × 106 cm。茶几至電視櫃48 cm，沙發至茶几35 cm。';
   configs.guest.text='保留150 × 188 cm客床，右側設40 × 108 cm雪板收納架。寶藍色 GRAY DESPE 26–27 搭配白色 Nidecker LT Supermatic，可拉出查看；板長暫以160 cm展示，待實際尺寸確認。床與南側門口動線保留。';
   window.B1_OWNED={ready,actors,sofa,backs,headrest,bed,deck,bedItems:items,struts,blinds,mirrorLight,speakerLed,rack,snowboard,bindings,figure,rewardProps,updateRewards,snapshot:()=>({sofaSize:[220,106],backOffsets:backs.map(g=>g.position.x),headrestSide:headSide,bedAngle:deck.rotation.z,bedStored:items.visible,snowboardX:snowboard.position.x,snowboardGear:{...snowboard.userData,bindingCount:bindings.length},rewardCount,rewardTotal,decorations:rewardProps.filter(p=>p.group.visible).map(p=>p.id),sweetHomeVisible:figure.visible,sweetHomeLabel:figure.userData.label})};
 })();
