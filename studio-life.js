@@ -14,9 +14,9 @@
   const daylight=[];scene.traverse(o=>{if(o.isSpotLight)daylight.push(o);});
   function applyDaylight(){for(const l of daylight){const x=l.position.x+750;const c=curtains.find(c=>x>=c.x-40&&x<=c.x+c.width+40);l.intensity=document.querySelector('#night').checked?0:35000*(1-(c?.closed||0)*.85);}}
 
-  const fridgePivots=[pivot(fridgeDoors[0],474.6,667.4),pivot(fridgeDoors[1],545,667.4)];
-  const fridgeLight=new T.PointLight('#d8ebff',0,100,2);fridgeLight.position.copy(W(510,682,151));scene.add(fridgeLight);
-  actors.push({id:'fridge',name:'Panasonic 冰箱',...point(510,666,136),range:125,on:false,p:0,room:'kitchen',verbs:['打開冰箱','關閉冰箱'],leaves:[{leaf:fridgePivots[0],span:28.5},{leaf:fridgePivots[1],span:-41}],apply:p=>{fridgePivots[0].rotation.y=-p*Math.PI*.48;fridgePivots[1].rotation.y=p*Math.PI*.48;fridgeLight.intensity=p*260;}});
+  const fridgePivots=[pivot(fridgeDoors[0],...FRIDGE_LAYOUT.map(474.6,667.4).slice(0,2)),pivot(fridgeDoors[1],...FRIDGE_LAYOUT.map(545,667.4).slice(0,2))];
+  const fridgeLight=new T.PointLight('#d8ebff',0,100,2);fridgeLight.position.copy(W(...FRIDGE_LAYOUT.map(510,682,151)));scene.add(fridgeLight);
+  actors.push({id:'fridge',name:'Panasonic 冰箱',...point(...FRIDGE_LAYOUT.map(510,666,136)),range:125,on:false,p:0,room:'kitchen',verbs:['打開冰箱','關閉冰箱'],leaves:[{leaf:fridgePivots[0],span:28.5},{leaf:fridgePivots[1],span:-41}],apply:p=>{fridgePivots[0].rotation.y=-p*Math.PI*.48;fridgePivots[1].rotation.y=p*Math.PI*.48;fridgeLight.intensity=p*260;}});
 
   const drumCanvas=document.createElement('canvas');drumCanvas.width=drumCanvas.height=128;const dc=drumCanvas.getContext('2d');dc.fillStyle='#1c252a';dc.fillRect(0,0,128,128);
   for(let i=0;i<3;i++){dc.save();dc.translate(64,64);dc.rotate(i*Math.PI*2/3);dc.fillStyle='#80918c';dc.beginPath();dc.ellipse(0,30,17,30,.3,0,Math.PI*2);dc.fill();dc.restore();}
@@ -28,9 +28,9 @@
   const washer={id:'washer',name:'LG 洗衣機',...point(347.5,386,65),range:120,on:false,p:0,room:'laundry',verbs:['啟動洗衣示範','停止洗衣示範'],apply:p=>{washerLed.material.emissiveIntensity=p*1.5;},flag:on=>{washSeconds=on?45:0;}};actors.push(washer);
 
   const waterMaterial=new T.MeshStandardMaterial({color:'#bcdeec',transparent:true,opacity:.65,roughness:.08,metalness:.05});
-  const water=new T.Mesh(new T.CylinderGeometry(.65,1.15,29,12),waterMaterial);water.position.copy(W(421,699,99));water.visible=false;scene.add(water);
+  const water=new T.Mesh(new T.CylinderGeometry(.65,1.15,29,12),waterMaterial);water.position.copy(W(...KITCHEN_LAYOUT.map(421,699,99)));water.visible=false;scene.add(water);
   let waterSeconds=0;
-  const faucet={id:'faucet',name:'廚房水龍頭',...point(421,699,109),range:125,on:false,p:0,room:'kitchen',verbs:['打開水龍頭','關閉水龍頭'],apply:p=>{water.visible=p>.01;water.scale.y=Math.max(.01,p);water.position.y=113.5-14.5*p;},flag:on=>{waterSeconds=on?90:0;}};actors.push(faucet);
+  const faucet={id:'faucet',name:'廚房水龍頭',...point(...KITCHEN_LAYOUT.map(421,699,109)),range:125,on:false,p:0,room:'kitchen',verbs:['打開水龍頭','關閉水龍頭'],apply:p=>{water.visible=p>.01;water.scale.y=Math.max(.01,p);water.position.y=113.5-14.5*p;},flag:on=>{waterSeconds=on?90:0;}};actors.push(faucet);
 
   const specs=[
     {id:'living',name:'客廳燈光',x:1246,y:736,bounds:[959,520,300,482]},

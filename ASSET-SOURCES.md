@@ -1,5 +1,13 @@
 # 青埔八街環景
 
+## 一樓街景與全室材質增補
+
+`assets/qingpu-ground-panorama.jpg` 為 1F 社區大廳獨立街景，鏡頭約離人行道160 cm；住宅仍用五樓環景與朝站景片。模式為 builtin imagegen 參考圖重構，原始輸出 `C:/Users/style/.codex/generated_images/01a16b99-3dc7-7470-84e3-db257abb3e22/exec-b168516e-db0c-4d28-9412-98c92999aa19.png`。三張景觀的本地恢復資料位於 `exterior-texture.js`，僅在圖片失敗時載入。
+
+全室掃描材質保存於 `assets/pbr/`，來源為 Poly Haven，採 [CC0 授權](https://polyhaven.com/license)。使用 [Rough Linen](https://polyhaven.com/a/rough_linen)、[Oak Veneer 01](https://polyhaven.com/a/oak_veneer_01)、[Marble 01](https://polyhaven.com/a/marble_01)、[Painted Plaster Wall](https://polyhaven.com/a/painted_plaster_wall) 的1K法線、粗糙度與部分色彩貼圖。織物維持室內指定色彩，木皮維持淺橡木色；石材取單片區域以避開磁磚縫。逐檔下載網址及授權紀錄見 `assets/pbr/sources.json`。
+
+家具幾何為本案本地重建與細化，沒有將其宣稱為整批外部掃描模型。Panasonic NR-D505XGS-W 的外尺寸依 [原廠商品頁](https://www.panasonic.com/tw/consumer/refrigerator/four-door/nr-d505xgs.html) 校正為183.4高 × 72.1寬 × 69.5深 cm，門片包括在總深度內。
+
 網站素材：`assets/qingpu-8th-9th-panorama.jpg`。模式：builtin imagegen 新圖生成；PNG 原始輸出以 JPEG 編碼供網站載入。原始輸出位於 `C:/Users/style/.codex/generated_images/01a16b99-3dc7-7470-84e3-db257abb3e22/exec-45f07ad1-7337-4732-ba81-df8a165baf0e.png`。
 
 位置與方向由使用者提供：青埔八街與青埔九街交叉口附近、社區後側青松街、客廳朝高鐵桃園站。樓層沿用專案的五樓假設。這張圖是區域情境，沒有宣稱還原精確門牌的建物、景觀遮擋或實拍街景。
@@ -12,6 +20,13 @@
 渲染以單一內向球面承接連續環景；圖中央朝 +CAD-y，對應客廳窗面，背向接續住宅街區。日光、夕暮、夜間使用同一方向與不同色調。照片本身沒有分別在四面重複貼上。
 
 為改善窗內放大的清晰度，前方另使用 `assets/qingpu-station-facing.jpg`，以相同街區環景為參考重製約 85 度視野的景片，再投射到球面前側。模式：builtin imagegen 參考圖編輯／重構；原始輸出 `C:/Users/style/.codex/generated_images/01a16b99-3dc7-7470-84e3-db257abb3e22/exec-acc7e8ae-b029-4a73-bc71-238b69f24ca5.png`。圖片原始像素不代表施工或實景精度。
+
+## 一樓景片提示
+
+Use case: exterior environmental background for a FIRST-FLOOR residential community lobby game scene in Qingpu, Zhongli, Taoyuan, Taiwan.
+Image 1 is only a reference for the neighbourhood's Taiwanese architecture and natural daylight. Create a NEW seamless 360-degree equirectangular panorama, 2:1 aspect ratio, camera exactly at pedestrian eye level 1.6 metres above the pavement, level horizon at 50% image height. Location context: intersection of Qingpu 8th Street and Qingpu 9th Street, with Qingsong Street on the rear side of the residential block. A plausible regional reconstruction rather than a documentary exact-address photograph.
+Main central heading looks outward from the entrance of a residential community onto an ordinary modest Taiwanese local street: pale concrete sidewalk and curb in the immediate lower foreground; asphalt roadway with realistic white markings and a few small parked scooters/cars; opposite three-to-five storey tiled townhouses, varied modern apartment facades, balconies and rooftop water tanks; low street trees and a normal crossroad. Buildings RISE above the viewer. All visible roofs must be ABOVE eye level; no aerial view, no looking down on roofs. Upper panorama mostly sky between tall facades, lower half pavement/street. Taoyuan HSR station belongs in the distant district but should naturally be largely hidden from this ground-level location; no giant station, no high speed railway viaduct, no train crossing the street. Flat Taoyuan terrain.
+The frame should be a clear realistic, natural-colour architectural photograph under soft bright daytime light. Modern inhabited neighbourhood, clean ordinary roads, fine facade details. No interior, no doors or window frames in front of the camera, no people close to the lens, no readable invented signage, no labels or watermark, no mountains/lake. Consistent spherical perspective, matching side seams, single continuous scene. Crucial: first-floor street-level eye height, not the elevated fifth-floor panorama in the reference.
 
 ## 前方景片提示
 

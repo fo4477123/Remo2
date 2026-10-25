@@ -1,6 +1,6 @@
 /* Warm-home walkthrough: phone input, rendering budget, and design validation. */
 (() => {
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261024-life1';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261025-community3';document.head.append(css);
   const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<850;
   document.body.classList.add('home-ready');
   // Full-height walls and real windows are the default; cutaway is opt-in.
@@ -66,8 +66,8 @@
   box(1016,496,22,2,2,chrome,112);box(1031,468,1,24,35,linen,77);
   // Subtle ceramic tile joints on the bath wall and splashback.
   const joint=mat('#bab6ae',.95);
-  for(let z=60;z<260;z+=60)box(770,300.2,273,.3,.13,joint,z);
-  for(let x=829;x<1043;x+=60)box(x,300.2,.13,.3,260,joint);
+  for(let z=60;z<ROOM_HEIGHT;z+=60)box(770,300.2,273,.3,.13,joint,z);
+  for(let x=829;x<1043;x+=60)box(x,300.2,.13,.3,ROOM_HEIGHT,joint);
   // Display pieces remain on the three short ledges above the TV.
   for(const [y,z,color]of [[806,191,'#a8b09a'],[860,203,'#cbb498'],[916,191,'#aebabc']]){
     const body=new T.Mesh(new T.SphereGeometry(1,20,16),mat(color,.5));body.scale.set(4.5,6,4.5);body.position.copy(W(1244,y,z+6));scene.add(body);
@@ -112,7 +112,7 @@
   const capture=document.createElement('button');capture.id='capture-view';capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{renderer.render(scene,camera);const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Curated photoreal render gallery: these are high-detail design views, while
   // the canvas above remains the measured interactive model.
-  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261024-life1'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
+  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261025-community3'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
   const gallery=document.createElement('section');gallery.className='render-gallery';gallery.innerHTML='<div class="render-gallery__head"><div><p class="overline">PREMIUM RENDER COLLECTION</p><b>高級空間渲染</b></div><label>選擇空間 <select aria-label="選擇高級渲染空間"></select></label></div><figure><img alt="高級室內設計渲染"><figcaption></figcaption></figure>';
   const gallerySelect=gallery.querySelector('select'),galleryImage=gallery.querySelector('img'),galleryCaption=gallery.querySelector('figcaption');
   for(const [key,[label]] of Object.entries(premiumRenders)){const option=document.createElement('option');option.value=key;option.textContent=label;gallerySelect.append(option);}
@@ -134,12 +134,11 @@
   if(walking){[walkX,walkY,walkYaw]=stops[selected]||stops.living;lookPitch=-.22;}
   else if(mobile&&!location.hash&&!location.search){renderButton.click();}
   select(selected);
-  B1_REVIEW.audit=()=>({windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
-  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261024-life1';
+  B1_REVIEW.audit=()=>({roomHeight:ROOM_HEIGHT,windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
+  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261025-community3';
   const loadGame=()=>{
-    const life=document.createElement('script');life.src='studio-life.js?v=20261024-life1';
-    const attachGame=()=>{const s=document.createElement('script');s.src='studio-game.js?v=20261024-life1';s.onload=()=>{B1_REVIEW.ready=true;if(B1_REVIEW.gameReady)loading.remove();else loadFailure('探索功能');};s.onerror=()=>loadFailure('探索功能');document.head.append(s);};
-    life.onload=()=>{if(window.B1_LIFE)attachGame();else loadFailure('生活互動');};life.onerror=()=>loadFailure('生活互動');document.head.append(life);
+    const modules=['studio-models.js','studio-refine.js','studio-shell.js','studio-life.js','studio-community.js','studio-game.js'];let index=0;
+    const next=()=>{if(index===modules.length){B1_REVIEW.ready=true;if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261025-community3';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
   };
   renderScript.onload=loadGame;renderScript.onerror=loadGame;document.head.append(renderScript);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clearMovement();loading.textContent='圖形記憶體暫時不足，請重新載入頁面。';view.append(loading);});

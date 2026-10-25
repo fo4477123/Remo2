@@ -21,17 +21,17 @@
   });
 
   // TV field stays one uninterrupted cream panel toward the planter.
-  box(1253,732,1.5,263,233,cream,26);
+  box(1253,732,1.5,263,ROOM_HEIGHT-27,cream,26);
   const lights=[],strips=[],warm=new T.MeshStandardMaterial({color:'#ffe0ad',emissive:'#ffcf91',emissiveIntensity:2});
   function strip(x,y,w,d,z){strips.push(box(x,y,w,d,1,warm,z));}
   function light(x,y,z,power,range){const l=new T.PointLight(0xffd9ad,power,range,2);l.position.copy(W(x,y,z));scene.add(l);lights.push([l,power]);}
-  strip(1246,735,2,254,250);strip(1226,510,2,480,24);
+  strip(1246,735,2,254,ROOM_HEIGHT-10);strip(1226,510,2,480,24);
   for(const y of [770,865,955]){light(1234,y,239,3800,230);light(1214,y,22,1500,155);}
   for(const z of [65,113,161,209]){strip(1225,678,2,48,z+2);light(1228,702,z+15,450,75);}
   for(const [x,y,w,d]of rooms){
     if(w<180)continue;
-    box(x+8,y+8,w-16,7,7,cream,246);strip(x+10,y+10,w-20,2,254);
-    light(x+w/2,y+35,240,6500,Math.max(w,d));
+    box(x+8,y+8,w-16,7,7,cream,ROOM_HEIGHT-14);strip(x+10,y+10,w-20,2,ROOM_HEIGHT-6);
+    light(x+w/2,y+35,ROOM_HEIGHT-20,6500,Math.max(w,d));
   }
   strip(915,525,54,2,212);light(942,546,205,800,100);
   strip(978,545,122,2,168);light(1040,548,155,1100,150);
@@ -61,5 +61,5 @@
   configs.living.text='依參考圖調整淡橡木、奶油色連續電視立面、櫃底與展示層板暖光。可用滑鼠轉頭、WASD行走，或用小地圖換位置。';
   configs.entry.text='沿電視牆轉角看向大門，再接客衛隱藏門收納；右側室內動線延伸到主臥、多功能室、次臥與廚房。130 cm 工作檯與短收納立面保留原配置。';
   if(new URLSearchParams(location.search).has('realistic')){renderButton.click();}
-  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js?v=20261024-life1';finishScript.onerror=()=>loadFailure('材質');document.head.append(finishScript);
+  const finishScript=document.createElement('script');finishScript.src='studio-finishes.js?v=20261025-community3';finishScript.onerror=()=>loadFailure('材質');document.head.append(finishScript);
 })();
