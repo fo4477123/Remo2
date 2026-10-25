@@ -3,7 +3,7 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-kitchen-swap1';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-daily2';detailScript.async=false;
 function loadFailure(name){if(window.B1_REVIEW)B1_REVIEW.ready=true;loading.replaceChildren(document.createTextNode(`${name}載入未完成。`));const retry=document.createElement('button');retry.textContent='重新載入';retry.onclick=()=>location.reload();loading.append(retry);}
 detailScript.onerror=()=>loadFailure('空間細節');
 setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},20000);
@@ -298,22 +298,23 @@ item('Panasonic NR-D505XGS-W 雲岩白四門冰箱',530.5,655.2,72.1,69.5,()=>{
   const fridgeControl=box(539.3,666.7,2,1.2,2,dark,177);fridgeDoors[1].attach(fridgeControl);
   for(const m of scene.children.slice(fridgeStart))FRIDGE_LAYOUT.transformMesh(m);
 });
+const KITCHEN_HEIGHT=245;
 const APPLIANCE_LAYOUT={x:470.5,y:669,width:58.5,depth:60,map:(x,y,z=0)=>[470.5+(x-546.1)*58.5/80,669+(y-668)*60/72,z],transformMesh:m=>{const [x,y,z]=APPLIANCE_LAYOUT.map(m.position.x+750,700-m.position.z,m.position.y);m.position.copy(W(x,y,z));m.scale.x*=58.5/80;m.scale.z*=60/72;return m;}};
 const applianceDoors=[];
 item('頂天電器櫃 58.5 cm',470.5,669,58.5,60,()=>{
   const applianceStart=scene.children.length;
-  box(546.1,670,2,70,ROOM_HEIGHT,oak);box(624.1,670,2,70,ROOM_HEIGHT,oak);box(548.1,738,76,2,ROOM_HEIGHT-4,cream,3);
-  for(const z of [2,92,150,205,ROOM_HEIGHT-3])box(548.1,670,76,68,3,oak,z);
+  box(546.1,670,2,70,KITCHEN_HEIGHT,oak);box(624.1,670,2,70,KITCHEN_HEIGHT,oak);box(548.1,738,76,2,KITCHEN_HEIGHT-4,cream,3);
+  for(const z of [2,92,150,205,KITCHEN_HEIGHT-3])box(548.1,670,76,68,3,oak,z);
   box(548.1,668,76,2,86,cream,4);
   // Two ventilated appliance bays plus enclosed pantry storage.
   box(550,669,72,2,2,oak,92);box(550,669,72,2,2,oak,150);box(550,669,72,2,2,oak,205);
   box(552,670,68,20,38,black,100);box(554,669,64,2,30,mat('#313735',.25,{metalness:.25}),104);
   box(552,670,68,20,36,black,158);box(554,669,64,2,28,mat('#313735',.25,{metalness:.25}),162);
-  for(const x of [548.1,588.1])applianceDoors.push(box(x,668,36,2,ROOM_HEIGHT-212,cream,208));
+  for(const x of [548.1,588.1])applianceDoors.push(box(x,668,36,2,KITCHEN_HEIGHT-212,cream,208));
   for(const m of scene.children.slice(applianceStart))APPLIANCE_LAYOUT.transformMesh(m);
 });
 const nightLights=[];for(const [x,y]of [[1100,800],[840,900],[860,640],[1070,580]]){const l=new T.PointLight(0xffc17d,0,440,2);l.position.copy(W(x,y,220));scene.add(l);nightLights.push(l);cyl(x,y,6,2,mat('#fff3cd',.2,{emissive:0xffdba3,emissiveIntensity:.5}),ROOM_HEIGHT-5)}
-Object.assign(designSpecs.kitchen,{counter:[239,669.5,230,60],cooktop:[255,679.5,60,43],sink:[421,699.5,52,36],fridge:[530.5,655.2,72.1,69.5],fridgeHeight:183.4,fridgeBackClearance:5,applianceCabinet:[470.5,669,58.5,60],usableWallRight:603.6,backWallFace:729.7});
+Object.assign(designSpecs.kitchen,{counter:[239,669.5,230,60],cooktop:[255,679.5,60,43],sink:[421,699.5,52,36],fridge:[530.5,655.2,72.1,69.5],ceilingHeight:KITCHEN_HEIGHT,fridgeHeight:183.4,fridgeBackClearance:5,applianceCabinet:[470.5,669,58.5,60],usableWallRight:603.6,backWallFace:729.7});
 const configs={all:{target:[750,690],radius:1650,yaw:.6,pitch:.8,title:'全室配置',sub:'依 DWG 房間位置配置',text:'客廳在右側、最小臥室位於上方中央；將其規劃為影音工作室。淨高暫定 280 cm，牆體顯示為可切換剖面。'},living:{target:[1110,790],radius:560,yaw:1.2,pitch:.46,title:'木框沙發 × 玻璃收藏牆',sub:'客廳 / 暖木與留白',text:'220 cm 沙發沿影音室外牆擺放，朝向右側電視。展示櫃集中於電視兩端，以封閉底櫃收整日常雜物；淺色地毯統一客廳範圍。'},media:{target:[840,900],radius:490,yaw:.8,pitch:.65,title:'一間房，三種日常',sub:'影音 / 工作 / 收藏',text:'最小房暫採上方中央約 220 × 300 cm 臥室。60 cm 深臥榻沿窗、升降桌靠左牆、展示收納靠右牆。影音設備與座位視線待選型調整。'},entry:{target:[1080,570],radius:500,yaw:1,pitch:.6,title:'以同一片立面迎接回家',sub:'玄關 / 隱藏門概念',text:'玄關以淺橡木與奶油白櫃門串連入口。廁所隱藏門須依原門洞位置及開門方向確認；目前展示櫃體語彙與預留範圍。'},laundry:{target:[310,420],radius:500,yaw:-1,pitch:.7,title:'清爽的洗衣陽台',sub:'洗脫烘 / 耐潮工作檯',text:'LG 15 kg 機器先預留 65 × 75 cm 示意體積，並非已核對型號尺寸。陽台安排獨立洗衣檯面，後續依實際型號確認管線與維修空間。'}};
 configs.living.yaw=-1.12;configs.living.radius=700;
 configs.living.title='弧背沙發 × 石材茶几';configs.living.text='奶油色弧背模組沙發改採低矮、柔和的飯店式比例，搭配圓角石材升降茶几；桌緣至沙發保留約37 cm、至電視牆約51 cm。花台端不放植栽或高櫃，讓採光與主要動線保持留白。';

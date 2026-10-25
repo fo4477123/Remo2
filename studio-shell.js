@@ -18,5 +18,8 @@
   for(const [a,b]of boundary){const start=wallGroup.children.length;addWallWithWindows(a,b);for(const m of wallGroup.children.slice(start)){const old=m.geometry,{width:w,height:h}=old.parameters;m.geometry=new T.BoxGeometry(w,h,8);old.dispose();m.material=shellMaterial;m.userData.fullHeightY=m.position.y;}}
   for(const [x,y,w,d]of [[626,548,90,16],[614,736,115,12],[729,758,90,12],[386,740,16,79],[239,546,145,14]]){const m=box(x,y,w,d,ROOM_HEIGHT-230,shellMaterial,230,wallGroup);m.userData.fullHeightY=m.position.y;}
   scene.traverse(o=>{if(!o.isMesh)return;for(const m of Array.isArray(o.material)?o.material:[o.material])if(!m.transparent&&m.side===T.FrontSide){m.side=T.DoubleSide;m.needsUpdate=true;}});
-  B1_REVIEW.shell={height:ROOM_HEIGHT,continuousCeiling:true,continuousFoundation:true,closedReturns:boundary.length,doorHeaders:5};
+  const kitchenDrop=box(239,565,364.606,164.697,ROOM_HEIGHT-KITCHEN_HEIGHT,shellMaterial,KITCHEN_HEIGHT,ceilingGroup);kitchenDrop.name='kitchen-245-ceiling';
+  // Lower exposed fixtures with the kitchen ceiling; existing structure above remains sealed.
+  scene.traverse(o=>{const x=o.position.x+750,y=700-o.position.z;if(o.parent!==scene||x<239||x>603.6||y<565||y>729.7||o.position.y<245)return;if(o.isLight)o.position.y-=ROOM_HEIGHT-KITCHEN_HEIGHT;else if(o.isMesh&&!o.userData.furnitureName)o.position.y-=ROOM_HEIGHT-KITCHEN_HEIGHT;});
+  B1_REVIEW.shell={height:ROOM_HEIGHT,kitchenHeight:KITCHEN_HEIGHT,continuousCeiling:true,continuousFoundation:true,closedReturns:boundary.length,doorHeaders:5};
 })();
