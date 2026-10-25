@@ -3,7 +3,7 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-gpu1';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-rug1';detailScript.async=false;
 function loadFailure(name){if(window.B1_REVIEW)B1_REVIEW.ready=true;loading.replaceChildren(document.createTextNode(`${name}載入未完成。`));const retry=document.createElement('button');retry.textContent='重新載入';retry.onclick=()=>location.reload();loading.append(retry);}
 detailScript.onerror=()=>loadFailure('空間細節');
 setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},120000);
@@ -93,7 +93,7 @@ item('奶油弧背模組沙發',970,750,90,210,()=>{
   for(const yy of [781,872]){box(1000,yy,2,52,1.2,piping,58);box(1000,yy+67,2,52,1.2,piping,58);}
   for(const yy of [770,936])for(const xx of [980,1040])cyl(xx,yy,2.5,12,walnut,8);
 });
-item('羊毛地毯',1025,690,205,235,()=>box(1025,690,205,235,1.5,mat('#ded8c7'),1));
+item('羊毛地毯',1025,690,205,235,()=>box(1025,690,205,235,1.5,mat('#a99d8b'),1));
 item('圓角石材升降茶几',1097,785,72,110,()=>{
   const stone=mat('#c7baaa',.32),bronze=mat('#8e745b',.28,{metalness:.6}),warmOak=mat('#a98a69',.58);
   softBox(1099,787,68,106,10,stone,43);box(1104,792,58,96,6,warmOak,34);
@@ -329,7 +329,7 @@ let selected='all',yaw=.6,pitch=.8,radius=1650,target=W(750,690,30);function sel
 let walking=false,compare=false,walkX=1150,walkY=600,walkYaw=0,lookPitch=0,drag=null;
 canvas.onpointerdown=e=>{drag=[e.clientX,e.clientY];canvas.setPointerCapture(e.pointerId)};canvas.onpointermove=e=>{if(!drag)return;const dx=e.clientX-drag[0],dy=e.clientY-drag[1];if(walking){walkYaw+=dx*.006;lookPitch=Math.max(-1,Math.min(1,lookPitch-dy*.005))}else{yaw-=dx*.008;pitch=Math.max(.12,Math.min(1.5,pitch+dy*.006))}drag=[e.clientX,e.clientY]};canvas.onpointerup=canvas.onpointercancel=()=>drag=null;canvas.onwheel=e=>{e.preventDefault();if(!walking)radius=Math.max(200,Math.min(2800,radius*Math.exp(e.deltaY*.001))) };
 document.querySelector('#walls').onchange=e=>{for(const m of wallGroup.children){const scale=e.target.checked?.35:1;m.scale.y=scale;m.position.y=m.userData.fullHeightY*scale;}renderer.shadowMap.needsUpdate=true;};document.querySelector('#walls').dispatchEvent(new Event('change'));document.querySelector('#ceiling').onchange=e=>{ceilingGroup.visible=e.target.checked;renderer.shadowMap.needsUpdate=true;};document.querySelector('#night').onchange=e=>{const n=e.target.checked;hemi.intensity=n?.5:2.3;sun.intensity=n?.15:3;scene.background.set(n?'#303b38':'#dedfd5');nightLights.forEach(l=>l.intensity=n?15000:0)};
-const svg=document.querySelector('#plan'),NS='http://www.w3.org/2000/svg';function el(n,a,text){const e=document.createElementNS(NS,n);for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(text)e.textContent=text;svg.append(e);return e}for(const [x,y,w,d]of rooms)el('rect',{x,y:1100-y-d,width:w,height:d,fill:'#e5d3b3',stroke:'#c1b49b','stroke-width':1});for(const p of B1_PLAN.paths)el('polyline',{points:p.points.map(([x,y])=>`${x},${1100-y}`).join(' '),fill:'none',stroke:/WALL|A-RC|wall-i/.test(p.layer)?'#475247':'#a1a897','stroke-width':/WALL/.test(p.layer)?2:1});for(const f of furniture){el('rect',{x:f.x,y:1100-f.y-f.d,width:f.w,height:f.d,rx:5,fill:f.name.includes('地毯')?'#ded8c7':'#b5c0a4','fill-opacity':.75,stroke:'#6f8063','stroke-width':1});el('text',{x:f.x+f.w/2,y:1100-f.y-f.d/2,'text-anchor':'middle','font-size':12,fill:'#314334'},f.name)}
+const svg=document.querySelector('#plan'),NS='http://www.w3.org/2000/svg';function el(n,a,text){const e=document.createElementNS(NS,n);for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(text)e.textContent=text;svg.append(e);return e}for(const [x,y,w,d]of rooms)el('rect',{x,y:1100-y-d,width:w,height:d,fill:'#e5d3b3',stroke:'#c1b49b','stroke-width':1});for(const p of B1_PLAN.paths)el('polyline',{points:p.points.map(([x,y])=>`${x},${1100-y}`).join(' '),fill:'none',stroke:/WALL|A-RC|wall-i/.test(p.layer)?'#475247':'#a1a897','stroke-width':/WALL/.test(p.layer)?2:1});for(const f of furniture){el('rect',{x:f.x,y:1100-f.y-f.d,width:f.w,height:f.d,rx:5,fill:f.name.includes('地毯')?'#a99d8b':'#b5c0a4','fill-opacity':.75,stroke:'#6f8063','stroke-width':1});el('text',{x:f.x+f.w/2,y:1100-f.y-f.d/2,'text-anchor':'middle','font-size':12,fill:'#314334'},f.name)}
 const compareButton=document.createElement('button');compareButton.dataset.mode='compare';compareButton.textContent='3D＋平面對照';document.querySelector('header nav').append(compareButton);
 const renderButton=document.createElement('button');renderButton.dataset.mode='render';renderButton.textContent='寫實3D漫遊';document.querySelector('header nav').append(renderButton);
 const renderPanel=document.createElement('div');renderPanel.id='render-panel';renderPanel.hidden=true;renderPanel.style.display='none';view.append(renderPanel);

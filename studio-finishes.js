@@ -62,7 +62,7 @@
   const shadowMaterial=new T.MeshBasicMaterial({map:texture(shadowCanvas),transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1});
   for(const f of furniture){if(/地毯|隱藏門/.test(f.name))continue;const m=new T.Mesh(new T.PlaneGeometry(f.w+26,f.d+26),shadowMaterial);m.rotation.x=-Math.PI/2;m.position.copy(W(f.x+f.w/2,f.y+f.d/2,.58));scene.add(m);}
   // Fine loop-pile rug instead of a solid block of beige.
-  const rugMat=new T.MeshStandardMaterial({color:'#d3cbbd',map:tex,bumpMap:tex,bumpScale:.15,roughness:1});
+  const rugMat=new T.MeshStandardMaterial({color:'#a99d8b',map:tex,bumpMap:tex,bumpScale:.15,roughness:1});
   scene.traverse(m=>{if(m.isMesh&&m.geometry.parameters?.width===210&&m.geometry.parameters?.depth===250)m.material=rugMat;});
   // Replace the former narrow curtain bars with flowing fabric panels.
   const curtainMat=new T.MeshStandardMaterial({color:'#eee5d6',roughness:.98,side:T.DoubleSide,map:tex,transparent:true,opacity:.9});
@@ -111,13 +111,13 @@
   const setExteriorMood=B1_EXTERIOR.setMood;B1_EXTERIOR.setMood=mode=>{setExteriorMood(mode);detailMaterial.color.copy(exteriorMaterial.color);groundMaterial.color.copy(exteriorMaterial.color);};
   let backupPromise,generation=0;
   const reloadView=document.createElement('button');reloadView.type='button';reloadView.textContent='重新載入窗景';reloadView.onclick=()=>loadStreetViews();document.querySelector('.toolbar').append(reloadView);
-  function backup(){if(!backupPromise)backupPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='exterior-texture.js?v=20261025-gpu1';s.onload=()=>window.B1_EXTERIOR_CACHE?resolve(B1_EXTERIOR_CACHE):reject(new Error('No backup'));s.onerror=reject;document.head.append(s);}).catch(e=>{backupPromise=null;throw e;});return backupPromise;}
+  function backup(){if(!backupPromise)backupPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='exterior-texture.js?v=20261025-rug1';s.onload=()=>window.B1_EXTERIOR_CACHE?resolve(B1_EXTERIOR_CACHE):reject(new Error('No backup'));s.onerror=reject;document.head.append(s);}).catch(e=>{backupPromise=null;throw e;});return backupPromise;}
   function loadStreetViews(){const current=++generation;reloadView.textContent='窗景載入中…';
     for(const [id,url,material]of [['panorama','assets/qingpu-8th-9th-panorama.jpg',exteriorMaterial],['station','assets/qingpu-station-facing.jpg',detailMaterial],['ground','assets/qingpu-ground-panorama.jpg',groundMaterial]]){
       let fallbackStarted=false,timer;
       const applyMap=map=>{if(current!==generation){map.dispose();return;}clearTimeout(timer);map.colorSpace=T.SRGBColorSpace;map.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());if(id!=='station')map.wrapS=T.RepeatWrapping;const old=material.map;material.map=map;material.needsUpdate=true;if(old&&old!==map)old.dispose();if(id==='panorama'){exterior.visible=true;B1_REVIEW.exteriorLoaded=true;}else if(id==='station'){stationDetail.visible=true;B1_REVIEW.exteriorDetailLoaded=true;}else B1_REVIEW.exteriorGroundLoaded=true;B1_EXTERIOR.setMood(window.B1_GAME?.snapshot().scene||(nightControl.checked?'night':'day'));if(B1_REVIEW.exteriorLoaded&&B1_REVIEW.exteriorDetailLoaded&&B1_REVIEW.exteriorGroundLoaded)reloadView.textContent='重新載入窗景';};
       const rescue=()=>{if(fallbackStarted||current!==generation)return;fallbackStarted=true;backup().then(cache=>new T.TextureLoader().load(cache[id],map=>{B1_REVIEW.exteriorFallbackUsed=true;applyMap(map);},undefined,()=>reloadView.textContent='點此重新載入窗景')).catch(()=>reloadView.textContent='點此重新載入窗景');};
-      timer=setTimeout(rescue,12000);new T.TextureLoader().load(url+'?v=20261025-gpu1',applyMap,undefined,()=>new T.TextureLoader().load(url+'?retry='+Date.now(),applyMap,undefined,rescue));
+      timer=setTimeout(rescue,12000);new T.TextureLoader().load(url+'?v=20261025-rug1',applyMap,undefined,()=>new T.TextureLoader().load(url+'?retry='+Date.now(),applyMap,undefined,rescue));
     }
   }
   exterior.frustumCulled=stationDetail.frustumCulled=false;
@@ -205,5 +205,5 @@
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
   }
-  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261025-gpu1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261025-rug1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
 })();
