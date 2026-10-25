@@ -1,7 +1,7 @@
 /* Warm-home exploration. Measured geometry stays authoritative; state is local. */
 (() => {
   'use strict';
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261025-community3';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261025-kitchen-swap1';document.head.append(css);
   const SAVE_KEY='b1-warm-home-exploration-v1', reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const roomList=[
     {id:'entry',name:'迎接日常',label:'大門與隱藏門',bounds:[769,510,445,190],tip:'沿電視牆轉角是大門，再接客衛隱藏門櫃；室內走道通往其他房間。'},
@@ -90,7 +90,7 @@
     {id:'entrance',name:'入口大門',x:1157,y:507,h:125,range:125,on:false,p:0,leaf:window.mainDoorHinge,span:100,apply:p=>window.mainDoorHinge.rotation.y=p*Math.PI/2,flag:on=>{mainDoorOpen=on;mainDoorSwing.setAttribute('visibility',on?'visible':'hidden');mainDoorButton.textContent=on?'關閉大門':'開啟大門';}},
     {id:'hidden',name:'客衛隱藏門',x:869,y:554,h:120,range:115,on:false,p:0,leaf:hiddenDoorHinge,span:80,apply:p=>hiddenDoorHinge.rotation.y=-p*Math.PI/2,flag:on=>{doorOpen=on;doorSwing.setAttribute('visibility',on?'visible':'hidden');doorButton.textContent=on?'關閉隱藏門':'開啟隱藏門';}},
     {id:'cleaning',name:'清潔收納櫃',x:942,y:555,h:130,range:100,on:false,p:0,leaf:cleanHinge,span:60,apply:p=>cleanHinge.rotation.y=p*Math.PI/2,flag:on=>cleaningButton.textContent=on?'關閉清潔櫃':'打開清潔櫃'},
-    {id:'wardrobe',name:'主臥滑門衣櫥',x:660,y:920,h:140,range:100,on:false,p:0,apply:p=>wardrobeDoors[1].position.z=wardrobeZ+132*p},
+    {id:'wardrobe',name:'主臥滑門衣櫥',x:660,y:900,h:140,range:100,on:false,p:0,apply:p=>wardrobeDoors[1].position.z=wardrobeZ+122*p},
     {id:'appliance',name:'電器收納櫃',x:APPLIANCE_LAYOUT.map(585,668)[0],y:APPLIANCE_LAYOUT.map(585,668)[1],h:225,range:120,on:false,p:0,apply:p=>{applianceHinges[0].rotation.y=-p*Math.PI/2;applianceHinges[1].rotation.y=p*Math.PI/2;}},
     {id:'desk',name:'升降工作桌',x:873,y:870,h:90,range:120,on:false,p:0,verbs:['升至站姿','降回坐姿'],apply:p=>{for(const {mesh,y}of deskParts)mesh.position.y=y+37*p;for(const m of extensions){m.visible=p>.01;m.scale.y=Math.max(.01,p);m.position.y=72+18.5*p;}}},
     {id:'tv',name:'客廳電視',x:1248,y:863,h:120,range:185,on:false,p:0,verbs:['開啟電視','關閉電視'],apply:p=>{if(tvMesh)tvMesh.material=p>.5?tvOn:tvOff;}},

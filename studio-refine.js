@@ -14,7 +14,7 @@
   for(const [x,y]of [[1100,800],[840,900],[860,640],[1070,580]]){const trim=new T.Mesh(new T.TorusGeometry(6.1,.4,8,40),brushed);trim.rotation.x=Math.PI/2;trim.position.copy(W(x,y,279));detail.add(trim);}
 
   // Cabinet edge gaps and pull profiles stay attached to the actual moving panels.
-  wardrobeDoors.forEach((leaf,i)=>attach(rod([i?657.4:660.4,i?1020:886,102],[i?657.4:660.4,i?1020:886,153],.42,brushed),leaf));
+  wardrobeDoors.forEach((leaf,i)=>attach(rod([i?657.4:660.4,i?1000:876,102],[i?657.4:660.4,i?1000:876,153],.42,brushed),leaf));
   attach(rounded(939,552.5,1,1.4,52,brushed,100,detail,.4),cleaningDoors[0]);
   applianceDoors.forEach((leaf,i)=>applianceAttach(rod([i?593:579,668.1,214],[i?593:579,668.1,250],.4,brushed),leaf));
   for(const [i,leaf]of fridgeDoors.entries()){

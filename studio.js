@@ -3,7 +3,7 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-community3';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261025-kitchen-swap1';detailScript.async=false;
 function loadFailure(name){if(window.B1_REVIEW)B1_REVIEW.ready=true;loading.replaceChildren(document.createTextNode(`${name}載入未完成。`));const retry=document.createElement('button');retry.textContent='重新載入';retry.onclick=()=>location.reload();loading.append(retry);}
 detailScript.onerror=()=>loadFailure('空間細節');
 setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},20000);
@@ -257,10 +257,10 @@ item('陽台直條格柵欄',220,300,12,250,()=>{
 });
 item('主臥飯店級軟包雙人床／轉向90度',425,890,188,150,()=>{box(425,890,188,150,12,oak,14);softBox(425,890,188,150,22,linen,24);softBox(417,890,12,150,82,mat('#c2b4a3',.94),18);for(const yy of [902,972])softBox(438,yy,35,58,11,cream,46);box(538,890,75,150,3,sage,47)});
 const wardrobeDoors=[];
-item('主臥整牆頂天滑門衣櫥 275 cm',664,765,55,275,()=>{
-  box(716,765,3,275,ROOM_HEIGHT,oak);box(664,765,55,3,ROOM_HEIGHT,oak);box(664,1037,55,3,ROOM_HEIGHT,oak);box(664,765,55,275,3,oak,ROOM_HEIGHT-3);
-  for(const z of [3,60,195])box(664,768,52,269,3,oak,z);
-  for(const [x,y]of [[661,767],[658,901]])wardrobeDoors.push(box(x,y,2,134,ROOM_HEIGHT-8,oak,4));
+item('主臥頂天滑門衣櫥 255 cm',664,765,55,255,()=>{
+  box(716,765,3,255,ROOM_HEIGHT,oak);box(664,765,55,3,ROOM_HEIGHT,oak);box(664,1017,55,3,ROOM_HEIGHT,oak);box(664,765,55,255,3,oak,ROOM_HEIGHT-3);
+  for(const z of [3,60,195])box(664,768,52,249,3,oak,z);
+  for(const [x,y]of [[661,767],[658,891]])wardrobeDoors.push(box(x,y,2,124,ROOM_HEIGHT-8,oak,4));
 });
 item('次臥飯店級客床 150×188',415,320,150,188,()=>{box(415,320,150,188,12,oak,14);softBox(415,320,150,188,22,linen,24);softBox(415,508,150,10,76,mat('#c2b4a3',.94),16);softBox(430,465,110,35,12,cream,46)});
 const KITCHEN_LAYOUT={map:(x,y,z=0)=>[x,y-.5,z],transformMesh:m=>{m.position.z+=.5;return m;}};
@@ -280,9 +280,9 @@ item('橫向廚具 230×60',239,669.5,230,60,()=>{
   for(const m of scene.children.slice(kitchenStart))KITCHEN_LAYOUT.transformMesh(m);
 });
 // Panasonic NR-D505XGS-W cloud-rock white: upper French doors + two wide drawers.
-const FRIDGE_LAYOUT={x:470.5,y:655.2,width:72.1,depth:69.5,height:183.4,backClearance:5,map:(x,y,z=0)=>[x-3.5,655.2+(y-666.2)*69.5/73.3,z-2],transformMesh:m=>{const [x,y,z]=FRIDGE_LAYOUT.map(m.position.x+750,700-m.position.z,m.position.y);m.position.copy(W(x,y,z));m.scale.z*=69.5/73.3;return m;}};
+const FRIDGE_LAYOUT={x:530.5,y:655.2,width:72.1,depth:69.5,height:183.4,backClearance:5,map:(x,y,z=0)=>[x+56.5,655.2+(y-666.2)*69.5/73.3,z-2],transformMesh:m=>{const [x,y,z]=FRIDGE_LAYOUT.map(m.position.x+750,700-m.position.z,m.position.y);m.position.copy(W(x,y,z));m.scale.z*=69.5/73.3;return m;}};
 const fridgeDoors=[];
-item('Panasonic NR-D505XGS-W 雲岩白四門冰箱',470.5,655.2,72.1,69.5,()=>{
+item('Panasonic NR-D505XGS-W 雲岩白四門冰箱',530.5,655.2,72.1,69.5,()=>{
   const fridgeStart=scene.children.length;
   const glassWhite=mat('#e7e5dc',.19,{metalness:.08}),edge=mat('#aeb1ad',.22,{metalness:.18});
   box(474,670,2.2,69.5,183.4,white,2);box(543.9,670,2.2,69.5,183.4,white,2);box(476.2,737,67.7,2.5,183.4,white,2);
@@ -298,9 +298,9 @@ item('Panasonic NR-D505XGS-W 雲岩白四門冰箱',470.5,655.2,72.1,69.5,()=>{
   const fridgeControl=box(539.3,666.7,2,1.2,2,dark,177);fridgeDoors[1].attach(fridgeControl);
   for(const m of scene.children.slice(fridgeStart))FRIDGE_LAYOUT.transformMesh(m);
 });
-const APPLIANCE_LAYOUT={x:544.1,y:669,width:58.5,depth:60,map:(x,y,z=0)=>[544.1+(x-546.1)*58.5/80,669+(y-668)*60/72,z],transformMesh:m=>{const [x,y,z]=APPLIANCE_LAYOUT.map(m.position.x+750,700-m.position.z,m.position.y);m.position.copy(W(x,y,z));m.scale.x*=58.5/80;m.scale.z*=60/72;return m;}};
+const APPLIANCE_LAYOUT={x:470.5,y:669,width:58.5,depth:60,map:(x,y,z=0)=>[470.5+(x-546.1)*58.5/80,669+(y-668)*60/72,z],transformMesh:m=>{const [x,y,z]=APPLIANCE_LAYOUT.map(m.position.x+750,700-m.position.z,m.position.y);m.position.copy(W(x,y,z));m.scale.x*=58.5/80;m.scale.z*=60/72;return m;}};
 const applianceDoors=[];
-item('頂天電器櫃 58.5 cm',544.1,669,58.5,60,()=>{
+item('頂天電器櫃 58.5 cm',470.5,669,58.5,60,()=>{
   const applianceStart=scene.children.length;
   box(546.1,670,2,70,ROOM_HEIGHT,oak);box(624.1,670,2,70,ROOM_HEIGHT,oak);box(548.1,738,76,2,ROOM_HEIGHT-4,cream,3);
   for(const z of [2,92,150,205,ROOM_HEIGHT-3])box(548.1,670,76,68,3,oak,z);
@@ -313,16 +313,16 @@ item('頂天電器櫃 58.5 cm',544.1,669,58.5,60,()=>{
   for(const m of scene.children.slice(applianceStart))APPLIANCE_LAYOUT.transformMesh(m);
 });
 const nightLights=[];for(const [x,y]of [[1100,800],[840,900],[860,640],[1070,580]]){const l=new T.PointLight(0xffc17d,0,440,2);l.position.copy(W(x,y,220));scene.add(l);nightLights.push(l);cyl(x,y,6,2,mat('#fff3cd',.2,{emissive:0xffdba3,emissiveIntensity:.5}),ROOM_HEIGHT-5)}
-Object.assign(designSpecs.kitchen,{counter:[239,669.5,230,60],cooktop:[255,679.5,60,43],sink:[421,699.5,52,36],fridge:[470.5,655.2,72.1,69.5],fridgeHeight:183.4,fridgeBackClearance:5,applianceCabinet:[544.1,669,58.5,60],usableWallRight:603.6,backWallFace:729.7});
+Object.assign(designSpecs.kitchen,{counter:[239,669.5,230,60],cooktop:[255,679.5,60,43],sink:[421,699.5,52,36],fridge:[530.5,655.2,72.1,69.5],fridgeHeight:183.4,fridgeBackClearance:5,applianceCabinet:[470.5,669,58.5,60],usableWallRight:603.6,backWallFace:729.7});
 const configs={all:{target:[750,690],radius:1650,yaw:.6,pitch:.8,title:'全室配置',sub:'依 DWG 房間位置配置',text:'客廳在右側、最小臥室位於上方中央；將其規劃為影音工作室。淨高暫定 280 cm，牆體顯示為可切換剖面。'},living:{target:[1110,790],radius:560,yaw:1.2,pitch:.46,title:'木框沙發 × 玻璃收藏牆',sub:'客廳 / 暖木與留白',text:'220 cm 沙發沿影音室外牆擺放，朝向右側電視。展示櫃集中於電視兩端，以封閉底櫃收整日常雜物；淺色地毯統一客廳範圍。'},media:{target:[840,900],radius:490,yaw:.8,pitch:.65,title:'一間房，三種日常',sub:'影音 / 工作 / 收藏',text:'最小房暫採上方中央約 220 × 300 cm 臥室。60 cm 深臥榻沿窗、升降桌靠左牆、展示收納靠右牆。影音設備與座位視線待選型調整。'},entry:{target:[1080,570],radius:500,yaw:1,pitch:.6,title:'以同一片立面迎接回家',sub:'玄關 / 隱藏門概念',text:'玄關以淺橡木與奶油白櫃門串連入口。廁所隱藏門須依原門洞位置及開門方向確認；目前展示櫃體語彙與預留範圍。'},laundry:{target:[310,420],radius:500,yaw:-1,pitch:.7,title:'清爽的洗衣陽台',sub:'洗脫烘 / 耐潮工作檯',text:'LG 15 kg 機器先預留 65 × 75 cm 示意體積，並非已核對型號尺寸。陽台安排獨立洗衣檯面，後續依實際型號確認管線與維修空間。'}};
 configs.living.yaw=-1.12;configs.living.radius=700;
 configs.living.title='弧背沙發 × 石材茶几';configs.living.text='奶油色弧背模組沙發改採低矮、柔和的飯店式比例，搭配圓角石材升降茶几；桌緣至沙發保留約37 cm、至電視牆約51 cm。花台端不放植栽或高櫃，讓採光與主要動線保持留白。';
 configs.media.text='160 × 65 cm升降桌移到對面實牆，椅子面向桌面；窗邊只保留 60 cm 臥榻與採光，中央通道保持開闊。';
 configs.entry.target=[1020,650];configs.entry.yaw=2.65;configs.entry.radius=350;configs.entry.pitch=.65;configs.entry.title='客廳全景與客衛隱藏門';configs.entry.sub='窗戶・大門・電視牆・隱藏門';configs.entry.text='按 3D 配置由客廳查看窗戶、主大門及側向電視牆；客衛隱藏門位在大門旁的短收納立面，門後即客用衛浴。清潔櫃與大門旁 130 cm 工作檯依模型位置保留；隱藏門與主大門是兩扇不同的門。';
-configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾整牆衣櫥，頂天收納',sub:'主臥 / 約275 × 55 × 280 cm',text:'維持床頭朝左、150 × 188 cm雙人床。床尾右側牆做 275 cm 長木質滑門衣櫥，延伸至天花板，入口門洞保留；原入口側櫃體移除。床尾至門面約49 cm，偏窄，須現場確認與調整後才能施工；280 cm高度為模型暫定值。'};
+configs.master={target:[555,900],radius:590,yaw:.5,pitch:.8,title:'床尾滑門衣櫥，頂天收納',sub:'主臥 / 衣櫥255 × 55 × 280 cm',text:'維持床頭朝左、150 × 188 cm雙人床。木質滑門衣櫥由275 cm減少20 cm，改為255 cm，入口端不動，靠窗端縮短；淨高280 cm。'};
 configs.guest={target:[580,430],radius:570,yaw:.7,pitch:.85,title:'清空次臥櫃體，保留彈性',sub:'次臥 / 只保留客床與完整動線',text:'移除原本的衣櫃、書桌與零散櫃體，留下150×188 cm客床及完整門口動線。後續可依實際需求再放入活動式家具，不先以固定櫃體壓縮空間。'};
 configs.laundry.text='LG WD-S15NDB 15公斤洗脫烘（65 × 64.5 × 95 cm）放在既有陽台位置，依270度後再轉90度設定為360度；門面朝室內。現場仍需確認開門深度、給排水與插座。';
-configs.kitchen={target:[470,690],radius:620,yaw:-.7,pitch:.7,title:'廚具・冰箱・窄深電器收納',sub:'230 × 60 cm 檯面 / Panasonic NR-D505XGS-W',text:'依背牆內側約 365 cm 淨長重新配置：230 cm 檯面、72.1 cm 冰箱與 58.5 × 60 cm 電器櫃。冰箱實際外尺寸為72.1 × 69.5 × 183.4 cm，向室內調整位置並預留背後5 cm，櫃體不再伸進側牆或背牆。散熱與安裝間距仍須依現場及原廠安裝圖複核。'};
+configs.kitchen={target:[470,690],radius:620,yaw:-.7,pitch:.7,title:'廚具・電器收納・冰箱',sub:'230 × 60 cm 檯面 / Panasonic NR-D505XGS-W',text:'依家人指定，沿檯面往側牆依序為230 cm 檯面、58.5 × 60 cm 電器櫃、72.1 cm 冰箱。冰箱實際外尺寸為72.1 × 69.5 × 183.4 cm，預留背後5 cm，兩側設備保持間隙，櫃體不伸進側牆或背牆。散熱與安裝間距仍須依現場及原廠安裝圖複核。'};
 for(const [name,label]of [['master','06　主臥'],['guest','07　次臥'],['kitchen','08　廚房']]){const b=document.createElement('button');b.dataset.room=name;b.textContent=label;document.querySelector('.rooms').append(b)}
 let selected='all',yaw=.6,pitch=.8,radius=1650,target=W(750,690,30);function select(name){selected=name;const c=configs[name];yaw=c.yaw;pitch=c.pitch;radius=c.radius;target=W(...c.target,35);document.querySelector('#title').textContent=c.title;document.querySelector('#description').textContent=c.text;document.querySelector('#subtitle').textContent=c.sub;document.querySelector('#viewname').textContent=c.title;document.querySelectorAll('[data-room]').forEach(b=>b.classList.toggle('active',b.dataset.room===name))}document.querySelectorAll('[data-room]').forEach(b=>b.onclick=()=>select(b.dataset.room));document.querySelector('#reset').onclick=()=>select(selected);
 let walking=false,compare=false,walkX=1150,walkY=600,walkYaw=0,lookPitch=0,drag=null;

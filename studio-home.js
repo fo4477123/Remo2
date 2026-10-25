@@ -1,6 +1,6 @@
 /* Warm-home walkthrough: phone input, rendering budget, and design validation. */
 (() => {
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261025-community3';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261025-kitchen-swap1';document.head.append(css);
   const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<850;
   document.body.classList.add('home-ready');
   // Full-height walls and real windows are the default; cutaway is opt-in.
@@ -24,7 +24,7 @@
   roomPicker.onchange=()=>{const b=document.querySelector(`[data-room="${roomPicker.value}"]`);b.click();};
   const walkPicker=roomPicker.cloneNode(true);walkPicker.className='walk-picker';walkPicker.setAttribute('aria-label','漫遊中切換房間');walkPicker.onchange=()=>{roomPicker.value=walkPicker.value;roomPicker.onchange();};view.append(walkPicker);
   const selectBefore=select;select=function(name){selectBefore(name);roomPicker.value=walkPicker.value=name;};
-  configs.master.text='床頭靠左、150 × 188 cm雙人床向左微移17 cm，床尾至滑門面約66 cm；整牆衣櫥及浴室入口保留。這仍是偏緊的通道，須現場複核。';
+  configs.master.text='床頭靠左、150 × 188 cm雙人床向左微移17 cm，床尾至滑門面約66 cm；衣櫥由275 cm減少20 cm，改為255 cm，入口端位置保留、靠窗端縮短。這仍是偏緊的通道，須現場複核。';
   configs.living.text='77 吋電視置中於連續奶油色電視牆，搭配弧背模組沙發與圓角石材升降茶几；洗白橡木、礦物石材、織品與暖光統一成安靜的暖日式質感，花台端不放植栽，入口通道保持留白。';
   configs.media.text='160 × 65 cm升降桌移到對面實牆，搭配高階網布人體工學椅與雙螢幕工作區；窗邊維持臥榻與採光，不再讓螢幕面對窗戶。';
   B1_REVIEW.clearances.masterBedToWardrobe=66;B1_REVIEW.clearances.sofaToTable=37;B1_REVIEW.clearances.tableToTV=51;B1_REVIEW.clearances.mediaDeskLength=160;B1_REVIEW.clearances.mediaDeskToBench=50;
@@ -112,7 +112,7 @@
   const capture=document.createElement('button');capture.id='capture-view';capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{renderer.render(scene,camera);const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Curated photoreal render gallery: these are high-detail design views, while
   // the canvas above remains the measured interactive model.
-  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261025-community3'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
+  const premiumRenders={living:['客廳','renders/living-premium.png'],entry:['客廳全景（電視牆・大門・客衛隱藏門櫃）','renders/hidden-door-premium.png?v=20261025-kitchen-swap1'],kitchen:['餐廚','renders/kitchen-premium.png?v=20261024-layout5'],master:['主臥','renders/master-premium.png?v=20261024-layout2'],media:['多功能室','renders/media-premium.png?v=20261024-layout2'],guest:['次臥','renders/guest-premium.png?v=20261024-layout2'],bath:['客用衛浴','renders/bath-premium.png?v=20261024-layout3'],ensuite:['主臥衛浴','renders/ensuite-premium.png?v=20261024-layout2'],laundry:['洗衣陽台','renders/laundry-premium.png?v=20261024-layout3']};
   const gallery=document.createElement('section');gallery.className='render-gallery';gallery.innerHTML='<div class="render-gallery__head"><div><p class="overline">PREMIUM RENDER COLLECTION</p><b>高級空間渲染</b></div><label>選擇空間 <select aria-label="選擇高級渲染空間"></select></label></div><figure><img alt="高級室內設計渲染"><figcaption></figcaption></figure>';
   const gallerySelect=gallery.querySelector('select'),galleryImage=gallery.querySelector('img'),galleryCaption=gallery.querySelector('figcaption');
   for(const [key,[label]] of Object.entries(premiumRenders)){const option=document.createElement('option');option.value=key;option.textContent=label;gallerySelect.append(option);}
@@ -135,10 +135,10 @@
   else if(mobile&&!location.hash&&!location.search){renderButton.click();}
   select(selected);
   B1_REVIEW.audit=()=>({roomHeight:ROOM_HEIGHT,windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
-  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261025-community3';
+  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261025-kitchen-swap1';
   const loadGame=()=>{
     const modules=['studio-models.js','studio-refine.js','studio-shell.js','studio-life.js','studio-community.js','studio-game.js'];let index=0;
-    const next=()=>{if(index===modules.length){B1_REVIEW.ready=true;if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261025-community3';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
+    const next=()=>{if(index===modules.length){B1_REVIEW.ready=true;if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261025-kitchen-swap1';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
   };
   renderScript.onload=loadGame;renderScript.onerror=loadGame;document.head.append(renderScript);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clearMovement();loading.textContent='圖形記憶體暫時不足，請重新載入頁面。';view.append(loading);});
