@@ -6,14 +6,14 @@
   function cancel(){if(timer)clearTimeout(timer);timer=null;state=null;overlay.hidden=true;}
   function after(ms,fn){timer=setTimeout(()=>{timer=null;fn();},ms);}
   function phase(name,title,sub){state.phase=name;overlay.className='transit-view '+state.kind+' '+name;overlay.querySelector('strong').textContent=title;overlay.querySelector('span').textContent=sub;}
-  function start(kind,destination,door=null,elevator=null){if(B1_COMMUNITY.inTransit)return false;document.querySelectorAll('dialog[open]').forEach(d=>d.close());cancel();state={kind,destination,phase:'boarding',from:B1_COMMUNITY.zone,door,elevator};B1_COMMUNITY.setTransit(true);if(elevator)elevator.goal=1;if(door)door.userData.goal=1;B1_SOUND.transit(kind,'open');
+  function start(kind,destination,door=null,elevator=null,tower=null){if(B1_COMMUNITY.inTransit)return false;document.querySelectorAll('dialog[open]').forEach(d=>d.close());cancel();state={kind,destination,phase:'boarding',from:B1_COMMUNITY.zone,door,elevator,tower:tower||elevator?.tower};B1_COMMUNITY.setTransit(true);if(elevator)elevator.goal=1;if(door)door.userData.goal=1;B1_SOUND.transit(kind,'open');
     after(750,()=>{if(elevator)elevator.goal=0;if(door)door.userData.goal=0;overlay.hidden=false;phase('boarding','','');requestAnimationFrame(()=>requestAnimationFrame(()=>{if(state)phase('closing',kind==='lift'?'電梯關門':'安全門關閉',kind==='lift'?'請稍候，準備前往目的樓層':'沿安全梯前往目的樓層');}));B1_SOUND.transit(kind,'close');
-      after(850,()=>{phase('travelling',kind==='lift'?'電梯運行中':'循安全梯步行',destination==='lobby'?'前往 1F 共享大廳':destination==='parking'?'前往 B3 停車場':'前往 5F 住戶廊廳');B1_SOUND.transit(kind,'travel');
-        after(kind==='lift'?1350:1650,()=>{const journey=state;B1_COMMUNITY.travel(destination,kind==='stairs'?'stairs':elevator.tower);state={...journey,phase:'opening'};B1_COMMUNITY.setTransit(true);overlay.hidden=false;phase('opening','','');const arrival=B1_NEIGHBORHOOD.elevators.find(e=>e.zone===destination&&e.tower===elevator?.tower&&e.index===elevator?.index);if(arrival)arrival.goal=1;B1_SOUND.transit(kind,'arrival');
+      after(850,()=>{phase('travelling',kind==='lift'?'電梯運行中':'循安全梯步行',destination==='lobby'?'前往 1F・'+state.tower+' 棟長廊及中央接待大廳':destination==='parking'?'前往 B3 停車場':destination==='hallA5'?'前往 A 棟 5F 住戶廊廳':'前往 B 棟 5F 住戶廊廳');B1_SOUND.transit(kind,'travel');
+        after(kind==='lift'?1350:1650,()=>{const journey=state;B1_COMMUNITY.travel(destination,kind==='stairs'?'stairs-'+journey.tower:elevator.tower+'-'+elevator.index);state={...journey,phase:'opening'};B1_COMMUNITY.setTransit(true);overlay.hidden=false;phase('opening','','');const arrival=B1_NEIGHBORHOOD.elevators.find(e=>e.zone===destination&&e.tower===elevator?.tower&&e.index===elevator?.index);if(arrival)arrival.goal=1;B1_SOUND.transit(kind,'arrival');
           after(900,()=>{overlay.hidden=true;B1_COMMUNITY.setTransit(false);if(arrival){arrival.goal=0;B1_SOUND.transit('lift','close');}state=null;});
         });
       });
     });return true;
   }
-  window.B1_TRANSIT={cancel,ride:(e,id)=>start('lift',id,null,e),stairs:a=>start('stairs',a.destination,a.stairDoor),snapshot:()=>state?{kind:state.kind,phase:state.phase,destination:state.destination}:null};
+  window.B1_TRANSIT={cancel,ride:(e,id)=>start('lift',id,null,e),stairs:a=>start('stairs',a.destination,a.stairDoor,null,a.tower||B1_NEIGHBORHOOD.zones[B1_COMMUNITY.zone]?.tower||'B'),snapshot:()=>state?{kind:state.kind,phase:state.phase,destination:state.destination}:null};
 })();

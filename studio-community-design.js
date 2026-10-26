@@ -23,22 +23,23 @@
     b(z,x+direction*9,y+83,2,14,37,dark,98);text(z,tower+' '+index,z.floor+'F',x+direction*12,y,258,105,35,east?-Math.PI/2:Math.PI/2);target(z,e.id,tower+'棟 '+index+'號電梯',x+direction*55,y,135,{kind:'elevator',elevator:e.id,tower},160);
   }
   function residentDoor(z,u,south){if(u.own)return target(z,'unit-'+u.id,'B1-5F 家門',u.x,u.y,130,{kind:'home-door'},145);const y=u.y;b(z,u.x-58,y-5,116,12,238,dark);b(z,u.x-50,y+(south?-8:6),100,4,228,oakWall,3);b(z,u.x+35,y+(south?-13:11),3,4,23,metal,99);text(z,u.id,'5F',u.x-20,y+(south?-14:13),180,45,18,south?0:Math.PI);target(z,'unit-'+u.id,u.own?'進入 B1-5F・你的家':'按 '+u.id+' 門鈴',u.x,y,130,{kind:'unit',unit:u.id,own:u.own},150);}
-  function hallway(tower){const areas=[[2000,400,920,310],[2400,670,250,570]],z=create('hall'+tower+'5',tower+'棟・5F 中央梯廳',5,[2000,400,920,840],areas);z.tower=tower;z.spawn=[2120,590,Math.PI/2];z.description='依標準層圖重建：中央橫向梯廳、北側雙樓梯門、南側L形電梯廊與雙梯。';z.referenceFeatures=['cross-hall','south-lift-core','north-twin-stairs','four-corner-units'];
+  function hallway(tower){const areas=[[2000,400,920,310],[2400,670,250,570]],z=create('hall'+tower+'5',tower+'棟・5F 中央梯廳',5,[2000,400,920,840],areas);z.tower=tower;z.arrivals={['stairs-'+tower]:[2340,470,Math.PI],[tower+'-1']:[2515,925,Math.PI/2],[tower+'-2']:[2515,1120,Math.PI/2]};z.spawn=[2120,590,Math.PI/2];z.description='依標準層圖重建：中央橫向梯廳、北側雙樓梯門、南側L形電梯廊與雙梯。';z.referenceFeatures=['cross-hall','south-lift-core','north-twin-stairs','four-corner-units'];
     for(const [x,y,w,d]of [[2000,400,920,310],[2400,710,250,530]]){b(z,x,y,w,d,7,paleStone,-7);b(z,x,y,w,d,7,ivory,280);}
     for(const [x,y,w,d]of [[2000,395,920,10],[1995,400,10,310],[2915,400,10,310],...(tower==='B'?[[2000,705,52,10],[2168,705,232,10]]:[[2000,705,400,10]]),[2650,705,270,10],[2395,710,10,137],[2395,1003,10,39],[2395,1198,10,42],[2645,710,10,530]])b(z,x,y,w,d,280,ivory);
     b(z,2400,1230,250,8,48,ivory);b(z,2400,1230,250,8,45,ivory,235);b(z,2400,1230,250,3,187,glazing,48);for(const x of [2400,2523,2647])b(z,x,1227,3,10,232,metal,48);
     for(const [x,y,w,d]of [[2015,518,730,2],[2015,690,370,2],[2603,690,142,2],[2417,710,2,510],[2570,710,2,510]])b(z,x,y,w,d,.5,blackStone,.1,.1);
     for(const x of [2140,2400,2660])b(z,x-50,600,100,3,1,mat('#fff1d0',.3,{emissive:0xffedce,emissiveIntensity:1}),278);
-    const arrangement=tower==='B'?[1,2,3,5]:[2,1,5,3];z.units=arrangement.map((n,i)=>({n,id:tower+n+'-5F',rooms:i<2?3:2,own:tower==='B'&&n===1,x:i%2?2835:2110,y:tower==='B'?(i===0||i===3?705:405):(i<2?405:705),side:i%2?'east':'west'}));for(let i=0;i<z.units.length;i++)residentDoor(z,z.units[i],z.units[i].y>600);if(tower==='B')b(z,2052,705,116,10,52,ivory,228);
-    for(const x of [2340,2490]){b(z,x-46,398,92,7,230,dark);const stairLeaf=b(z,x-40,405,80,3,222,mat('#969a90',.8),4);const stairHinge=new T.Group();stairHinge.position.copy(W(x-40,405));z.scene.add(stairHinge);stairHinge.attach(stairLeaf);(z.stairDoors||=[]).push(stairHinge);text(z,'安全梯','STAIRS',x,410,245,105,30);target(z,'stairs-'+x,'沿安全梯前往一樓',x,420,130,{kind:'stairs',destination:'lobby',stairDoor:stairHinge},130);}
+    const arrangement=tower==='B'?[1,2,3,5]:[2,1,5,3];z.units=arrangement.map((n,i)=>({n,id:tower+n+'-5F',rooms:i<2?3:2,own:tower==='B'&&n===1,x:i%2?2835:2110,y:tower==='B'?(i===0||i===1?705:405):(i<2?405:705),side:i%2?'east':'west'}));for(let i=0;i<z.units.length;i++)residentDoor(z,z.units[i],z.units[i].y>600);if(tower==='B')b(z,2052,705,116,10,52,ivory,228);
+    for(const x of [2340,2490]){b(z,x-46,398,92,7,230,dark);const stairLeaf=b(z,x-40,405,80,3,222,mat('#969a90',.8),4);const stairHinge=new T.Group();stairHinge.position.copy(W(x-40,405));z.scene.add(stairHinge);stairHinge.attach(stairLeaf);(z.stairDoors||=[]).push(stairHinge);text(z,'安全梯','STAIRS',x,410,245,105,30);target(z,'stairs-'+x,'沿安全梯前往一樓',x,420,130,{kind:'stairs',destination:'lobby',tower,stairDoor:stairHinge},130);}
     lift(z,2407,925,tower,1);lift(z,2407,1120,tower,2);moveNpc(z,tower==='B'?'chen':'yu',tower==='B'?2720:2150,tower==='B'?620:660);if(tower==='B')z.npcs[0].badge.scale.setScalar(.55);return z;
   }
   hallway('A');hallway('B');
-  const z=create('lobby','寶台未來共享大廳',1,[1600,100,1800,3380],[[1600,100,1800,1500],[2260,1560,480,1920]],540);z.cameraFov=64;z.spawn=[2770,1430,-3.05];z.viewPitch=.19;z.description='橢圓天井接待大廳連接一樓長廊；沿走道兩側進入公設，後段分別通往 A／B 棟雙電梯。';z.referenceFeatures=['oval-oculus','ring-light','dark-stone-reception','raised-lounge','left-right-amenity-wings','connected-rectangular-corridor'];
-  b(z,1600,100,1800,1500,10,floorStone,-10);b(z,1600,100,1800,15,60,ivory);b(z,1600,100,1800,15,45,ivory,495);b(z,1600,106,1800,3,435,glazing,60);for(let x=1600;x<3400;x+=130)b(z,x,100,5,14,490,dark,20);for(const x of [1600,3388]){b(z,x,100,12,1500,65,ivory);b(z,x,100,12,1500,50,ivory,490);b(z,x+2,115,3,1470,425,glazing,65);for(let y=120;y<1600;y+=130)b(z,x,y,12,4,490,dark,20);}
-  // A real 4.8 m opening connects the lobby to the lower, rectangular amenity corridor.
-  for(const [x,w]of [[1600,660],[2740,660]]){b(z,x,1588,w,12,30,ivory);b(z,x,1588,w,12,40,ivory,500);b(z,x,1590,w,3,470,glazing,30);for(let xx=x;xx<x+w;xx+=150)b(z,xx,1585,5,12,500,dark);}
-  b(z,2260,1588,480,12,240,ivory,300);text(z,'公設長廊','健身 · 閱讀 · 音樂 · A/B 棟電梯',2500,1580,275,320,55,0);
+  const z=create('lobby','寶台未來共享大廳',1,[-280,100,5560,1500],[[1600,100,1800,1500],[-280,1100,1920,480],[3360,1100,1920,480]],540);z.cameraFov=64;z.spawn=[2500,820,0];z.viewPitch=.19;z.description='中央天井接待大廳；左側 A 棟長廊連接健身房、圖書館及 A 棟雙梯，右側 B 棟長廊連接琴房、鼓室及 B 棟雙梯。';z.referenceFeatures=['oval-oculus','ring-light','dark-stone-reception','raised-lounge','left-right-amenity-wings','connected-rectangular-corridor','central-lobby-two-tower-wings'];
+  b(z,1600,100,1800,1500,10,floorStone,-10);b(z,1600,100,1800,15,60,ivory);b(z,1600,100,1800,15,45,ivory,495);b(z,1600,106,1800,3,435,glazing,60);for(let x=1600;x<3400;x+=130)b(z,x,100,5,14,490,dark,20);
+  // The shared reception stays between the two independently labelled wings.
+  for(const x of [1600,3388]){for(const [y,d]of [[100,1000],[1580,20]]){b(z,x,y,12,d,65,ivory);b(z,x,y,12,d,50,ivory,490);b(z,x+2,y+1,3,d-2,425,glazing,65);for(let yy=y;yy<y+d;yy+=130)b(z,x,yy,12,4,490,dark,20);}b(z,x,1100,12,480,240,ivory,300);}
+  b(z,1600,1588,1800,12,30,ivory);b(z,1600,1588,1800,12,40,ivory,500);b(z,1610,1590,1780,3,470,glazing,30);for(let x=1620;x<3390;x+=150)b(z,x,1585,5,12,500,dark);
+  text(z,'A 棟長廊','健身房 · 小圖書館 · A 棟電梯',1618,1340,275,350,55,Math.PI/2);text(z,'B 棟長廊','琴房 · 鼓室 · B 棟電梯',3382,1340,275,350,55,-Math.PI/2);
   // Ceiling slab surrounds a real oval opening; curved mosaic soffit rises to the skylight.
   const shape=new T.Shape();shape.moveTo(850,-600);shape.lineTo(2650,-600);shape.lineTo(2650,900);shape.lineTo(850,900);shape.closePath();const opening=new T.Path();opening.absellipse(1700,200,500,380,0,Math.PI*2,true);shape.holes.push(opening);const ceiling=new T.Mesh(new T.ShapeGeometry(shape),ivory);ceiling.rotation.x=-Math.PI/2;ceiling.position.y=540;ceiling.material=ivory.clone();ceiling.material.side=T.DoubleSide;ceiling.name='reference-oval-ceiling';z.scene.add(ceiling);
   const mosaic=document.createElement('canvas');mosaic.width=mosaic.height=128;const mp=mosaic.getContext('2d');mp.fillStyle='#737b7e';mp.fillRect(0,0,128,128);for(let y=0;y<128;y+=16)for(let x=0;x<128;x+=16){mp.fillStyle=(x+y)%32?'#d0d4d3':'#a5acaf';mp.beginPath();mp.moveTo(x+1,y+1);mp.lineTo(x+15,y+1);mp.lineTo(x+13,y+14);mp.lineTo(x+3,y+14);mp.closePath();mp.fill();mp.fillStyle='#f1f1e9';mp.fillRect(x+2,y+2,11,2);}const mosaicMap=new T.CanvasTexture(mosaic);mosaicMap.colorSpace=T.SRGBColorSpace;mosaicMap.wrapS=mosaicMap.wrapT=T.RepeatWrapping;
@@ -54,27 +55,30 @@
   const leafMat=mat('#587752',.95),leafGeo=new T.IcosahedronGeometry(1,2);for(let x=2190;x<3260;x+=55){for(const y of [145,170]){const bush=new T.Mesh(leafGeo,leafMat);bush.scale.set(35,65,32);bush.position.copy(W(x,y,106));z.scene.add(bush);}}b(z,2170,138,1100,65,35,blackStone);
   // Long dark stone reception stays on the left, leaving the circular centre open.
   b(z,3010,700,190,445,100,blackStone,0,2);b(z,3000,690,215,465,7,paleStone,100,1);obstacle(z,3000,690,215,465);const secretary=moveNpc(z,'secretary',3270,830);secretary.x=2980;secretary.y=830;secretary.range=260;text(z,'寶台未來','RESIDENT SERVICES',2998,900,66,250,48,-Math.PI/2);
-  function wingDoor(x,y,label,dest,east){const side=east?-1:1;b(z,x-5,y-62,10,124,245,blackStone);b(z,x+side*7,y-53,3,106,230,glazing,4);for(const yy of [y-55,y,y+55])b(z,x+side*9,yy,4,4,230,metal,4);text(z,label,east?'B WING':'A WING',x+side*14,y,260,190,45,east?-Math.PI/2:Math.PI/2);target(z,'portal-'+dest,label,x+side*55,y,135,{kind:'travel',destination:dest},175);}
-  // Fully enclosed corridor: four amenity portals first, then paired tower lift banks.
-  b(z,2260,1600,480,1880,10,floorStone,-10);b(z,2250,1600,500,1890,10,ivory,300);
-  const openings=[1820,2090,2570,3000,3280];
-  for(const x of [2250,2740]){let last=1600;for(const y of openings){b(z,x,last,10,y-80-last,300,ivory);b(z,x,y-80,10,160,52,ivory,248);last=y+80;}b(z,x,last,10,3480-last,300,ivory);}
-  b(z,2250,3470,500,10,55,ivory);b(z,2250,3470,500,10,45,ivory,255);b(z,2260,3473,480,3,200,glazing,55);for(const x of [2260,2420,2580,2736])b(z,x,3470,4,8,245,metal,55);
-  for(const x of [2280,2718])b(z,x,1610,2,1840,.3,blackStone,.2,.1);
-  for(const x of [2261,2735]){let last=1600;for(const y of openings){b(z,x,last,4,y-80-last,75,paleStone);b(z,x,last,5,y-80-last,2,gold,75);last=y+80;}b(z,x,last,4,3470-last,75,paleStone);}
-  // Modest wall panels and a resting bench leave the full centre of the corridor clear.
-  for(const [x,y,east]of [[2266,1830,false],[2734,2350,true]]){b(z,x-2,y-44,4,88,110,oakWall,110);b(z,x+(east?-3:3),y-35,2,70,85,paleStone,122);b(z,x+(east?-5:5),y-18,2,35,52,gold,139);}
-  b(z,2280,2730,48,160,10,oakWall,42,2);b(z,2288,2740,28,12,42,dark);b(z,2288,2868,28,12,42,dark);obstacle(z,2280,2730,48,160);
-  const glow=mat('#fff4df',.4,{emissive:0xffecc9,emissiveIntensity:.6});
-  for(let y=1750;y<3400;y+=260){b(z,2380,y,240,6,3,gold,294);b(z,2382,y+1,236,4,2,glow,291);}
-  for(const [y,label,sub]of [[1850,'公設空間','← 健身房 / 閱覽室　琴房 / 鼓室 →'],[2800,'住戶電梯','← A 棟　　B 棟 →']])text(z,label,sub,2500,y,265,300,48,0);
-  wingDoor(2265,2090,'健身房','gym',false);wingDoor(2265,2570,'小圖書館','library',false);wingDoor(2735,2090,'琴房','piano',true);wingDoor(2735,2570,'鼓室','drums',true);
-  // Backing vestibules prevent seeing the exterior through portal frames.
-  for(const x of [2000,2740])for(const y of [2090,2570]){b(z,x,y-80,260,160,8,floorStone,-8);b(z,x,y-80,260,160,8,ivory,300);b(z,x,y-80,260,8,300,ivory);b(z,x,y+72,260,8,300,ivory);b(z,x===2000?2000:2992,y-80,8,160,300,oakWall);}
-  for(const [x,tower,east]of [[2265,'A',false],[2735,'B',true]])for(const [i,y]of [[1,3000],[2,3280]])lift(z,x,y,tower,i,east);
-  const stairHinge=new T.Group();stairHinge.position.copy(W(2265,1775));z.scene.add(stairHinge);const stairPanel=b(z,2265,1775,4,90,230,oakWall,4);stairHinge.attach(stairPanel);z.stairDoors=[stairHinge];text(z,'安全梯','5F 住戶廊廳',2280,1820,260,150,38,Math.PI/2);target(z,'lobby-stairs','沿安全梯前往五樓',2320,1820,130,{kind:'stairs',destination:'hallB5',stairDoor:stairHinge},170);b(z,2735,1740,10,160,248,ivory);
-  z.arrivals={stairs:[2420,1820,Math.PI/2],gym:[2420,2090,Math.PI/2],library:[2420,2570,Math.PI/2],piano:[2580,2090,-Math.PI/2],drums:[2580,2570,-Math.PI/2],A:[2400,3000,Math.PI/2],B:[2600,3000,-Math.PI/2]};
+  z.arrivals={};z.stairDoors=[];
+  const wings={};
+  function wing(tower,cx,angle,amenities){
+    const group=new T.Group();group.name='lobby-'+tower+'-long-corridor';group.rotation.y=angle;group.position.copy(W(cx,1340)).sub(W(240,0).applyAxisAngle(new T.Vector3(0,1,0),angle));z.scene.add(group);
+    const local={id:'lobby',floor:1,scene:group,targets:[],obstacles:[]},c=Math.cos(angle),sn=Math.sin(angle),map=(x,y)=>[cx+(x-240)*c-y*sn,1340+(x-240)*sn+y*c],pose=(x,y,yaw)=>[...map(x,y),yaw-angle];
+    b(local,0,0,480,1880,10,floorStone,-10);b(local,-10,0,500,1890,10,ivory,300);
+    const left=[490,1400,1680],right=[220,970];
+    for(const [x,openings]of [[-10,left],[480,right]]){let last=0;for(const y of openings){b(local,x,last,10,y-80-last,300,ivory);b(local,x,y-80,10,160,52,ivory,248);b(local,x+10,last,2,y-80-last,75,paleStone);last=y+80;}b(local,x,last,10,1880-last,300,ivory);}
+    b(local,-10,1870,500,10,55,ivory);b(local,-10,1870,500,10,45,ivory,255);b(local,0,1873,480,3,200,glazing,55);for(const x of [0,160,320,476])b(local,x,1870,4,8,245,metal,55);
+    for(const x of [20,458])b(local,x,10,2,1840,.3,blackStone,.2,.1);
+    const glow=mat('#fff4df',.4,{emissive:0xffecc9,emissiveIntensity:.6});for(let y=150;y<1800;y+=260){b(local,120,y,240,6,3,gold,294);b(local,122,y+1,236,4,2,glow,291);}
+    text(local,tower+' 棟長廊',tower==='A'?'健身房 · 圖書館 · A 棟雙梯':'琴房 · 鼓室 · B 棟雙梯',240,270,265,320,48,0);text(local,tower+' 棟電梯','1F / 5F / B3',240,1190,265,280,45,0);text(local,'中央接待大廳','RECEPTION',240,100,265,280,45,Math.PI);
+    amenities.forEach(([dest,label],i)=>{const x=i?473:7,y=i?970:490,east=Boolean(i),side=east?-1:1;b(local,x-5,y-62,10,124,245,blackStone);b(local,x+side*7,y-53,3,106,230,glazing,4);for(const yy of [y-55,y,y+55])b(local,x+side*9,yy,4,4,230,metal,4);text(local,label,tower+' WING',x+side*14,y,260,190,45,east?-Math.PI/2:Math.PI/2);target(local,'portal-'+dest,label,x+side*55,y,135,{kind:'travel',destination:dest,tower},175);z.arrivals[dest]=pose(i?320:160,y,i?-Math.PI/2:Math.PI/2);
+      const bx=i?480:-260;b(local,bx,y-80,260,160,8,floorStone,-8);b(local,bx,y-80,260,160,8,ivory,300);for(const yy of [y-80,y+72])b(local,bx,yy,260,8,300,ivory);b(local,i?732:-260,y-80,8,160,300,oakWall);
+    });
+    for(const [index,y]of [[1,1400],[2,1680]]){lift(local,7,y,tower,index);z.arrivals[tower+'-'+index]=pose(160,y,Math.PI/2);}z.arrivals[tower]=z.arrivals[tower+'-1'];
+    const stair=new T.Group();stair.position.copy(W(473,175));group.add(stair);const leaf=b(local,473,175,4,90,230,oakWall,4);stair.attach(leaf);z.stairDoors.push(stair);for(const y of [140,265])b(local,473,y,10,35,248,ivory);b(local,473,175,10,90,18,ivory,230);b(local,480,140,170,160,8,floorStone,-8);b(local,480,140,170,160,8,ivory,300);b(local,642,140,8,160,300,dark);for(const y of [140,292])b(local,480,y,170,8,300,ivory);text(local,'安全梯',tower+' 棟 5F',458,220,260,150,38,-Math.PI/2);target(local,tower==='B'?'lobby-stairs':'lobby-stairs-A',tower+' 棟安全梯前往五樓',418,220,130,{kind:'stairs',destination:'hall'+tower+'5',tower,stairDoor:stair},170);z.arrivals['stairs-'+tower]=pose(320,220,-Math.PI/2);
+    b(local,400,1110,48,140,10,oakWall,42,2);for(const y of [1120,1230])b(local,410,y,28,12,42,dark);obstacle(local,400,1110,48,140);
+    for(const t of local.targets){[t.x,t.y]=map(t.x,t.y);z.targets.push(t);}for(const [x,y,w,d]of local.obstacles){const corners=[[x,y],[x+w,y],[x+w,y+d],[x,y+d]].map(([a,b])=>map(a,b)),xs=corners.map(p=>p[0]),ys=corners.map(p=>p[1]);obstacle(z,Math.min(...xs),Math.min(...ys),Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys));}
+    wings[tower]={bounds:tower==='A'?[-280,1100,1880,480]:[3400,1100,1880,480],entrance:[cx,1340],center:map(240,940),height:300,amenities:amenities.map(a=>a[0]),tower};
+  }
+  wing('A',1600,Math.PI/2,[['gym','健身房'],['library','小圖書館']]);wing('B',3400,-Math.PI/2,[['piano','琴房'],['drums','鼓室']]);
+  const lobbySun=z.scene.children.find(o=>o.isDirectionalLight);lobbySun.position.copy(W(1300,1900,2000));lobbySun.target.position.copy(W(2500,900,0));
   b(z,1830,1080,170,20,155,oakWall,40);text(z,'鄰里委託','任務・活動・生活收藏',1915,1105,150,150,85);target(z,'board','查看社區任務看板',1915,1120,150,{kind:'board'},190);obstacle(z,1830,1080,170,20);
   for(let row=0;row<3;row++)for(let col=0;col<5;col++)b(z,2830+col*31,1548,29,25,30,metal,35+row*33);obstacle(z,2830,1548,155,25);target(z,'mail','查看住戶信箱',2900,1520,110,{kind:'action',action:'lobby-mail',message:'信箱已查看・鄰里消息已更新'},170);
-  z.scene.userData.design={height:540,oculus:[2450,900,1000,760],loungeHeight:36,corridor:{bounds:[2260,1600,480,1880],height:300,liftY:[3000,3280],amenityY:[2090,2570]},amenityWings:{A:['gym','library'],B:['piano','drums']}};
+  z.scene.userData.design={height:540,oculus:[2450,900,1000,760],loungeHeight:36,corridors:wings,centralReception:true,amenityWings:{A:['gym','library'],B:['piano','drums']}};
 })();
