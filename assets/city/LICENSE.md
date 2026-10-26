@@ -11,6 +11,11 @@ from API XML. The in-game map also displays this attribution.
 Building appearances, vehicles, signs and public-space proposals are original
 procedural models; geographic data does not imply endorsement by depicted places.
 
+The user's [Bao Tai In The Future reference](https://newhouse.591.com.tw/132815)
+and its standard-floor plan / lobby illustration were inspected for spatial and
+architectural reference. Those photographs and plan images are not redistributed
+as game textures. Building facade textures are generated locally by the project.
+
 Official information checked:
 
 - [Taoyuan Metro station A19](https://www.tymetro.com.tw/tymetro-new/tw/_pages/travel-guide/A19)

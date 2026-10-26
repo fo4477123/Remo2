@@ -46,19 +46,8 @@
     target(z,e.id,`${tower}棟 ${index}號電梯`,x+(side==='west'?28:-28),y,133,{kind:'elevator',elevator:e.id,tower},160);return e;
   }
   function npc(z,id,name,role,x,y,color='#71877d'){
-    const root=new T.Group();root.name='npc-'+id;root.position.copy(W(x,y));z.scene.add(root);
-    const shadow=new T.Mesh(new T.CircleGeometry(25,24),new T.MeshBasicMaterial({color:'#35423b',transparent:true,opacity:.16,depthWrite:false}));shadow.rotation.x=-Math.PI/2;shadow.position.copy(W(x,y,.25));z.scene.add(shadow);
-    const skin=mat('#d1ab8f',.72),hair=mat('#3b3934',.88),suit=mat(color,.93),pants=mat('#424c4c',.85),shoe=mat('#303635',.65),face=mat('#303d37',.7);
-    const mesh=(geo,m,px,py,pz,sx=1,sy=1,sz=1)=>{const a=new T.Mesh(geo,m);a.position.set(px,py,pz);a.scale.set(sx,sy,sz);a.castShadow=a.receiveShadow=true;root.add(a);return a;};
-    for(const s of [-1,1]){mesh(new T.CapsuleGeometry(6,57,5,12),pants,s*10,49,0);mesh(new T.SphereGeometry(1,12,8),shoe,s*10,7,-7,8,6,15);}
-    const torso=mesh(new T.CapsuleGeometry(20,37,6,16),suit,0,112,0,1,1,.63);
-    mesh(new T.CylinderGeometry(5.2,6.5,12,12),skin,0,153,0);const head=mesh(new T.SphereGeometry(1,20,16),skin,0,171,-1,13,17,12);
-    mesh(new T.SphereGeometry(13.6,20,12,0,Math.PI*2,0,Math.PI*.6),hair,0,175,0);
-    for(const s of [-1,1]){mesh(new T.SphereGeometry(.85,10,8),face,s*4.4,173,-12.5);mesh(new T.SphereGeometry(2.2,10,8),skin,s*13,170,-1);mesh(new T.BoxGeometry(6,1.2,1),hair,s*4.5,177,-12.1);}
-    mesh(new T.SphereGeometry(1,12,8),skin,0,169,-13.8,1.8,2.8,2);mesh(new T.BoxGeometry(5,.8,.7),face,0,164,-12.2);
-    const arms=[];for(const s of [-1,1]){const pivot=new T.Group();pivot.position.set(s*23,136,0);root.add(pivot);const arm=new T.Mesh(new T.CapsuleGeometry(5.5,38,5,12),suit);arm.position.y=-22;pivot.add(arm);const hand=new T.Mesh(new T.SphereGeometry(5.5,12,10),skin);hand.position.set(0,-48,0);pivot.add(hand);pivot.rotation.z=-s*.09;arms.push(pivot);}
-    mesh(new T.BoxGeometry(4,32,1),mat('#d7d2c6',.9),0,125,-13.1);mesh(new T.BoxGeometry(9,6,.8),gold,-10,134,-14);
-    const badge=text(z,name,role,x,y,213,105,36);const n={id,name,role,x,y,zone:z.id,root,torso,head,arms,badge,waveUntil:0};npcs.push(n);z.npcs.push(n);obstacle(z,x-20,y-20,40,40);target(z,'npc-'+id,`與${name}交談`,x,y,161,{kind:'npc',npc:id},200);return n;
+    const rig=B1_CHARACTERS.create({color}),{root,torso,head,arms}=rig;root.name='npc-'+id;root.position.copy(W(x,y,z.scene.userData.floorAt?.(x,y)||0));z.scene.add(root);
+    const badge=text(z,name,role,x,y,198,105,36);const n={id,name,role,x,y,zone:z.id,root,torso,head,arms,rig,badge,waveUntil:0};npcs.push(n);z.npcs.push(n);obstacle(z,x-20,y-20,40,40);target(z,'npc-'+id,'與'+name+'交談',x,y,150,{kind:'npc',npc:id},240);return n;
   }
   function hall(tower){
     const z=room('hall'+tower+'5',`${tower}棟・五樓電梯廊廳`,5,[1800,400,1200,700]);z.tower=tower;z.spawn=[2050,505,Math.PI/2];z.description=`同側 ${tower}1-5F、${tower}3-5F；走道另一側 ${tower}2-5F、${tower}5-5F。西側為雙電梯。`;
@@ -134,7 +123,7 @@
   target(parkingZone,'parking-31','B3-31・我的專屬車位',2495,900,108,{kind:'activity',activity:'parking-space'},185);parkingZone.ownedSpace=ownedSlot;
   const activeUntil={};
   function pulse(kind,note=0){activeUntil[kind]=performance.now()+10000;for(const m of motions)if(m.kind===kind){m.until=performance.now()+250;m.note=note;}}
-  function tick(zone,dt,now,px,py){for(const n of npcs)if(n.zone===zone){const d=Math.hypot(px-n.x,py-n.y);if(d<260){const goal=-Math.atan2(px-n.x,py-n.y);n.root.rotation.y+=Math.atan2(Math.sin(goal-n.root.rotation.y),Math.cos(goal-n.root.rotation.y))*Math.min(1,dt*3);}n.torso.scale.y=1+Math.sin(now*.0018+n.x)*.008;if(n.waveUntil>now)n.arms[1].rotation.z=-1.9+Math.sin(now*.014)*.2;else n.arms[1].rotation.z=-.09;const goal=n.root.rotation.y;n.badge.rotation.y=goal+Math.PI;}
+  function tick(zone,dt,now,px,py){for(const n of npcs)if(n.zone===zone){const d=Math.hypot(px-n.x,py-n.y);if(d<260){const goal=-Math.atan2(px-n.x,py-n.y);n.root.rotation.y+=Math.atan2(Math.sin(goal-n.root.rotation.y),Math.cos(goal-n.root.rotation.y))*Math.min(1,dt*3);}n.rig.update(dt,{wave:n.waveUntil>now});const goal=n.root.rotation.y;n.badge.rotation.y=goal+Math.PI;}
     for(const e of elevators)if(e.zone===zone){e.open+=(e.goal-e.open)*Math.min(1,dt*7);e.left.position.z=e.leftZ+e.open*49;e.right.position.z=e.rightZ-e.open*49;}
     for(const m of motions)if(m.zone===zone){if(m.kind==='belt'&&(activeUntil.belt||0)>now)for(const p of m.parts)p.mesh.position.z=700-(488+(p.base-488+now*.04)%146);if(m.kind==='bike'&&(activeUntil.bike||0)>now)m.mesh.rotation.x+=dt*4;if(m.kind==='keys')m.keys.forEach((p,i)=>p.mesh.position.y=p.base-(m.until>now&&i===[0,2,4,7][m.note%4]?1.8:0));if(m.kind==='drums')m.parts.forEach((p,i)=>{p.mesh.position.y=p.base+(m.until>now&&i===m.note%m.parts.length?Math.sin(now*.07)*1.6:0);});}
   }

@@ -37,7 +37,7 @@
   const [ox,oy,oz]=APPLIANCE_LAYOUT.map(560,668.6,109),oven=rounded(ox,oy,42, .5,20,warm.clone(),oz,scene,.4);oven.visible=false;effects.push(oven);
   actor('oven','電器櫃烤箱',ox+20,oy,122,'kitchen',['啟動烤箱示範','關閉烤箱'],p=>{oven.visible=p>.01;oven.material.emissiveIntensity=p*1.3;},90);
   const lamps=[];
-  for(const [id,name,x,y,room]of [['master-reading','主臥閱讀燈',447,864,'master'],['guest-reading','次臥閱讀燈',577,485,'guest']]){
+  for(const [id,name,x,y,room]of [['master-reading','主臥閱讀燈',447,864,'master'],['guest-reading','次臥閱讀燈',577,343,'guest']]){
     rounded(x-12,y-12,24,24,44,oak,0,scene,1.5);rod([x,y,46],[x,y,77],.8,metal);rounded(x-8,y-8,16,16,1.5,metal,45,scene,1);
     const shade=rounded(x-11,y-11,22,22,17,warm.clone(),72,scene,3),l=new T.PointLight('#ffdc9c',0,140,2);l.position.copy(W(x,y,76));scene.add(l);lamps.push(l);
     actor(id,name,x,y,77,room,['打開閱讀燈','關閉閱讀燈'],p=>{shade.material.emissiveIntensity=p*.8;l.intensity=p*1600;});

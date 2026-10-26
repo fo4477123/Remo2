@@ -1,0 +1,44 @@
+// Dependency-free Chromium/CDP verification; no files are uploaded by this script.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{spawn}=require('node:child_process');
+const assert=require('node:assert/strict');
+const root=__dirname,outputRoot=path.join(root,'qa-output');fs.mkdirSync(outputRoot,{recursive:true});const out=fs.mkdtempSync(path.join(outputRoot,'run-'));console.log('QA artifacts: '+out);
+const server=http.createServer((req,res)=>{const target=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!target.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(target,(err,data)=>{if(err){res.writeHead(404).end();return;}const ext=path.extname(target);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.jpg':'image/jpeg','.glb':'model/gltf-binary','.mp3':'audio/mpeg'})[ext]||'application/octet-stream');res.end(data);});});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
+(async()=>{
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const profile=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'b1-browser-'));
+ browser=spawn('C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',['--headless=new','--remote-debugging-port=0','--user-data-dir='+profile,'--no-first-run','--no-default-browser-check','--disable-background-networking','--enable-unsafe-swiftshader','--disable-gpu-vsync','--disable-frame-rate-limit','--disable-renderer-backgrounding','--disable-background-timer-throttling','--disable-features=CalculateNativeWinOcclusion','--enable-unsafe-webgpu','--ignore-gpu-blocklist','--enable-dawn-features=allow_unsafe_apis','--window-size=1440,1000','about:blank'],{windowsHide:true,stdio:'ignore'});
+ let port;for(let i=0;i<100;i++){try{port=fs.readFileSync(path.join(profile,'DevToolsActivePort'),'utf8').split('\n')[0];break;}catch{await sleep(200);}}
+ assert(port,'Chromium debugging port unavailable');
+ const tabs=await (await fetch(`http://127.0.0.1:${port}/json`)).json();ws=new WebSocket(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await new Promise(r=>ws.addEventListener('open',r,{once:true}));
+ let id=0;const pending=new Map(),exceptions=[];ws.addEventListener('close',()=>{for(const p of pending.values())p.reject(new Error('Browser connection closed'));pending.clear();});
+ ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);if(p){pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result);}}if(m.method==='Runtime.exceptionThrown'){exceptions.push(m.params.exceptionDetails);console.log('RUNTIME',JSON.stringify(m.params.exceptionDetails));}if(m.method==='Runtime.consoleAPICalled'&&m.params.type==='error'){const error=m.params.args.map(x=>x.value||x.description);exceptions.push(error);console.log('RENDER ERROR',JSON.stringify(error));}};
+ const cdp=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}));});
+ const ev=async expression=>{const r=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+ await cdp('Runtime.enable');await cdp('Page.enable');await cdp('Network.enable');
+ await cdp('Network.setBlockedURLs',{urls:['https://*','http://cdn.*']});
+ const mode=process.env.B1_RENDERER||'webgl';
+ await cdp('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/index.html?renderer=${mode}`});
+ const wait=async(ex,msg)=>{for(let i=0;i<500;i++){if(await ev(ex))return;await sleep(200);}throw Error(msg);};
+ await wait('Boolean(window.B1_REVIEW?.ready&&window.B1_ENGINE?.ready&&window.B1_GAME)','Ready');
+ await ev('(()=>{const q=document.querySelector("select[aria-label=畫質]");q.value="low";q.dispatchEvent(new Event("change"));})()');await cdp('Page.bringToFront');await cdp('Page.captureScreenshot',{format:'png'});
+ if(mode==='webgpu')assert(await ev('B1_ENGINE.webgpu'),'Actual WebGPU backend');
+ const shot=async name=>{await sleep(400);const p=await cdp('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(p.data,'base64'));};
+ const layout=await ev('(()=>{scene.updateMatrixWorld(true);const w=new T.Box3();for(const o of scene.children)if(o.userData.furnitureName==="主臥頂天滑門衣櫥 255 cm")w.expandByObject(o);const bed=B1_MODELS.groups["次臥飯店級客床 150×188"],bounds=new T.Box3().setFromObject(bed),pieces=bed.children.filter(o=>o.isMesh).map(o=>{const b=new T.Box3().setFromObject(o),s=b.getSize(new T.Vector3());return {x:b.min.x+750,y:700-b.max.z,w:s.x,d:s.z,h:s.y,z:b.min.y};});return {wardrobe:{back:w.max.x+750,end:700-w.min.z,length:w.max.z-w.min.z},bed:{x:bounds.min.x+750,y:700-bounds.max.z,w:bounds.max.x-bounds.min.x,d:bounds.max.z-bounds.min.z,pieces},spec:designSpecs.masterWardrobe};})()');
+ assert(Math.abs(layout.wardrobe.back-717.1)<.02&&Math.abs(layout.wardrobe.end-1058.2)<.02,'Cabinet flush to side and window-end CAD wall faces');
+ assert(Math.abs(layout.wardrobe.length-255)<.02,'Cabinet keeps the approved 255cm length');
+ const head=layout.bed.pieces.find(p=>p.h>75&&p.h<90&&p.w>140);assert(head&&Math.abs(head.y-310)<.2,'Actual headboard rotates to north side');
+ const pillows=layout.bed.pieces.filter(p=>p.h>10&&p.h<15&&p.w>45&&p.w<70&&p.d<40);assert(pillows.length===2&&pillows.every(p=>p.y<365),'Both pillows rotate with the bed');
+ fs.writeFileSync(path.join(out,'layout-debug.json'),JSON.stringify(layout,null,2));
+ assert(Math.abs(layout.bed.x-415)<.3&&Math.abs(layout.bed.y-310)<.3&&Math.abs(layout.bed.w-150)<.3&&Math.abs(layout.bed.d-198)<.3,'Bed collision matches rotated model bounds '+JSON.stringify({x:layout.bed.x,y:layout.bed.y,w:layout.bed.w,d:layout.bed.d}));
+ assert(await ev('(()=>{for(const name of ["主臥頂天滑門衣櫥 255 cm","次臥飯店級客床 150×188"]){const f=furniture.find(f=>f.name===name),r=[...svg.querySelectorAll("text")].find(t=>t.textContent===name).previousElementSibling;if(+r.getAttribute("x")!==f.x||+r.getAttribute("y")!==1100-f.y-f.d||+r.getAttribute("height")!==f.d)return false;}return svg.querySelectorAll("[data-bedroom-layout]").length===3;})()'),'Plan rectangles and north-headboard detail updated');
+ assert(await ev('B1_GAME.snapshot().actors["guest-reading"]!==undefined&&B1_ACTIVITIES.actors.find(a=>a.id==="guest-reading").y===343'),'Bedside reading light moves to new head end');
+ assert(await ev('canStand(625,940)&&canStand(625,1020)&&canStand(590,420)&&canStand(650,530)&&!canStand(690,1040)&&!canStand(490,315)'),'Bed/wardrobe collisions and surrounding paths');
+ const door=await ev('wardrobeDoors[1].position.z');await ev('B1_GAME.toggle("wardrobe")');await wait('B1_GAME.snapshot().actors.wardrobe.progress===1','Wardrobe opens');assert(Math.abs((await ev('wardrobeDoors[1].position.z'))-door-122)<.01,'Translated sliding door still opens122cm');await ev('B1_GAME.toggle("wardrobe")');await wait('B1_GAME.snapshot().actors.wardrobe.progress===0','Wardrobe closes');assert(Math.abs((await ev('wardrobeDoors[1].position.z'))-door)<.01,'Door closes exactly');
+ await ev('B1_REVIEW.setTour(false);select("master");document.querySelector("#walls").checked=true;document.querySelector("#walls").dispatchEvent(new Event("change"));view.scrollIntoView({block:"center"})');await shot('master-wardrobe-flush');
+ await ev('select("guest")');await shot('guest-bed-north');
+ await ev('B1_GAME.goRoom("master");B1_PLAYER.setMode("third")');await shot('master-third-person');
+ assert(await ev('canStand(walkX,walkY)&&B1_PLAYER.snapshot().visible'),'Master walkthrough spawn stays clear');
+ await ev('B1_GAME.goRoom("guest");B1_PLAYER.setMode("first");B1_GAME.toggle("guest-reading")');await wait('B1_GAME.snapshot().actors["guest-reading"].progress===1','Reading light');await shot('guest-walkthrough');
+ assert.equal(exceptions.length,0,'Runtime errors '+JSON.stringify(exceptions));fs.writeFileSync(path.join(out,'bedroom-report.json'),JSON.stringify({backend:await ev('B1_ENGINE.backend'),layout,exceptions},null,2));console.log('PASS bedrooms: flush cabinet, rotated complete bed, lamp, collision, plan, sliding door, walkthrough');await cdp('Browser.close');
+})().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{ws?.close();browser?.kill();server.close();});

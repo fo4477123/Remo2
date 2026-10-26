@@ -45,7 +45,9 @@
     if(side==='x'){rounded(x-8,y,10,d,84,upholstery,15,g,4);for(const yy of [y+14,y+82])rounded(x+14,yy,42,52,12,bedding,47,g,5);}
     else{rounded(x,y+d,w,10,82,upholstery,15,g,4);for(const xx of [x+10,x+78])rounded(xx,y+d-45,60,31,12,bedding,47,g,5);}
     const quilt=new T.PlaneGeometry(w-10,d-10,28,28),p=quilt.attributes.position;for(let i=0;i<p.count;i++)p.setZ(i,Math.sin(p.getX(i)*.11+p.getY(i)*.07)*.65+Math.sin(p.getY(i)*.25)*.25);quilt.computeVertexNormals();const cover=new T.Mesh(quilt,bedding);cover.rotation.x=-Math.PI/2;cover.position.copy(W(x+w/2,y+d/2,49));cover.receiveShadow=true;g.add(cover);
-    tube([[x+5,y+5,45],[x+w-5,y+5,45],[x+w-5,y+d-5,45],[x+5,y+d-5,45],[x+5,y+5,45]],.16,seam,g);
+    const stitchPath=new T.CurvePath(),corners=[[x+5,y+5,45],[x+w-5,y+5,45],[x+w-5,y+d-5,45],[x+5,y+d-5,45]].map(p=>W(...p));
+    for(let i=0;i<corners.length;i++)stitchPath.add(new T.LineCurve3(corners[i],corners[(i+1)%corners.length]));
+    const stitching=new T.Mesh(new T.TubeGeometry(stitchPath,64,.16,5,true),seam);stitching.castShadow=true;g.add(stitching);
     if(side==='x')rounded(x+w-58,y+3,48,d-6,1.5,mat('#9da891',.98),50,g,.6);else rounded(x+3,y+20,w-6,44,1.5,mat('#a9b1a5',.98),50,g,.6);
     for(const xx of [x+12,x+w-12])for(const yy of [y+12,y+d-12])rod([xx,yy,0],[xx,yy,14],1.5,bronze,g);return g;
   }

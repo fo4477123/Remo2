@@ -29,6 +29,19 @@
   action('sofa-back-right','伴木右側靠背',987,902,79,'living',['右側靠背前移','右側靠背後移'],p=>{backs[1].position.x=12*p;syncHead();});
   action('sofa-headrest','伴木插銷頭枕',980,910,103,'living',['頭枕移到另一側','頭枕移回原側'],p=>{headSide=p;syncHead();});
   function updateFootprint(oldName,newName,bounds){const f=furniture.find(f=>f.name===oldName);if(!f)return;Object.assign(f,{name:newName,x:bounds[0],y:bounds[1],w:bounds[2],d:bounds[3]});const label=[...svg.querySelectorAll('text')].find(t=>t.textContent===oldName);if(label){const r=label.previousElementSibling;if(r?.tagName==='rect')for(const [key,val]of Object.entries({x:f.x,y:1100-f.y-f.d,width:f.w,height:f.d}))r.setAttribute(key,val);label.textContent=newName;label.setAttribute('x',f.x+f.w/2);label.setAttribute('y',1100-f.y-f.d/2);}if(oldName!==newName&&B1_MODELS.coverage[oldName]){B1_MODELS.coverage[newName]=B1_MODELS.coverage[oldName];delete B1_MODELS.coverage[oldName];}}
+  // Keep the 255-cm cabinet on its original wall, flush to the window-end return.
+  // These are the inner CAD wall faces, including the 1.5-cm wall mesh thickness.
+  const wardrobeName='主臥頂天滑門衣櫥 255 cm',wardrobeShift={x:-1.9,y:38.2};
+  for(const part of scene.children.filter(o=>o.userData.furnitureName===wardrobeName)){part.position.x+=wardrobeShift.x;part.position.z-=wardrobeShift.y;}
+  updateFootprint(wardrobeName,wardrobeName,[656.1,803.2,61,255]);
+  designSpecs.masterWardrobe={length:255,bodyDepth:55,body:[662.1,803.2,55,255],footprint:[656.1,803.2,61,255],wallX:717.1,wallY:1058.2,control:[658.1,938.2]};
+  B1_REVIEW.clearances.masterBedToWardrobe=60.1;
+  // Rotate the complete detailed guest bed around its mattress centre.
+  const guestBed=B1_MODELS.groups['次臥飯店級客床 150×188'],guestCenter=W(490,414),turn=new T.Matrix4().makeTranslation(guestCenter.x,0,guestCenter.z).multiply(new T.Matrix4().makeRotationY(Math.PI)).multiply(new T.Matrix4().makeTranslation(-guestCenter.x,0,-guestCenter.z));
+  guestBed.applyMatrix4(turn);guestBed.userData.rotationDeg=180;
+  updateFootprint('次臥飯店級客床 150×188','次臥飯店級客床 150×188',[415,310,150,198]);
+  for(const [x,y,w,d,color]of [[415,310,150,10,'#6f8063'],[427,334,60,31,'#e9e5d9'],[495,334,60,31,'#e9e5d9']]){const detail=document.createElementNS(NS,'rect');for(const [key,value]of Object.entries({x,y:1100-y-d,width:w,height:d,rx:2,fill:color,'data-bedroom-layout':'guest-head-north'}))detail.setAttribute(key,value);svg.append(detail);}
+  designSpecs.guestBed={mattress:[415,320,150,188],rotationDeg:180,headboard:'north',footprint:[415,310,150,198],readingLight:[577,343]};
   updateFootprint('奶油弧背模組沙發','暖嶼家居伴木沙發 220×106',[959,745,106,220]);
   const coffee=B1_MODELS.groups['暖嶼家居島語升降茶几'];coffee.position.x+=3;B1_MODELS.actors.find(a=>a.id==='coffee-lift').x+=3;updateFootprint('暖嶼家居島語升降茶几','暖嶼家居島語升降茶几',[1100,785,72,110]);
   scene.traverse(m=>{let parent=m.parent;while(parent){if(parent===coffee)return;parent=parent.parent;}const p=m.geometry?.parameters;if(m.isMesh&&p?.width&&m.position.x+750>1097&&m.position.x+750<1169&&700-m.position.z>785&&700-m.position.z<895&&m.position.y>70&&m.position.y<90)m.position.x+=3;});
@@ -102,8 +115,8 @@
   rewardProps.forEach(p=>p.group.visible=false);figure.visible=false;
   B1_LIFE.actors.push(...actors);
   const ready=B1_MODELS.pbrReady.then(async()=>{let source;oldSofa.traverse(m=>{if(!source&&m.material?.userData.surface==='fabric'&&m.material.normalMap)source=m.material;});if(source)for(const m of clothMaterials){m.normalMap=source.normalMap;m.normalScale.set(.18,.18);m.roughnessMap=source.roughnessMap;m.needsUpdate=true;}const woodSource=wardrobeDoors.find(m=>m.material.normalMap)?.material;if(woodSource)for(const m of [wood,joinery]){m.normalMap=woodSource.normalMap;m.normalScale.set(.1,.1);m.roughnessMap=woodSource.roughnessMap;m.needsUpdate=true;}const {mergeVertices}=await import('three/addons/utils/BufferGeometryUtils.js'),smoothBoard=mergeVertices(boardGeometry);smoothBoard.computeVertexNormals();board.geometry=smoothBoard;boardGeometry.dispose();return true;});
-  configs.master.title='上掀收納床 × 滑門衣櫥';configs.master.text='150 × 188 cm床面維持原位置，床墊與底板可一起上掀，內有支撐桿及寢具收納。衣櫥長255 cm，床尾至門面約66 cm。';configs.guest.title='客房 × 雪板收納';configs.guest.sub='右側實牆 / 40 × 108 cm立式雪板區';configs.guest.text='保留150 × 188 cm客床，右側實牆新增約190 cm高的立式雪板收納，附固定架與護具格；雪板可拉出查看，床與南側門口動線保留。';
+  configs.master.title='上掀收納床 × 滑門衣櫥';configs.master.text='150 × 188 cm床面維持原位置，床墊與底板可一起上掀，內有支撐桿及寢具收納。衣櫥長255 cm，背板貼原側牆、靠窗端貼齊牆邊，床尾至門面約60 cm。';configs.guest.title='客房 × 雪板收納';configs.guest.sub='右側實牆 / 40 × 108 cm立式雪板區';configs.guest.text='保留150 × 188 cm客床，右側實牆新增約190 cm高的立式雪板收納，附固定架與護具格；雪板可拉出查看，床與南側門口動線保留。';
   configs.living.text='暖嶼伴木沙發改為溫潤中灰色，搭配暖嶼家居島語淺橡木升降茶几與暖灰褐羊毛地毯；茶几有雙抽屜、開放收納格、腳輪與可升降桌板。保留木腳、縫線與靠背互動。沙發尺寸220 × 106 cm，茶几淨距35／48 cm。';
-  configs.guest.text='保留150 × 188 cm客床，右側設40 × 108 cm雪板收納架。寶藍色 GRAY DESPE 26–27 搭配白色 Nidecker LT Supermatic，可拉出查看；板長暫以160 cm展示，待實際尺寸確認。床與南側門口動線保留。';
+  configs.guest.text='150 × 188 cm客床整組旋轉180度，床頭與閱讀燈改到北側；右側設40 × 108 cm雪板收納架。寶藍色 GRAY DESPE 26–27 搭配白色 Nidecker LT Supermatic，可拉出查看；板長暫以160 cm展示，待實際尺寸確認。床與南側門口動線保留。';
   window.B1_OWNED={ready,actors,sofa,backs,headrest,bed,deck,bedItems:items,struts,blinds,mirrorLight,speakerLed,rack,snowboard,bindings,figure,rewardProps,updateRewards,snapshot:()=>({sofaSize:[220,106],backOffsets:backs.map(g=>g.position.x),headrestSide:headSide,bedAngle:deck.rotation.z,bedStored:items.visible,snowboardX:snowboard.position.x,snowboardGear:{...snowboard.userData,bindingCount:bindings.length},rewardCount,rewardTotal,decorations:rewardProps.filter(p=>p.group.visible).map(p=>p.id),sweetHomeVisible:figure.visible,sweetHomeLabel:figure.userData.label})};
 })();
