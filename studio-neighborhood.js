@@ -46,7 +46,7 @@
     target(z,e.id,`${tower}棟 ${index}號電梯`,x+(side==='west'?28:-28),y,133,{kind:'elevator',elevator:e.id,tower},160);return e;
   }
   function npc(z,id,name,role,x,y,color='#71877d'){
-    const rig=B1_CHARACTERS.create({color}),{root,torso,head,arms}=rig;root.name='npc-'+id;root.position.copy(W(x,y,z.scene.userData.floorAt?.(x,y)||0));z.scene.add(root);
+    const rig=B1_CHARACTERS.create({color,variant:/小雨|秘書|小姐/.test(name+role)?'urban-woman':'urban-man'}),{root,torso,head,arms}=rig;root.name='npc-'+id;root.position.copy(W(x,y,z.scene.userData.floorAt?.(x,y)||0));z.scene.add(root);
     const badge=text(z,name,role,x,y,198,105,36);const n={id,name,role,x,y,zone:z.id,root,torso,head,arms,rig,badge,waveUntil:0};npcs.push(n);z.npcs.push(n);obstacle(z,x-20,y-20,40,40);target(z,'npc-'+id,'與'+name+'交談',x,y,150,{kind:'npc',npc:id},240);return n;
   }
   function hall(tower){

@@ -1,0 +1,39 @@
+{
+  "source": "https://github.com/microsoft/Microsoft-Rocketbox",
+  "sourceCommit": "0943055db6ec570bcef9f2c8b41c9e5467c808f9",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2020 Microsoft",
+  "models": {
+    "urban-man": "Male_Adult_08",
+    "casual-man": "Male_Adult_01",
+    "urban-woman": "Female_Adult_02"
+  },
+  "motions": [
+    "m_idle_neutral_01",
+    "m_walk_neutral",
+    "m_run_neutral",
+    "m_wave_01"
+  ],
+  "files": [
+    {
+      "name": "urban-man.glb",
+      "bytes": 2458076,
+      "sha256": "a3ad13827293779b0bb8618032c2739485ff45221ad83ce8e9420373d97cefd4"
+    },
+    {
+      "name": "casual-man.glb",
+      "bytes": 2462680,
+      "sha256": "2a7b45c608a7cf918edbc17470acd30ea3249f37bea3bbc15d49071765e20633"
+    },
+    {
+      "name": "urban-woman.glb",
+      "bytes": 2881028,
+      "sha256": "642f00960f2d81e74c3a3851468f81a20199737b7b6e08cd6dd4abb4469ba5d1"
+    },
+    {
+      "name": "motions.json",
+      "bytes": 1578498,
+      "sha256": "6e59e680b859bbecff6bfbe3217109cc57a3abee2a59990f9a40b6912a467ec5"
+    }
+  ]
+}

@@ -9,3 +9,6 @@ const bounds=geo.bounds(data.bounds);for(const p of [[data.bounds[0],data.bounds
 // Local foot approach must go around a building, not draw through it.
 const routing=require('./studio-a18-routing.js'),clear=p=>!(p[0]>2&&p[0]<8&&p[1]>-3&&p[1]<3),route=routing.connect([0,0],[10,0],clear);assert(route&&route.length>2);for(let i=1;i<route.length;i++)for(let j=0;j<=100;j++){const t=j/100;assert(clear([route[i-1][0]+(route[i][0]-route[i-1][0])*t,route[i-1][1]+(route[i][1]-route[i-1][1])*t]));}
 console.log('PASS geographic orientation, all footprint round-trips, north/east handedness, heading/compass, old parking migration and obstacle-avoiding pedestrian approach');
+
+for(const yaw of [0,Math.PI/2,Math.PI,-Math.PI/2,.7]){const center=[120,-50],ahead=[center[0]+Math.sin(yaw)*100,center[1]-Math.cos(yaw)*100],right=[center[0]+Math.cos(yaw)*100,center[1]+Math.sin(yaw)*100],a=geo.minimapOffset(ahead,center,yaw),r=geo.minimapOffset(right,center,yaw);assert(near(a[0],0)&&near(a[1],-16),'Heading-up ahead is always screen-up');assert(near(r[0],16)&&near(r[1],0),'Heading-up right stays screen-right');}
+console.log('PASS heading-up minimap for cardinal and oblique headings');

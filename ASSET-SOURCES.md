@@ -71,7 +71,7 @@ Original local mesh reconstructions. Official product photographs are not redist
 - Zhongli water centre operator landscape references: https://www.ctci-hec.com.tw/Page2_2.aspx?Mbar=2 and images/photo/a09_2_20220528.jpg, a09_5_20220528.jpg. Landscaping is a game interpretation of the operator's plan, not a claim that every path is currently open.
 - IKEA official address and facade photograph: https://www.ikea.com.tw/zh/store/tao-yuan/info and /dairyfarm/tw/pageImages/page__zh_tw_15948816000.webp. Six-storey mass and lower yellow band, green wall and glazing guide the original local mesh.
 - Model Y: original local mesh using official Taiwan manual dimensions, see MODEL-Y-OWNED.md. No Tesla proprietary model is included.
-- Adult urban character: original generated geometry in studio-characters.js, approximately 175 cm, original clothes/face and joint animation. No GTA/Rockstar character asset is included.
+- Adult urban character: superseded by the MIT-licensed Microsoft Rocketbox models described below. No GTA/Rockstar or Final Fantasy asset is included.
 
 Official photos/PDFs were used as design references only and are not redistributed. Facade textures, signs and mesh details are generated locally; the game is an architectural interpretation rather than a photogrammetric replica.
 
@@ -85,3 +85,11 @@ Official photos/PDFs were used as design references only and are not redistribut
 - Actual local OSM building ways: COZZI 823329783, cinema 823329784, Xpark 823329785, common podium 856406373, P3 parking 23557246. Canopy ways remain roof-only/open below rather than opaque estimated apartment buildings. Crossing, bus-stop and bicycle-rental nodes are included in the derived A18 dataset.
 - All venue interiors, furnishings, dialogue, quests, marine life and projected short-film graphics are original local game content. Their layouts are not reproductions of official interior plans. No booking, ticket purchase, live listings or real venue service is performed. The water learning room is an interpretive game pavilion.
 - No researched photographs or official PDF graphics are embedded or redistributed.
+
+## Realistic residents (2026-10-27)
+
+- Source: [Microsoft Rocketbox](https://github.com/microsoft/Microsoft-Rocketbox), Copyright (c) 2020 Microsoft, [MIT license](https://github.com/microsoft/Microsoft-Rocketbox/blob/master/LICENSE.md), preserved in `assets/models/residents/LICENSE.md`.
+- Adults `Male_Adult_08`, `Male_Adult_01`, `Female_Adult_02`: converted from original FBX/TGA to local `urban-man.glb`, `casual-man.glb`, `urban-woman.glb`. Source geometry is respectively 7,364 / 7,440 / 8,940 triangles and 80 skin joints. Original skin, clothing and hair textures resized to 1024 (hair 512); normals retained; repeated material groups merged to three draw calls. The three GLBs total about 7.8 MB.
+- Shared source motions `m_idle_neutral_01.max.fbx`, `m_walk_neutral.max.fbx`, `m_run_neutral.max.fbx`, `m_wave_01.max.fbx` from the same repository, converted to quaternion tracks in local `motions.json`. Game adds reach/seated/cycling poses relative to the actor orientation.
+- Actor height normalised to175cm after updating skeleton matrices. Far street figures use locally clustered UV/skinning geometry (roughly700–800 triangles). Low quality limits full-detail street residents to two nearby people, balanced five, high eight. Shared textures and source geometry are reused across residents.
+- FFXV is a visual direction, not a claim of equivalent fidelity, a copied character, or licensed Square Enix content.

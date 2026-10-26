@@ -34,9 +34,9 @@ node serve.cjs
 - 使用者住宅為 **B1-5F**；同側 **B3-5F**，走道另一側 **B2-5F／B5-5F**。兩棟各層四戶雙梯、兩戶三房與兩戶兩房；一樓共用大廳連結健身房、小圖書館、琴房、鼓室，B3地下停車場含專屬 **B3-31**。按 E 對話、選樓、操作設施；社區導覽亦可快速換區。大廳與標準層改依使用者提供的寶台未來591示意圖／平面重製，未標尺寸仍依比例估計。
 - 七位 NPC 提供對話和委託：秘書、鄰居、教練、閱讀志工、鋼琴與鼓手。包裹需領取後配送，書籍可挑選借還；跑步機與單車有三次節奏挑戰，鋼琴和鼓室有四音／四拍互動及合成音效。B3-31可定位、控制尋位燈與車擋。詳見 [社區擴充規格](COMMUNITY-EXPANSION.md)。
 - A18 生活圈聚焦桃園高鐵站、站前廣場、華泰名品城、中壢水資源回收中心與 IKEA 桃園店，使用實際道路及建築輪廓；移除 A17/A19 跨站玩法與遠處地標。支援步行／跑步、Model Y、機車、YouBike 與地圖導航。W/S 加減速、A/D 轉向、Space 煞車、F 上下車、M 地圖、H 車燈，汽車最高 100 km/h。詳見 [A18 規格與來源](A18-FOCUS.md)。新增依實際輪廓製作的和逸／Xpark／新光影城周邊、遮雨棚、P3 停車場及圖資中的過街／候車／自行車站點。
-- 新增 8 個可進入的原創場館室內、15 位場館角色與街區嚮導、6 個會回饋客廳收藏的新委託。靠近入口按 E，先下車再進入；室內出口會回到同一街道入口。茶飲、車票、配色、閱讀燈、回收、放映與送明信片可互動並保存進度。真實位置與遊戲室內的界線見 [擴充規格](A18-LIFE-EXPANSION.md)。
+- 新增 8 個可進入的原創場館室內、13 位場館角色、32 位街頭人物（14 位有名字的住戶／嚮導與18位行人），以及6個場館委託與6條街區故事。靠近入口按 E，先下車再進入；室內出口會回到同一街道入口。茶飲、車票、配色、閱讀燈、回收、放映與送明信片可互動並保存進度。真實位置與遊戲室內的界線見 [擴充規格](A18-LIFE-EXPANSION.md)。
 - 已修正街區左右鏡像：地圖、3D 道路／建築、導航與小地圖羅盤共用東西南北轉換，舊停車存檔會遷移到正確位置；住宅 CAD 座標保持不變。
-- 街區預設第三人稱，原創成人都市角色約 175 cm，修正頭身比例、連續肘膝關節與手指；鏡頭後退減少角色畫面占比，室內鏡頭受阻時暫時隱藏角色並改用眼高視角。住宅／社區按 V 切換視角；保留行走、跑步、揮手、伸手與騎乘動畫。A18 商家可搜尋、導航並收集店章。
+- 街區預設第三人稱，外部寫實成人模型約175 cm，具80個骨骼、皮膚／服裝色彩與法線貼圖，以及柔性蒙皮和共享動作；鏡頭後退減少角色畫面占比，室內鏡頭受阻時暫時隱藏角色並改用眼高視角。小地圖改成人物面向朝上，地圖隨轉向旋轉，完整地圖保持北朝上。住宅／社區按 V 切換視角；保留行走、跑步、揮手、伸手與騎乘動畫。A18 商家可搜尋、導航並收集店章。
 - 島語茶几依官方介紹圖重製為收合80 × 60 × 53 cm／展開80 × 120 × 74 cm，具有翻折桌板、平行升降連桿、單面單抽屜＋雙收納凳／背面開放格＋雙抽屜。凳面可上掀，茶杯高度同步，手札可直接操作。詳見 [已購家具](OWNED-FURNITURE.md)。
 - 桌面用 WASD／方向鍵移動、拖曳轉頭；靠近並面向物件後按 E。J 開啟手札，Esc 釋放滑鼠／退出漫遊。
 - 手機用左下搖桿與另一指轉頭，點畫面提示操作；沉浸模式內可直接打開手札。
@@ -62,6 +62,8 @@ A18 周邊保留 1140 筆 OSM 建築輪廓及 1235 筆道路資料，碰撞與�
 
 `node qa-community.cjs` 驗證本輪花灑路徑、公共區域可達性、NPC、電梯、包裹、借還書、樂器與健身挑戰、車位互動、獎勵及手機介面；設定 `B1_RENDERER=webgpu` 可要求真實 WebGPU 後端。截圖與報告寫入已忽略的 `qa-output/run-*`。
 
+`node qa-street-life.cjs [webgpu]` 驗證32位街頭人物、骨架揮手、對話、LOD預算、附近入口提示與8場館導覽。`node qa-minimap.cjs [webgpu]` 檢查四個朝向的實際Canvas像素與車輛朝向。`node qa-a18-events.cjs [webgpu]` 實際完成攝影、清潔、搬家、自行車、街區故事和慢週末，驗證重試、存檔、一次性獎勵及客廳收藏。
+
 `node qa-city-geo.cjs` 驗證地理方向與舊停車座標遷移。`node qa-a18-life.cjs [webgpu]` 驗證八個場館的實際 E 進出、全部互動可達、任務／存檔與連續步行導航。`node qa-a18-layout.cjs` 驗證實際輪廓與道路不穿插。`node qa-a18.cjs [webgpu]` 驗證五個地點的導航、任務與繪製預算。`node qa-adult-driving.cjs [webgpu]` 驗證成人角色與實際道路上 100 km/h 加速／煞車。`node qa-model-y.cjs [webgpu]` 驗證車輛比例、B3-31 與上下車。原 `qa-city.cjs` 的跨站章節已由 A18 測試取代。`node qa-islewhisper.cjs` 驗證購入茶几模型與互動。
 
 `node qa-world-quality.cjs` 以實際按鍵檢查手臂、膝蓋與腳的位移、NPC揮手、圖資輪廓、大廳天井與抬高地坪、梯廳配置及公設可達；WebGPU模式另渲染高畫質大廳。
@@ -76,7 +78,7 @@ WebGPU章節測試必須實際初始化WebGPU後端，無adapter時明確失敗�
 
 ## 結構與界線
 
-`studio-engine.js` 初始化實際繪圖後端；`studio.js` 建立幾何與公分座標；`studio-detail.js` 補充空間；`studio-finishes.js` 建立材質與環景；`studio-home.js` 處理手機、圖庫與效能；`studio-render.js` 提供WebGPU的TSL／SSGI／抗鋸齒管線與相容PBR；`studio-models.js`、`studio-refine.js`、`studio-remake.js` 建立及細化模型、材質與LOD；`studio-shell.js` 補齊封閉結構；`studio-life.js`、`studio-activities.js` 提供居家設備；`studio-neighborhood.js` 建立廊廳、公設、停車場與角色；`studio-community.js` 提供對話、練習、交通、委託與收藏；`studio-game.js` 統一互動與探索狀態；`studio-music.js` 控制本地授權配樂。
+`studio-engine.js` 初始化實際繪圖後端；`studio.js` 建立幾何與公分座標；`studio-detail.js` 補充空間；`studio-finishes.js` 建立材質與環景；`studio-home.js` 處理手機、圖庫與效能；`studio-render.js` 提供WebGPU的TSL／SSGI／抗鋸齒管線與相容PBR；`studio-models.js`、`studio-refine.js`、`studio-remake.js` 建立及細化模型、材質與LOD；`studio-shell.js` 補齊封閉結構；`studio-life.js`、`studio-activities.js` 提供居家設備；`studio-neighborhood.js` 建立廊廳、公設、停車場與角色；`studio-a18-events.js` 提供六條有實際街道目標、分支與相簿的故事；`studio-characters.js` 載入寫實人物與動作，`studio-crowd.js` 控制街頭人物LOD；`studio-community.js` 提供對話、練習、交通、委託與收藏；`studio-game.js` 統一互動與探索狀態；`studio-music.js` 控制本地授權配樂。
 
 WebGPU高畫質與WebGL2相容模式各自有明確後端標示。FF7 Remake是美術方向參考，不代表已取得該遊戲資產或達到同等製作規模；本案沒有使用UE4、DLSS或原遊戲配樂。圖庫的生成圖是材質／氣氛提案，不能取代平面圖或施工放樣。第一張客廳圖保留；第二張走道修正詳見 [RENDER-CORRECTION.md](RENDER-CORRECTION.md)。
 
