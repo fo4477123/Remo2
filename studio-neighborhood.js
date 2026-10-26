@@ -124,6 +124,7 @@
   const activeUntil={};
   function pulse(kind,note=0){activeUntil[kind]=performance.now()+10000;for(const m of motions)if(m.kind===kind){m.until=performance.now()+250;m.note=note;}}
   function tick(zone,dt,now,px,py){for(const n of npcs)if(n.zone===zone){const d=Math.hypot(px-n.x,py-n.y);if(d<260){const goal=-Math.atan2(px-n.x,py-n.y);n.root.rotation.y+=Math.atan2(Math.sin(goal-n.root.rotation.y),Math.cos(goal-n.root.rotation.y))*Math.min(1,dt*3);}n.rig.update(dt,{wave:n.waveUntil>now});const goal=n.root.rotation.y;n.badge.rotation.y=goal+Math.PI;}
+    for(const door of zones[zone]?.stairDoors||[])door.rotation.y+=((door.userData.goal||0)*1.25-door.rotation.y)*Math.min(1,dt*6);
     for(const e of elevators)if(e.zone===zone){e.open+=(e.goal-e.open)*Math.min(1,dt*7);e.left.position.z=e.leftZ+e.open*49;e.right.position.z=e.rightZ-e.open*49;}
     for(const m of motions)if(m.zone===zone){if(m.kind==='belt'&&(activeUntil.belt||0)>now)for(const p of m.parts)p.mesh.position.z=700-(488+(p.base-488+now*.04)%146);if(m.kind==='bike'&&(activeUntil.bike||0)>now)m.mesh.rotation.x+=dt*4;if(m.kind==='keys')m.keys.forEach((p,i)=>p.mesh.position.y=p.base-(m.until>now&&i===[0,2,4,7][m.note%4]?1.8:0));if(m.kind==='drums')m.parts.forEach((p,i)=>{p.mesh.position.y=p.base+(m.until>now&&i===m.note%m.parts.length?Math.sin(now*.07)*1.6:0);});}
   }

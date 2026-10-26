@@ -54,3 +54,10 @@ Scene: realistic contemporary Qingpu residential street blocks, a mixture of 3�
 Lighting: bright soft late-morning daylight, neutral photographic exposure, airy Taiwanese humidity with moderate atmospheric perspective, detailed yet quiet realistic photography, natural non-saturated colours, clear varied facade details. Straight verticals, consistent spherical perspective, continuous street fabric across all 360 degrees. Do not repeat the station or clone building clusters, no fisheye frame or montage, no labels, no text overlay, no watermark.
 Output as a full 2:1 equirectangular panoramic texture with complete zenith/nadir coverage and matching side seams.
 
+
+## Owner-selected office furniture (2026-10-26)
+
+- ENJOY121 enterprise 2.0 EJB2-AB-HAM: https://ergohuman.com.tw/ejb2-ab-ham/ (official front photo and dimension drawing; black nylon base).
+- IKEA MITTZON 495.303.43: https://www.ikea.com.tw/zh/products/office-workspace/office-desks-and-tables/mittzon-spr-49530343 (160×80 cm walnut/white, 62–126 cm height range).
+
+Original local mesh reconstructions. Official product photographs are not redistributed. Household footsteps, latches, hinges, lift motor/chimes and stair effects are synthesized locally with Web Audio.

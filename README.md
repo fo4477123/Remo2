@@ -1,5 +1,26 @@
 # B1 暖木日常
 
+## 本機啟動
+
+已安裝 Node.js 時，在 PowerShell 執行：
+
+~~~powershell
+cd C:\Users\style\Remo2
+node serve.cjs
+~~~
+
+以 Edge／Chrome 開啟 http://localhost:8080/ 。Ctrl+C 停止；連接埠被占用時用 `node serve.cjs 8081`。也可雙擊 `start-local.cmd`。不需要安裝 npm 套件或執行建置。
+
+## 2026-10-26 家具與空間連通
+
+- MITTZON 160×80 cm 胡桃木／白色升降桌、ENJOY121 企業版2.0 黑網布椅依官方圖與尺寸重建。
+- 29 件室內家具都有「家具互動」入口；連到開合、升降、燈光、坐下／起身、放水、整理等功能。
+- 電視牆第二格為上下櫃與開放紀念品層；修補客衛門旁櫃殼。
+- B1-5F 與加寬梯廳同場景、同座標，可開門直接看見並步行往返。電梯及安全梯各有關門／抵達動畫與獨立音效，實際走動有腳步聲，並提供音量／靜音。
+- 青埔道路依建物輪廓校正，捷運使用來源軌道折線；一樓改成接待大廳接公設長廊，兩側公設、後段雙棟電梯。
+
+規格與限制見 [HOME-CONTINUITY.md](HOME-CONTINUITY.md)、[CITY-CORRIDOR-REPAIR.md](CITY-CORRIDOR-REPAIR.md)。`node qa-continuity.cjs` 驗證家具、門檻往返與兩種交通動畫；`node qa-city-layout.cjs` 檢查道路與建築相交。
+
 以 B1 公分座標平面為基礎的 WebGPU 室內設計與居家探索。線上版本：<https://fo4477123.github.io/Remo2/>。
 
 本輪依使用者選擇採WebGPU網頁路線：Three.js 0.186.1原生WebGPU、SSGI間接光／接觸陰影、時間抗鋸齒、2K本地掃描材質、外部現代家具及更細緻床品。無WebGPU裝置時明確切換WebGL2相容模式；頁首及顯示設定會標示實際後端。完整範圍與品質界線見 [WEBGPU-REMAKE.md](WEBGPU-REMAKE.md)。

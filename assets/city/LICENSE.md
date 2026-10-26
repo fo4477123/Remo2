@@ -1,7 +1,7 @@
 # Qingpu map data
 
 Roads, building positions, parks, water and station coordinates are derived from
-© OpenStreetMap contributors, downloaded 2026-10-25 using the official OSM API.
+© OpenStreetMap contributors, downloaded 2026-10-26 using the official OSM API.
 
 Database license: [Open Data Commons Open Database License 1.0](https://opendatacommons.org/licenses/odbl/1-0/).
 Attribution and source: [OpenStreetMap copyright](https://www.openstreetmap.org/copyright).

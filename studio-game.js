@@ -1,7 +1,7 @@
 /* Warm-home exploration. Measured geometry stays authoritative; state is local. */
 (() => {
   'use strict';
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261026-world2';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261026-home3';document.head.append(css);
   const SAVE_KEY='b1-warm-home-exploration-v1', reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const roomList=[
     {id:'entry',name:'迎接日常',label:'大門與隱藏門',bounds:[769,510,445,190],tip:'沿電視牆轉角是大門，再接客衛隱藏門櫃；室內走道通往其他房間。'},
@@ -79,7 +79,7 @@
   let changingMood=false;
   function setMood(mode,earned=false){sceneMode=mode;changingMood=true;const n=document.querySelector('#night');n.checked=mode==='night';n.dispatchEvent(new Event('change'));changingMood=false;
     sun.color.set(mode==='dusk'?'#ffc48b':'#fff2da');sun.intensity=mode==='night'?.08:mode==='dusk'?1.05:2.1;hemi.intensity=mode==='night'?.3:mode==='dusk'?.8:1.05;scene.background.set(mode==='night'?'#303b38':mode==='dusk'?'#d5c5b2':'#dedfd5');renderer.toneMappingExposure=1.2;renderer.shadowMap.needsUpdate=true;
-    window.B1_EXTERIOR?.setMood(mode);window.B1_LIFE?.refreshLighting();document.querySelectorAll('[data-mood]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mood===mode)));if(earned&&mode!=='day')award('mood');persist();}
+    window.B1_ATMOSPHERE?.setMood(mode);window.B1_EXTERIOR?.setMood(mode);window.B1_LIFE?.refreshLighting();document.querySelectorAll('[data-mood]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mood===mode)));if(earned&&mode!=='day')award('mood');persist();}
   document.querySelector('#night').addEventListener('change',e=>{if(!changingMood)setMood(e.target.checked?'night':'day',true);});
 
   // Each actor holds an actual leaf/mesh, one state and a reversible transition.
@@ -89,7 +89,7 @@
   const wardrobeZ=wardrobeDoors[1].position.z;
   const wardrobeControl=designSpecs.masterWardrobe?.control||[660,900];
   const deskParts=scene.children.filter(o=>o.userData.furnitureName==='160 cm 升降工作桌／對面實牆'&&o.position.y>=70).map(mesh=>({mesh,y:mesh.position.y}));
-  const extensions=[804,914].map(y=>box(905,y,5.5,5.5,38,chrome,51));extensions.forEach(m=>m.visible=false);
+  const extensions=(window.B1_PERSONAL?[]:[804,914]).map(y=>box(905,y,5.5,5.5,38,chrome,51));extensions.forEach(m=>m.visible=false);
   let tvMesh;scene.traverse(o=>{if(o.isMesh&&o.userData.furnitureName==='延伸電視牆／單扇玻璃門'&&o.material===black&&Math.abs((o.geometry.parameters?.depth||0)-170.4)<1)tvMesh=o;});
   const screenCanvas=document.createElement('canvas');screenCanvas.width=512;screenCanvas.height=288;const sc=screenCanvas.getContext('2d');const grad=sc.createLinearGradient(0,0,512,288);grad.addColorStop(0,'#183e42');grad.addColorStop(1,'#83987b');sc.fillStyle=grad;sc.fillRect(0,0,512,288);sc.fillStyle='#ffffff18';sc.beginPath();sc.arc(440,60,160,0,Math.PI*2);sc.fill();sc.fillStyle='#f8eed5';sc.font='22px sans-serif';sc.fillText('WARM HOME',42,72);sc.font='bold 50px serif';sc.fillText('Slow living.',40,158);sc.font='16px sans-serif';sc.fillText('A little light. A little time.',43,208);const tvTexture=new T.CanvasTexture(screenCanvas);tvTexture.colorSpace=T.SRGBColorSpace;
   const tvOff=tvMesh?.material.clone(),tvOn=new T.MeshBasicMaterial({map:tvTexture});
@@ -99,7 +99,7 @@
     {id:'cleaning',name:'清潔收納櫃',x:942,y:555,h:130,range:100,on:false,p:0,leaf:cleanHinge,span:60,apply:p=>cleanHinge.rotation.y=p*Math.PI/2,flag:on=>cleaningButton.textContent=on?'關閉清潔櫃':'打開清潔櫃'},
     {id:'wardrobe',name:'主臥滑門衣櫥',x:wardrobeControl[0],y:wardrobeControl[1],h:140,range:100,on:false,p:0,apply:p=>wardrobeDoors[1].position.z=wardrobeZ+122*p},
     {id:'appliance',name:'電器收納櫃',x:APPLIANCE_LAYOUT.map(585,668)[0],y:APPLIANCE_LAYOUT.map(585,668)[1],h:225,range:120,on:false,p:0,apply:p=>{applianceHinges[0].rotation.y=-p*Math.PI/2;applianceHinges[1].rotation.y=p*Math.PI/2;}},
-    {id:'desk',name:'升降工作桌',x:873,y:870,h:90,range:120,on:false,p:0,verbs:['升至站姿','降回坐姿'],apply:p=>{for(const {mesh,y}of deskParts)mesh.position.y=y+37*p;for(const m of extensions){m.visible=p>.01;m.scale.y=Math.max(.01,p);m.position.y=72+18.5*p;}}},
+    {id:'desk',name:'升降工作桌',x:873,y:870,h:90,range:120,on:false,p:0,verbs:['升至站姿','降回坐姿'],apply:p=>{if(window.B1_PERSONAL){B1_PERSONAL.setDeskHeight(74+38*p);return;}for(const {mesh,y}of deskParts)mesh.position.y=y+37*p;for(const m of extensions){m.visible=p>.01;m.scale.y=Math.max(.01,p);m.position.y=72+18.5*p;}}},
     {id:'tv',name:'客廳電視',x:1248,y:863,h:120,range:185,on:false,p:0,verbs:['開啟電視','關閉電視'],apply:p=>{if(tvMesh)tvMesh.material=p>.5?tvOn:tvOff;}},
     {id:'table',name:'收合小餐桌',x:865,y:685,h:75,range:110,on:false,p:0,verbs:['展開餐桌','收起餐桌'],blocked:()=>walking&&walkX>808&&walkX<922&&walkY>638&&walkY<697,apply:p=>{leaf.visible=leafLeg.visible=p>.5;leafPlan.setAttribute('visibility',p>.5?'visible':'hidden');},flag:on=>foldButton.textContent=on?'收起小餐桌':'展開小餐桌'},
     ...(window.B1_LIFE?.actors||[]),...(window.B1_MODELS?.actors||[]),...(window.B1_COMMUNITY?.actors||[])
@@ -108,16 +108,16 @@
   const leaves=a=>a.leaves||(a.leaf?[a]:[]);
   const segment=a=>{a.leaf.updateWorldMatrix(true,false);const start=a.leaf.localToWorld(new T.Vector3(0,0,0)),end=a.leaf.localToWorld(new T.Vector3(a.span,0,0));return [[start.x+750,700-start.z],[end.x+750,700-end.z]];};
   function doorDistance(a,x,y){return Math.min(...leaves(a).map(l=>{const [s,e]=segment(l);return distanceToSegment(x,y,s,e);}));}
-  function toggle(id,options={}){const a=actor(id);if(!a)return false;if(window.B1_COMMUNITY?.inLobby&&!options.stayHere)B1_COMMUNITY.returnHome(a.room||'living');if(a.interact){a.interact();return true;}if(a.guard&&!a.guard()){notify(a.blockedMessage);return false;}if(!a.on&&a.blocked?.()){notify(a.blockedMessage||'請先離開餐桌展開範圍，再展開桌面');return false;}a.on=!a.on;a.motion={from:a.p,at:performance.now()};a.flag?.(a.on);if(reduced.matches){const before=a.p;a.p=a.on?1:0;a.apply(a.p);if(leaves(a).length&&walking&&doorDistance(a,walkX,walkY)<13){a.p=before;a.on=before>.5;a.apply(before);a.flag?.(a.on);notify('門邊有點擠，請退一步再操作');return false;}}if(a.on&&a.p===1)award(id);updateLifeControls();renderer.shadowMap.needsUpdate=true;return true;}
+  function toggle(id,options={}){const a=actor(id);if(!a)return false;if(window.B1_COMMUNITY?.inLobby&&!options.stayHere)B1_COMMUNITY.returnHome(a.room||'living');if(a.interact){a.interact();return true;}if(a.guard&&!a.guard()){notify(a.blockedMessage);return false;}if(!a.on&&a.blocked?.()){notify(a.blockedMessage||'請先離開餐桌展開範圍，再展開桌面');return false;}a.on=!a.on;window.B1_SOUND?.door(a.on,Boolean(a.leaf),a.id);a.motion={from:a.p,at:performance.now()};a.flag?.(a.on);if(reduced.matches){const before=a.p;a.p=a.on?1:0;a.apply(a.p);if(leaves(a).length&&walking&&doorDistance(a,walkX,walkY)<13){a.p=before;a.on=before>.5;a.apply(before);a.flag?.(a.on);notify('門邊有點擠，請退一步再操作');return false;}}if(a.on&&a.p===1)award(id);updateLifeControls();renderer.shadowMap.needsUpdate=true;return true;}
   mainDoorButton.onclick=()=>toggle('entrance');doorButton.onclick=()=>toggle('hidden');cleaningButton.onclick=()=>toggle('cleaning');foldButton.onclick=()=>toggle('table');
-  const staticStand=canStand;canStand=(x,y)=>(window.B1_COMMUNITY?.inLobby?B1_COMMUNITY.canStand(x,y):staticStand(x,y)&&actors.filter(a=>leaves(a).length).every(a=>doorDistance(a,x,y)>=12));B1_REVIEW.canStand=canStand;
+  const staticStand=canStand;const homeStand=(x,y)=>staticStand(x,y)&&actors.filter(a=>leaves(a).length).every(a=>doorDistance(a,x,y)>=12);canStand=(x,y)=>(window.B1_SEAMLESS&&(!B1_COMMUNITY.inLobby||B1_COMMUNITY.zone==='hallB5')?(staticStand(x,y)||B1_SEAMLESS.hallStand(x,y))&&actors.filter(a=>leaves(a).length).every(a=>doorDistance(a,x,y)>=12):window.B1_COMMUNITY?.inLobby?B1_COMMUNITY.canStand(x,y):homeStand(x,y));B1_REVIEW.canStand=canStand;
   // Rays stop at physical walls, windows and other door leaves, not at rooms' names.
   const walls=B1_PLAN.walls.flatMap(w=>w.points.slice(1).map((p,i)=>[w.points[i],p]));
   walls.push([[913,420],[913,447]]);
   for(const w of windowSpecs)walls.push(w.axis==='h'?[[w.from,w.line],[w.to,w.line]]:[[w.line,w.from],[w.line,w.to]]);
   function crossing(ax,ay,bx,by,c,d){const rx=bx-ax,ry=by-ay,sx=d[0]-c[0],sy=d[1]-c[1],den=rx*sy-ry*sx;if(Math.abs(den)<.0001)return null;const t=((c[0]-ax)*sy-(c[1]-ay)*sx)/den,u=((c[0]-ax)*ry-(c[1]-ay)*rx)/den;return t>0&&t<1&&u>=0&&u<=1?t:null;}
   function visible(a,x=walkX,y=walkY){const dist=Math.hypot(a.x-x,a.y-y);return !walls.some(([c,d])=>{const t=crossing(x,y,a.x,a.y,c,d);return t!==null&&t*dist>5&&(1-t)*dist>12;})&&!actors.some(b=>b!==a&&b.id!==a.id&&leaves(b).some(l=>crossing(x,y,a.x,a.y,...segment(l))!==null));}
-  function chooseTarget(){if(!walking||canvas.hidden||journal.open)return null;return actors.map(a=>{const dx=a.x-walkX,dy=a.y-walkY,d=Math.hypot(dx,dy),facing=(dx*Math.sin(walkYaw)+dy*Math.cos(walkYaw))/Math.max(d,1);const p=W(a.x,a.y,a.h).project(camera);return {a,d,facing,p};}).filter(({a,d,facing,p})=>(!a.available||a.available())&&d<a.range&&facing>.35&&Math.abs(p.x)<.9&&Math.abs(p.y)<.95&&p.z<1&&visible(a)).sort((u,v)=>(u.d+50*(1-u.facing)+40*(Math.abs(u.p.x)+Math.abs(u.p.y)))-(v.d+50*(1-v.facing)+40*(Math.abs(v.p.x)+Math.abs(v.p.y))))[0]?.a||null;}
+  function chooseTarget(){if(!walking||canvas.hidden||journal.open)return null;return actors.map(a=>{const dx=a.x-walkX,dy=a.y-walkY,d=Math.hypot(dx,dy),facing=(dx*Math.sin(walkYaw)+dy*Math.cos(walkYaw))/Math.max(d,1);const p=W(a.x,a.y,a.h).project(camera);return {a,d,facing,p};}).filter(({a,d,facing,p})=>(!a.available||a.available())&&d<a.range&&facing>.35&&Math.abs(p.x)<.9&&Math.abs(p.y)<.95&&p.z<1&&visible(a)).sort((u,v)=>(u.d+50*(1-u.facing)+40*(Math.abs(u.p.x)+Math.abs(u.p.y))+(u.a.id.startsWith('furniture-')?120:0))-(v.d+50*(1-v.facing)+40*(Math.abs(v.p.x)+Math.abs(v.p.y))+(v.a.id.startsWith('furniture-')?120:0)))[0]?.a||null;}
   let nearby=null;
   function activateNearby(){nearby=chooseTarget();if(nearby)toggle(nearby.id);}
   addEventListener('keydown',e=>{if(isEditing(e)||journal.open)return;if(e.key.toLowerCase()==='j'&&!e.repeat){e.preventDefault();openJournal();}if(e.key.toLowerCase()==='e'&&!e.repeat&&walking){e.preventDefault();activateNearby();}});
@@ -133,10 +133,10 @@
   const selectBeforeGame=select;select=function(id){window.B1_COMMUNITY?.returnHome(id,false);repairStop(id);selectBeforeGame(id);};
   repairStops();let uiClock=0,currentRoom=null,completeNotified=false;
   function resetHome(){window.B1_COMMUNITY?.reset();setTour(false);for(const a of actors){a.on=Boolean(a.initial);a.p=a.on?1:0;a.motion=null;a.flag?.(a.on);a.apply(a.p);}window.B1_LIFE?.reset();setMood('day');visited.clear();actions.clear();completeNotified=false;persist();resetButton.textContent='重新探索';resetArmedUntil=0;updateProgress();updateLifeControls();renderer.shadowMap.needsUpdate=true;notify('已復原門櫃、設備與晨光，探索紀錄已清除');}
-  function tick(dt,now){window.B1_COMMUNITY?.tick(dt,now);
+  function tick(dt,now){window.B1_FURNITURE?.tick(dt,now);window.B1_SEAMLESS?.tick(dt,now);window.B1_SOUND?.tick(dt,now);window.B1_COMMUNITY?.tick(dt,now);
     for(const a of actors){if(a.on&&!a.blockedMessage&&a.blocked?.()){a.on=false;a.motion={from:a.p,at:now};a.flag?.(false);}const goal=a.on?1:0;if(a.p===goal)continue;a.motion??={from:a.p,at:now};const elapsed=Math.max(0,Math.min(1,(now-a.motion.at)/500)),next=a.motion.from+(goal-a.motion.from)*elapsed,old=a.p,steps=Math.max(1,Math.ceil(Math.abs(next-old)/.025));let blocked=false;
       for(let i=1;i<=steps;i++){const candidate=old+(next-old)*i/steps,previous=a.p;a.p=candidate;a.apply(candidate*candidate*(3-2*candidate));if(leaves(a).length&&walking&&doorDistance(a,walkX,walkY)<12){a.p=previous;a.on=!a.on;a.motion={from:a.p,at:now};a.apply(a.p*a.p*(3-2*a.p));a.flag?.(a.on);updateLifeControls();blocked=true;break;}}
-      if(!blocked&&elapsed===1){a.p=goal;a.apply(goal);a.motion=null;if(a.on)award(a.id);}renderer.shadowMap.needsUpdate=true;
+      if(!blocked&&elapsed===1){a.p=goal;a.apply(goal);a.motion=null;if(!a.on&&leaves(a).length)window.B1_SOUND?.close();if(a.on)award(a.id);}renderer.shadowMap.needsUpdate=true;
     }
     window.B1_LIFE?.tick(dt,now);
     if(toastUntil&&now>toastUntil){toast.hidden=true;toastUntil=0;}if(resetArmedUntil&&now>resetArmedUntil){resetArmedUntil=0;resetButton.textContent='重新探索';}
