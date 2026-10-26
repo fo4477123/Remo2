@@ -61,3 +61,16 @@ Output as a full 2:1 equirectangular panoramic texture with complete zenith/nadi
 - IKEA MITTZON 495.303.43: https://www.ikea.com.tw/zh/products/office-workspace/office-desks-and-tables/mittzon-spr-49530343 (160×80 cm walnut/white, 62–126 cm height range).
 
 Original local mesh reconstructions. Official product photographs are not redistributed. Household footsteps, latches, hinges, lift motor/chimes and stair effects are synthesized locally with Web Audio.
+
+
+## A18 focused district / owned car / adult character (2026-10-26)
+
+- Local OSM-derived map: assets/city/a18-map.json; © OpenStreetMap contributors, ODbL 1.0. Raw API tile bounds used by prepare-a18.cjs: (121.195,24.983,121.2145,25.006), (121.2145,24.983,121.234,25.006), (121.195,25.006,121.2145,25.029), (121.2145,25.006,121.234,25.029), stored as qa-output/qingpu-0.osm through -3.osm. The checked-in derived map does not require network at runtime.
+- THSR official station/exit plan: https://www.thsrc.com.tw/event/map/Taoyuan.pdf
+- Gloria official site plan: https://www.gloriaoutlets.com/files/GO_CenterMap/CM_Download/MAP202501.pdf
+- Zhongli water centre operator landscape references: https://www.ctci-hec.com.tw/Page2_2.aspx?Mbar=2 and images/photo/a09_2_20220528.jpg, a09_5_20220528.jpg. Landscaping is a game interpretation of the operator's plan, not a claim that every path is currently open.
+- IKEA official address and facade photograph: https://www.ikea.com.tw/zh/store/tao-yuan/info and /dairyfarm/tw/pageImages/page__zh_tw_15948816000.webp. Six-storey mass and lower yellow band, green wall and glazing guide the original local mesh.
+- Model Y: original local mesh using official Taiwan manual dimensions, see MODEL-Y-OWNED.md. No Tesla proprietary model is included.
+- Adult urban character: original generated geometry in studio-characters.js, approximately 175 cm, original clothes/face and joint animation. No GTA/Rockstar character asset is included.
+
+Official photos/PDFs were used as design references only and are not redistributed. Facade textures, signs and mesh details are generated locally; the game is an architectural interpretation rather than a photogrammetric replica.

@@ -15,7 +15,7 @@
     const value={pipeline:renderPipeline,gi,temporal};pipelines.set(world,value);return value;
   }
   renderer.render=(world,cam)=>{
-    if(nested||!engine.ready||!engine.webgpu||!nodes||cam!==camera||renderer.getRenderTarget()||engine.quality!=='high')return nativeRender(world,cam);
+    if(world.userData.directPBR||nested||!engine.ready||!engine.webgpu||!nodes||cam!==camera||renderer.getRenderTarget()||engine.quality!=='high')return nativeRender(world,cam);
     nested=true;try{pipelineFor(world).pipeline.render();}finally{nested=false;}
     B1_REVIEW.sceneCalls=renderer.info.render.drawCalls||renderer.info.render.calls;B1_REVIEW.sceneTriangles=renderer.info.render.triangles;
   };

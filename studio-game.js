@@ -1,7 +1,7 @@
 /* Warm-home exploration. Measured geometry stays authoritative; state is local. */
 (() => {
   'use strict';
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261026-wings1';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261026-a18focus1';document.head.append(css);
   const SAVE_KEY='b1-warm-home-exploration-v1', reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const roomList=[
     {id:'entry',name:'迎接日常',label:'大門與隱藏門',bounds:[769,510,445,190],tip:'沿電視牆轉角是大門，再接客衛隱藏門櫃；室內走道通往其他房間。'},
@@ -36,7 +36,7 @@
   const intro=el('section','explore-intro');intro.setAttribute('aria-label','暖木日常探索');
   intro.innerHTML=`<div><p class="explore-eyebrow">B1 · QINGPU 8TH × 9TH STREET</p><h2>走進暖木日常</h2><p>九個住宅空間、雙棟社區與青埔街區。開車、騎車或搭捷運，讓每次探索都成為家裡的新收藏。</p></div>`;
   const introActions=el('div','explore-intro-actions'),start=button('開始探索',()=>goRoom('living'),'explore-primary');
-  const journalButton=button('探索手札',()=>openJournal());introActions.append(start,journalButton,button('青埔城市慢遊',()=>B1_CITY.start()));intro.append(introActions);workspace.prepend(intro);
+  const journalButton=button('探索手札',()=>openJournal());introActions.append(start,journalButton,button('A18 生活圈',()=>B1_CITY.start()));intro.append(introActions);workspace.prepend(intro);
   const progress=el('div','explore-progress');progress.innerHTML=`<span class="explore-progress-label"></span><progress max="${9+missions.length}" value="0" aria-label="探索完成進度"></progress><span class="explore-save"></span>`;intro.append(progress);
   const hud=el('div','explore-hud');hud.innerHTML='<span class="explore-eyebrow">WARM HOME / EXPLORE</span><strong>暖木日常</strong><small>隨意走走，或打開探索手札</small>';view.append(hud);
   const crosshair=el('span','explore-crosshair');crosshair.setAttribute('aria-hidden','true');view.append(crosshair);

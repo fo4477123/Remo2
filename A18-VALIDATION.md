@@ -1,0 +1,12 @@
+# A18 release validation — 2026-10-26
+
+- `node qa-a18-layout.cjs`: passed 10,912 road/pavement rectangles against actual building polygons; no intersections. Source streets requiring narrower widths are narrowed; bridge/tunnel geometry is excluded from ground-level roads.
+- `node qa-a18.cjs`: WebGL2 passed (`run-NcuCZO`). Five destinations have clear entrances and routes from the community; activities complete the retained quest IDs.
+- `node qa-a18.cjs webgpu`: native WebGPU passed (`run-it4xcT`), including high-quality rendering, retired cross-station travel, claimed reward/Sweet Home save migration, and map destination count. Final low-quality views: 92–195 draw calls, 243k–414k triangles, below the 300-call/500k budgets. The short headless RAF sample is diagnostic only and is not a laptop FPS guarantee.
+- `node qa-adult-driving.cjs`: passed (`run-NGrVvb`), adult measured height 176.32 cm (including hair/contact shadow bounds), head width 20.9 cm, shoulder/arm span 55.2 cm, 32 rigid-part meshes; knees/elbows animate. Third-person home framing and narrow-space camera behavior pass.
+- `node qa-adult-driving.cjs webgpu`: native WebGPU passed (`run-UHdrCN`), including actual acceleration along a mapped 120 m clear road. Forward speed reaches and clamps at 100 km/h; braking reduces it below 2 km/h in the tested one-second sequence. Final camera FOV adjustment was additionally verified in WebGL; publication checks repeat the A18 native WebGPU test on the hosted build.
+- `node qa-model-y.cjs webgpu`: passed (`run-7zxUi2`), actual B3-31 fit, four wheel pivots, entry/driving/braking/light switch/dismount, A-left/B-right lobby orientation and B2/B5 positions. Original material-batched Model Y uses 36 meshes and 50,584 triangles.
+- `node qa-continuity.cjs`: passed (`run-s0zvKJ`), home/hall use the same scene, real WASD doorway movement, purchased office furniture, 29 furnishing menus, lift/stair animations and distinct sound events. Return-crossing assertion now samples each browser frame rather than allowing 200 ms polling overshoot.
+- Syntax checks passed for 53 JS/CJS files; `git diff --check` passed.
+
+Screenshots and machine-readable reports are local under the ignored `qa-output/run-*` directories. No proprietary reference photographs or research PDFs are shipped. Exterior facade/landscape details are original interpretations of the cited plans and photographs; they are not surveyed or scanned replicas.

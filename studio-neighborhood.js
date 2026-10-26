@@ -100,7 +100,7 @@
   for(const [x,y,r]of [[2110,520,30],[2370,500,33],[2390,720,26]]){rod([x,y,0],[x,y,125],1.8,metal,drums.scene);for(let a=0;a<Math.PI*2;a+=Math.PI*2/3)rod([x,y,25],[x+Math.cos(a)*28,y+Math.sin(a)*28,2],1.3,metal,drums.scene);const cymbal=new T.Mesh(new T.ConeGeometry(r,3,32),gold);cymbal.position.copy(W(x,y,126));drums.scene.add(cymbal);drumParts.push({mesh:cymbal,base:126});}
   b(drums,2210,760,75,55,9,dark,46,3);obstacle(drums,2085,475,335,355);target(drums,'drum-kit','練習四拍鼓點',2250,865,106,{kind:'activity',activity:'drums-play'},190);motions.push({zone:'drums',kind:'drums',parts:drumParts,until:0,note:0});npc(drums,'drummer','阿澤','節奏鄰居・週末鼓手',2670,800,'#a58e74');
   for(let x=1840;x<2960;x+=95)b(drums,x,318,64,6,150,x%2?cloth:dark,85,2);
-  // B3 resident parking. Space 31 remains empty for the user's own vehicle.
+  // B3 resident parking includes the owner's correctly scaled Model Y.
   const parkingZone=room('parking','地下停車場・B3-31',-3,[1800,300,2400,1800]);parkingZone.spawn=[2040,1120,Math.PI/2];parkingZone.description='A／B 棟電梯共用的 B3 停車層。北側綠色標線為 R & Y 專屬 B3-31，沿黃色步行帶尋找車位。';
   const concrete=mat('#727b76',.88),paint=mat('#dfd6ac',.75),reserved=mat('#688c7b',.85),red=mat('#a57761',.7);parkingZone.scene.background.set('#39463f');
   b(parkingZone,1820,320,2360,1760,.3,concrete,.15,.1);
@@ -116,9 +116,10 @@
   text(parkingZone,'B3 地下停車場','A / B 雙棟電梯連通',3000,2080,170,320,80,0);
   function car(x,y,color){const body=mat(color,.3,{metalness:.28}),windows=mat('#526862',.18,{metalness:.35});b(parkingZone,x,y,180,414,67,body,34,8);b(parkingZone,x+17,y+115,146,188,56,windows,94,9);b(parkingZone,x+13,y+113,154,4,54,body,94,1);b(parkingZone,x+13,y+300,154,4,54,body,94,1);b(parkingZone,x+18,y+135,144,142,3,body,150,3);for(const xx of [x+4,x+174])for(const yy of [y+82,y+329]){const tire=new T.Mesh(new T.CylinderGeometry(30,30,11,24),dark);tire.rotation.z=Math.PI/2;tire.position.copy(W(xx,yy,34));parkingZone.scene.add(tire);const hub=new T.Mesh(new T.CylinderGeometry(19,19,11.5,20),metal);hub.rotation.copy(tire.rotation);hub.position.copy(tire.position);parkingZone.scene.add(hub);}for(const xx of [x+12,x+137])b(parkingZone,xx,y+412,31,2,13,mat('#e3dfc3',.35,{emissive:0x80784a,emissiveIntensity:.15}),67,1);obstacle(parkingZone,x,y,180,414);}
   car(2145,400,'#b9c0b6');car(2665,400,'#5d716c');car(3705,1560,'#c0b8a5');
+  const ownedVehicle=B1_VEHICLES.createModelY();ownedVehicle.group.name='b3-31-tesla-model-y-juniper';ownedVehicle.group.position.copy(W(2495,610,0));ownedVehicle.group.rotation.y=Math.PI;parkingZone.scene.add(ownedVehicle.group);obstacle(parkingZone,2388.55,368.5,212.9,483);target(parkingZone,'parking-model-y','坐上 Tesla Model Y 煥新版',2350,740,110,{kind:'activity',activity:'owned-model-y'},165);
   const locator=mat('#c9e5aa',.4,{emissive:0x82d66f,emissiveIntensity:0}),locatorLamp=b(parkingZone,2485,335,20,12,8,locator,225,2);
   const lock=new T.Group();lock.name='b3-31-parking-lock';lock.position.copy(W(2495,855,7));parkingZone.scene.add(lock);const arm=new T.Mesh(new T.TorusGeometry(38,4,8,24,Math.PI),gold);arm.position.y=3;lock.add(arm);b(parkingZone,2447,842,96,25,7,dark,.4,2);
-  const parking={...ownedSlot,bar:lock,locator,state:{located:false,light:false,barDown:false},apply:s=>{parking.state={located:s?.located===true,light:s?.light===true,barDown:s?.barDown===true};locator.emissiveIntensity=parking.state.light?2:0;lock.rotation.x=parking.state.barDown?-Math.PI/2:0;}};
+  const parking={...ownedSlot,vehicle:ownedVehicle,bar:lock,locator,state:{located:false,light:false,barDown:false},apply:s=>{parking.state={located:s?.located===true,light:s?.light===true,barDown:s?.barDown===true};locator.emissiveIntensity=parking.state.light?2:0;lock.rotation.x=parking.state.barDown?-Math.PI/2:0;}};
   const parkingStand=parkingZone.canStand;parkingZone.canStand=(x,y)=>parkingStand(x,y)&&(parking.state.barDown||!(x>2440&&x<2550&&y>830&&y<881));
   target(parkingZone,'parking-31','B3-31・我的專屬車位',2495,900,108,{kind:'activity',activity:'parking-space'},185);parkingZone.ownedSpace=ownedSlot;
   const activeUntil={};
