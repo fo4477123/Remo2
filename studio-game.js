@@ -1,7 +1,7 @@
 /* Warm-home exploration. Measured geometry stays authoritative; state is local. */
 (() => {
   'use strict';
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261026-a18focus1';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-game.css?v=20261026-a18life1';document.head.append(css);
   const SAVE_KEY='b1-warm-home-exploration-v1', reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const roomList=[
     {id:'entry',name:'迎接日常',label:'大門與隱藏門',bounds:[769,510,445,190],tip:'沿電視牆轉角是大門，再接客衛隱藏門櫃；室內走道通往其他房間。'},

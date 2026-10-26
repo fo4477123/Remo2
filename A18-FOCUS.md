@@ -1,6 +1,6 @@
 # A18 focused district
 
-Replace the broad A17–A19 game with five requested destinations: THSR Taoyuan station, its forecourt, Gloria Outlets, Zhongli Water Resources Recycling Center park, and IKEA Taoyuan. Preserve home/community, saved rewards and owned vehicles.
+Replace the broad A17–A19 game with five requested anchors (expanded with adjacent venues in A18-LIFE-EXPANSION.md): THSR Taoyuan station, its forecourt, Gloria Outlets, Zhongli Water Resources Recycling Center park, and IKEA Taoyuan. Preserve home/community, saved rewards and owned vehicles.
 
 All positions, road centre lines and principal building footprints use the local attributed OSM dataset in metres. Correct the old station marker (an underground parking node) to building way 23547222. IKEA uses way 823329786 at 高鐵站前東路一段1號. Station entrance numbers come from mapped door nodes. Official station/site plans and operator images guide architectural interpretation; unmeasured facade details are a game reconstruction, not a survey.
 

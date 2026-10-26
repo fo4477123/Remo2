@@ -19,7 +19,7 @@
     nested=true;try{pipelineFor(world).pipeline.render();}finally{nested=false;}
     B1_REVIEW.sceneCalls=renderer.info.render.drawCalls||renderer.info.render.calls;B1_REVIEW.sceneTriangles=renderer.info.render.triangles;
   };
-  engine.prepare=async()=>{window.B1_MUSIC?.attachGame();await setup;await window.B1_CITY?.ready;await window.B1_REMAKE?.ready;await window.B1_OWNED?.ready;await window.B1_ISLE?.ready;await B1_MODELS.pbrReady;renderer.setSize(view.clientWidth,view.clientHeight,false);camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();
+  engine.prepare=async()=>{window.B1_MUSIC?.attachGame();await setup;await window.B1_CITY?.ready;await window.B1_A18_LIFE?.ready;await window.B1_REMAKE?.ready;await window.B1_OWNED?.ready;await window.B1_ISLE?.ready;await B1_MODELS.pbrReady;renderer.setSize(view.clientWidth,view.clientHeight,false);camera.aspect=view.clientWidth/view.clientHeight;camera.updateProjectionMatrix();
     if(engine.webgpu){loading.textContent='正在編譯 WebGPU 材質與柔光…';await renderer.compileAsync(scene,camera);}
     engine.ready=true;engine.status.textContent=engine.webgpu?`WebGPU · ${engine.quality==='low'?'整合 GPU 省電':engine.quality==='balanced'?'平衡畫質':'畫質優先'}`:'WebGL2 · 相容模式';
     engine.status.title=engine.webgpu?`原生 WebGPU · ${engine.quality==='high'?'SSGI 間接光與時間抗鋸齒':'低負載畫質，適合整合 GPU'}`:engine.reason;

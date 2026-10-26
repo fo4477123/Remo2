@@ -3,7 +3,7 @@ const tourStyles=document.createElement('link');tourStyles.rel='stylesheet';tour
 const loading=document.createElement('p');loading.textContent='正在整理光線與材質，準備走進家裡…';loading.style.cssText='position:absolute;left:20px;top:45%;padding:14px;background:#faf6e8;border-radius:8px;z-index:20';document.querySelector('#viewport').append(loading);
 // Appended after the base scene below: dynamic scripts otherwise can race a
 // fast local response before `configs` / `B1_REVIEW` are initialized.
-const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261026-a18focus1';detailScript.async=false;
+const detailScript=document.createElement('script');detailScript.src='studio-detail.js?v=20261026-a18life1';detailScript.async=false;
 function loadFailure(name){if(window.B1_REVIEW)B1_REVIEW.ready=true;loading.replaceChildren(document.createTextNode(`${name}載入未完成。`));const retry=document.createElement('button');retry.textContent='重新載入';retry.onclick=()=>location.reload();loading.append(retry);}
 detailScript.onerror=()=>loadFailure('空間細節');
 setTimeout(()=>{if(!window.B1_REVIEW?.ready)loadFailure('空間資源');},120000);

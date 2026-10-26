@@ -205,5 +205,5 @@
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
   }
-  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261026-a18focus1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261026-a18life1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
 })();

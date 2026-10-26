@@ -74,3 +74,14 @@ Original local mesh reconstructions. Official product photographs are not redist
 - Adult urban character: original generated geometry in studio-characters.js, approximately 175 cm, original clothes/face and joint animation. No GTA/Rockstar character asset is included.
 
 Official photos/PDFs were used as design references only and are not redistributed. Facade textures, signs and mesh details are generated locally; the game is an architectural interpretation rather than a photogrammetric replica.
+
+
+## A18 adjacent venues and game interiors (2026-10-26)
+
+- COZZI official district/address/transport guide: https://cozzi.cathayhotel.com.tw/cozzi/blu/location
+- Shin Kong official complex information: https://www.skcinemas.com/mall
+- Gloria official store listing: https://www.gloriaoutlets.com/files/GO_CenterMap/CM_Download/Sitemap0503.pdf
+- Taoyuan tourism district reference photograph: https://travel.tycg.gov.tw/zh-tw/travel/tour/283
+- Actual local OSM building ways: COZZI 823329783, cinema 823329784, Xpark 823329785, common podium 856406373, P3 parking 23557246. Canopy ways remain roof-only/open below rather than opaque estimated apartment buildings. Crossing, bus-stop and bicycle-rental nodes are included in the derived A18 dataset.
+- All venue interiors, furnishings, dialogue, quests, marine life and projected short-film graphics are original local game content. Their layouts are not reproductions of official interior plans. No booking, ticket purchase, live listings or real venue service is performed. The water learning room is an interpretive game pavilion.
+- No researched photographs or official PDF graphics are embedded or redistributed.
