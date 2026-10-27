@@ -6,7 +6,12 @@
   "models": {
     "urban-man": "Male_Adult_08",
     "casual-man": "Male_Adult_01",
-    "urban-woman": "Female_Adult_02"
+    "urban-woman": "Female_Adult_02",
+    "street-artist": "Male_Adult_04",
+    "older-neighbour": "Male_Adult_14",
+    "hoodie-neighbour": "Male_Adult_18",
+    "casual-woman": "Female_Adult_07",
+    "sport-woman": "Female_Adult_12"
   },
   "motions": [
     "m_idle_neutral_01",
@@ -29,6 +34,31 @@
       "name": "urban-woman.glb",
       "bytes": 2881028,
       "sha256": "642f00960f2d81e74c3a3851468f81a20199737b7b6e08cd6dd4abb4469ba5d1"
+    },
+    {
+      "name": "street-artist.glb",
+      "bytes": 2354688,
+      "sha256": "9c2767c8930c089c8b0764824b4bb4014c9f862d36bceba8b163aed9051e796c"
+    },
+    {
+      "name": "older-neighbour.glb",
+      "bytes": 1686528,
+      "sha256": "d46e5f0037e926e1b7d3c761874551d1faea7dcdd97fddfb591676638ed04f31"
+    },
+    {
+      "name": "hoodie-neighbour.glb",
+      "bytes": 1493364,
+      "sha256": "a5c046e1a6a6e04a3e7530745fc4dd44f81fc0bfcb9269a0f5ab549852f30068"
+    },
+    {
+      "name": "casual-woman.glb",
+      "bytes": 2570660,
+      "sha256": "d575970e1667caa59ff5e777f1bb2a49ba4a93e4d0f6f67bcc440ead600c103b"
+    },
+    {
+      "name": "sport-woman.glb",
+      "bytes": 2642020,
+      "sha256": "4698fa04137960d55ef7633021f947b751243120d51ca4407688319e4ec313f5"
     },
     {
       "name": "motions.json",

@@ -1,0 +1,91 @@
+{
+  "license": "CC0-1.0",
+  "licenseUrl": "https://polyhaven.com/license",
+  "source": "Poly Haven",
+  "materials": [
+    {
+      "id": "asphalt_02",
+      "url": "https://polyhaven.com/a/asphalt_02",
+      "files": [
+        {
+          "name": "asphalt_02-color.jpg",
+          "bytes": 731707,
+          "sha256": "1aa5ce99f58a625c71d48cfc3e68b65ca85ccb00f39e045c0a928608a0ea25ed"
+        },
+        {
+          "name": "asphalt_02-normal.jpg",
+          "bytes": 1240122,
+          "sha256": "42a1c381b53204e83a982db2864479a30bc127bbdeebb1006f8ee51bff099df3"
+        },
+        {
+          "name": "asphalt_02-rough.jpg",
+          "bytes": 544032,
+          "sha256": "70ba3edc65525eb4dc366cf010ca7ae0bd34e0251ff0225c2dad627a873d0712"
+        }
+      ]
+    },
+    {
+      "id": "brick_wall_001",
+      "url": "https://polyhaven.com/a/brick_wall_001",
+      "files": [
+        {
+          "name": "brick_wall_001-color.jpg",
+          "bytes": 574381,
+          "sha256": "6a1233ec0186703de830354d89f122991e61e67fb67e0846c7eaf6c5aefea902"
+        },
+        {
+          "name": "brick_wall_001-normal.jpg",
+          "bytes": 295279,
+          "sha256": "8afbe3919308b168a6b7235fe7b930f670cfffa1a34de39ee790d55c9d7bda09"
+        },
+        {
+          "name": "brick_wall_001-rough.jpg",
+          "bytes": 211093,
+          "sha256": "a23342b02e6c5af106aaece16130aa9153a801cb1a84d5f3e0d06ce248677f38"
+        }
+      ]
+    },
+    {
+      "id": "concrete_wall_001",
+      "url": "https://polyhaven.com/a/concrete_wall_001",
+      "files": [
+        {
+          "name": "concrete_wall_001-color.jpg",
+          "bytes": 79320,
+          "sha256": "c3c936da86d57997d9fc4022371c3798c8d438aeecb8f41546104da6d3947c02"
+        },
+        {
+          "name": "concrete_wall_001-normal.jpg",
+          "bytes": 179270,
+          "sha256": "6f10711d123c8dff26375555196eae9e16d874c137acdacd44d1ba90168b6d46"
+        },
+        {
+          "name": "concrete_wall_001-rough.jpg",
+          "bytes": 156479,
+          "sha256": "d0964c690a8de99fb4f6657e0d3474eea9f9f293d080f4e5c871a55857d9448b"
+        }
+      ]
+    },
+    {
+      "id": "bark_brown_01",
+      "url": "https://polyhaven.com/a/bark_brown_01",
+      "files": [
+        {
+          "name": "bark_brown_01-color.jpg",
+          "bytes": 729893,
+          "sha256": "4213441aebcb72b9911f5a860e9ce74a61a8f6ce3b9c23d1f204173e7e7f6066"
+        },
+        {
+          "name": "bark_brown_01-normal.jpg",
+          "bytes": 1226534,
+          "sha256": "9d1537b3429579436a62890bb7c5050a0172a15ce768787eacde81c5ccefc9cc"
+        },
+        {
+          "name": "bark_brown_01-rough.jpg",
+          "bytes": 201307,
+          "sha256": "4e7f62508cf77faebfeee15ffb571ff02c45c18d5174aa19fcb8b98506359c5c"
+        }
+      ]
+    }
+  ]
+}
