@@ -97,3 +97,9 @@ WebGPU高畫質與WebGL2相容模式各自有明確後端標示。FF7 Remake是�
 車輛可行駛綠地，會碰撞建築、樹幹與椅子；水面會阻擋車輛，人進入水中會切換游泳動作與速度，地圖橋梁保持可通行。這些是遊戲規則，場景及室內為參考實際地理的設計詮釋。
 
 規格：[街區升級](A18-NEIGHBOURHOOD-UPGRADE.md)、[連續主線](A18-MAIN-STORY.md)。驗證：`node qa-terrain-geo.cjs`、`node qa-playable-terrain.cjs webgpu`、`node qa-neighbourhood.cjs webgpu`、`node qa-main-story.cjs webgpu`。
+
+## 青埔星燈：奇幻故事與街頭攻擊
+
+在一樓大廳和小林秘書對話選擇「奇幻故事・青埔星燈」，或從街區故事／探索手札開啟。依序尋找車站、公七公園和大願塔的星燈碎片，最後擊退三個幻影；完成自動獲得 180 生活點、420 XP 和一張客廳收藏。進度保存在瀏覽器，原有任務仍可繼續。
+
+在 A18 街區步行時按 Q 或「攻擊」按鈕揮拳；面向範圍內的幻影或路人可擊中，路人會受擊、暫時倒地並恢復。車內、游泳、室內和對話中不會攻擊。原創幻影與星燈模型、立面材質及街區座椅加入細節；揮拳、受擊與幻影音效遵循既有音效設定。規格及限制見 [A18-FANTASY.md](A18-FANTASY.md)，測試：`node qa-fantasy.cjs webgpu`。
