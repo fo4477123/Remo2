@@ -1,9 +1,9 @@
 /* Local pedestrian approach routing around mapped footprints; all coordinates are metres. */
 (() => {
-  function connect(from,to,clear){
+  function connect(from,to,clear,options={}){
     const line=(a,b)=>{const n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/.65));for(let i=0;i<=n;i++){const t=i/n;if(!clear([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t]))return false;}return true;};
     if(line(from,to))return [from,to];
-    for(const margin of [30,90]){const step=2,x0=Math.floor((Math.min(from[0],to[0])-margin)/step)*step,y0=Math.floor((Math.min(from[1],to[1])-margin)/step)*step,cols=Math.ceil((Math.abs(from[0]-to[0])+2*margin)/step)+1,rows=Math.ceil((Math.abs(from[1]-to[1])+2*margin)/step)+1;if(cols*rows>160000)continue;
+    for(const margin of [30,90]){const step=options.coarse&&Math.hypot(to[0]-from[0],to[1]-from[1])>400?5:2,x0=Math.floor((Math.min(from[0],to[0])-margin)/step)*step,y0=Math.floor((Math.min(from[1],to[1])-margin)/step)*step,cols=Math.ceil((Math.abs(from[0]-to[0])+2*margin)/step)+1,rows=Math.ceil((Math.abs(from[1]-to[1])+2*margin)/step)+1;if(cols*rows>160000)continue;
       const points=new Map(),cost=new Map(),previous=new Map(),heap=[],closed=new Set(),freeCache=new Map(),xy=id=>[x0+(id%cols)*step,y0+Math.floor(id/cols)*step],available=id=>{if(!freeCache.has(id))freeCache.set(id,clear(xy(id)));return freeCache.get(id);};
       const push=value=>{heap.push(value);let i=heap.length-1;while(i){const p=(i-1)>>1;if(heap[p].f<=value.f)break;heap[i]=heap[p];i=p;}heap[i]=value;},pop=()=>{const first=heap[0],last=heap.pop();if(heap.length){let i=0;while(true){let c=i*2+1;if(c>=heap.length)break;if(c+1<heap.length&&heap[c+1].f<heap[c].f)c++;if(heap[c].f>=last.f)break;heap[i]=heap[c];i=c;}heap[i]=last;}return first;};
       const sx=Math.round((from[0]-x0)/step),sy=Math.round((from[1]-y0)/step);for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++){const x=sx+dx,y=sy+dy;if(x<0||x>=cols||y<0||y>=rows)continue;const id=y*cols+x,p=xy(id);if(available(id)&&line(from,p)){const g=Math.hypot(p[0]-from[0],p[1]-from[1]);cost.set(id,g);previous.set(id,null);push({id,f:g+Math.hypot(p[0]-to[0],p[1]-to[1])});}}
