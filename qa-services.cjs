@@ -6,6 +6,8 @@ const end=source.lastIndexOf('})().catch');
 if(start<0||end<start)throw Error('City QA harness changed');
 source=source.slice(0,start)+`
  await ev('B1_CITY.start()');
+ await shot('community-street');
+ await ev('walkYaw+=Math.PI');await sleep(500);await shot('community-behind');
  const info=await ev("(()=>{const s=B1_CITY.snapshot(),d=B1_CITY.mapData();return {landmarks:s.landmarks.filter(x=>/qingpu-(police|fire)/.test(x.id)),stores:d.shops.filter(x=>x.kind==='convenience'),report:B1_CITY.scenery().report.publicSafety};})()");
  console.log('Public safety and stores',JSON.stringify(info));
  assert.equal(info.report.length,2);assert.equal(info.landmarks.length,2);assert(info.landmarks.every(l=>l.free));
