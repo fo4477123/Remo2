@@ -8,9 +8,13 @@ source=source.slice(0,start)+`
  await ev('B1_CITY.start()');
  await shot('community-street');
  await ev('walkYaw+=Math.PI');await sleep(500);await shot('community-behind');
- const info=await ev("(()=>{const s=B1_CITY.snapshot(),d=B1_CITY.mapData();return {landmarks:s.landmarks.filter(x=>/qingpu-(police|fire)/.test(x.id)),stores:d.shops.filter(x=>x.kind==='convenience'),report:B1_CITY.scenery().report.publicSafety};})()");
+ const info=await ev("(()=>{const s=B1_CITY.snapshot(),d=B1_CITY.mapData();return {landmarks:s.landmarks.filter(x=>/qingpu-(police|fire)/.test(x.id)),stores:d.shops.filter(x=>x.kind==='convenience'),report:B1_CITY.scenery().report.publicSafety,irrigation:B1_CITY.scenery().report.irrigation,office:s.landmarks.find(x=>x.id==='irrigation')};})()");
  console.log('Public safety and stores',JSON.stringify(info));
  assert.equal(info.report.length,2);assert.equal(info.landmarks.length,2);assert(info.landmarks.every(l=>l.free));
+ assert.equal(info.irrigation.id,'888810837');assert.equal(info.irrigation.height,48.6);assert(info.office.free);
+ assert(await ev("B1_CITY.navigate('irrigation')"),'Walking route to irrigation office');
+ await ev("(()=>{const l=B1_CITY.snapshot().landmarks.find(x=>x.id==='irrigation'),p=B1_CITY_GEO.toWorld(l.p),dx=l.entry[0]-p[0],dy=l.entry[1]-p[1],n=Math.hypot(dx,dy)||1;walkX=l.entry[0]+dx/n*2500;walkY=l.entry[1]+dy/n*2500;walkYaw=Math.atan2(-dx,-dy);lookPitch=.35;B1_PLAYER.setMode('first');})()");
+ await sleep(500);await shot('irrigation-office');
  for(const name of ['7-Eleven','全家便利商店','萊爾富'])assert(info.stores.some(s=>s.name===name));
  await ev("(()=>{B1_A18_LIFE.ensure('hsr');return true})()");
  const targets=await ev("B1_NEIGHBORHOOD.zones['a18-hsr'].targets.filter(x=>x.activity?.startsWith('convenience-')).map(x=>x.activity)");

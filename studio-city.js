@@ -80,6 +80,7 @@
       ['outlets','華泰名品城',[-28,-208],'mall','春德路 189 號；低樓層露天步行街與商家店章。'],
       ['waterpark','中壢水資源回收中心',[984,920],'waterpark','青松街 368 號；依營運單位景觀設計重建綠地、水景與低樓層設施。'],
       ['ikea','IKEA 桃園店',data.sites.ikea.center,'ikea','高鐵站前東路一段 1 號；實際六層量體、藍黃立面、玻璃入口與植生牆。'],
+      ['irrigation','農田水利署桃園管理處',[187,440],'public-service','青埔路二段 139 號；白色流線與玻璃立面依照片重建。'],
       ['qingpu-police','青埔派出所',[-340,-213],'public-safety','青埔路一段 67 號；建築輪廓依地圖，立面為遊戲重建。'],
       ['qingpu-fire','青埔消防分隊',[-311,-178],'public-safety','青埔路一段 69 號；建築輪廓依地圖，立面為遊戲重建。']
     ])addLandmark(id,name,p,kind,'OSM / 官方場館與園區資訊',description);

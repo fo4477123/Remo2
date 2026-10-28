@@ -7,3 +7,9 @@
 其他建築仍混合專案既有的地標重建和通用模型；無法宣稱全部逐棟依街景重建。後續逐棟工作需要能合法參考的多方向照片、確認建物身分、照片拍攝時間及必要的樓高資料，並應持續檢查道路碰撞和 GPU 表現。不要將估算值寫成實測值。
 
 驗證：`node qa-services.cjs`、`node qa-continuity.cjs`。
+
+## 農田水利署桃園管理處
+
+使用 OSM 建築 888810837 輪廓，在既有位置加入玻璃量體、白色水平帶與退縮屋頂；立面參考[官方建築照片](https://www.ia.gov.tw/zh-TW/about/officeContent?a=93&id=25)，九層及 48.6 公尺高度參考[青埔建築介紹](https://www.youtube.com/watch?v=Pkwde2Ov-JE)。白色曲線、屋頂與內部尺度為遊戲近似，並非完整測繪；保留建築碰撞，導航點在街道一側，暫無室內場景。
+
+預設渲染使用 WebGL2；有支援 WebGPU 的瀏覽器可透過 `?renderer=webgpu` 明確啟用，初始化失敗時回退 WebGL2。可用 `node qa-engine-default.cjs` 檢查不帶參數的預設模式。
