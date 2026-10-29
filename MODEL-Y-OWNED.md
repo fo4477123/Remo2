@@ -1,6 +1,6 @@
 # R & Y 的 Tesla Model Y 煥新版
 
-把街區可駕駛的專屬汽車與 B3-31 車位顯示車換成 Model Y 煥新版。本地網格依 Tesla 官方產品及 2025+ 車主手冊外觀重建，預設珍珠白、深色輪圈、全景玻璃車頂及煥新版前後貫穿燈；不是 Tesla 官方3D資產。
+街區專屬汽車與 B3-31 車位顯示車使用 joyemeng 的 [Tesla Model Y 2025](https://sketchfab.com/3d-models/tesla-model-y-2025-a66f7673a09d4fcb84d37111433f05a9)，採 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。模型已簡化、改為珍珠白並分組以轉動車輪；來源、修改及署名見 `assets/models/vehicles/MODEL-Y-CREDITS.md`。舊版自製網格保留為資產載入失敗時的備用模型，兩者均非 Tesla 官方 3D 資產。
 
 模型基準依台灣車主手冊 Premium 五人座近似值：長479 cm、車身寬192 cm、含鏡212.9 cm、高162.4 cm、軸距289 cm。使用者未指定動力版本，外觀採一般煥新版，不加入 Performance 專屬套件。
 

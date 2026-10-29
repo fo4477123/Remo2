@@ -70,7 +70,7 @@ Original local mesh reconstructions. Official product photographs are not redist
 - Gloria official site plan: https://www.gloriaoutlets.com/files/GO_CenterMap/CM_Download/MAP202501.pdf
 - Zhongli water centre operator landscape references: https://www.ctci-hec.com.tw/Page2_2.aspx?Mbar=2 and images/photo/a09_2_20220528.jpg, a09_5_20220528.jpg. Landscaping is a game interpretation of the operator's plan, not a claim that every path is currently open.
 - IKEA official address and facade photograph: https://www.ikea.com.tw/zh/store/tao-yuan/info and /dairyfarm/tw/pageImages/page__zh_tw_15948816000.webp. Six-storey mass and lower yellow band, green wall and glazing guide the original local mesh.
-- Model Y: original local mesh using official Taiwan manual dimensions, see MODEL-Y-OWNED.md. No Tesla proprietary model is included.
+- Model Y: [Tesla Model Y 2025](https://sketchfab.com/3d-models/tesla-model-y-2025-a66f7673a09d4fcb84d37111433f05a9) by joyemeng, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), simplified, recolored and grouped for wheel animation. The original local mesh remains a fallback; see `assets/models/vehicles/MODEL-Y-CREDITS.md`.
 - Adult urban character: superseded by the MIT-licensed Microsoft Rocketbox models described below. No GTA/Rockstar or Final Fantasy asset is included.
 
 Official photos/PDFs were used as design references only and are not redistributed. Facade textures, signs and mesh details are generated locally; the game is an architectural interpretation rather than a photogrammetric replica.
