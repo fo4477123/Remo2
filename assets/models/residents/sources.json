@@ -11,7 +11,24 @@
     "older-neighbour": "Male_Adult_14",
     "hoodie-neighbour": "Male_Adult_18",
     "casual-woman": "Female_Adult_07",
-    "sport-woman": "Female_Adult_12"
+    "sport-woman": "Female_Adult_12",
+    "female-adult-01": "Female_Adult_01",
+    "female-adult-03": "Female_Adult_03",
+    "female-adult-04": "Female_Adult_04",
+    "female-adult-05": "Female_Adult_05",
+    "female-adult-06": "Female_Adult_06",
+    "female-adult-08": "Female_Adult_08",
+    "female-adult-09": "Female_Adult_09",
+    "male-adult-02": "Male_Adult_02",
+    "male-adult-03": "Male_Adult_03",
+    "male-adult-05": "Male_Adult_05",
+    "male-adult-06": "Male_Adult_06",
+    "male-adult-07": "Male_Adult_07",
+    "female-child-01": "Female_Child_01",
+    "female-child-02": "Female_Child_02",
+    "male-child-01": "Male_Child_01",
+    "male-child-02": "Male_Child_02",
+    "teen-character": "Grab3D teen-character (CC0-1.0)"
   },
   "motions": [
     "m_idle_neutral_01",
@@ -64,6 +81,103 @@
       "name": "motions.json",
       "bytes": 1578498,
       "sha256": "6e59e680b859bbecff6bfbe3217109cc57a3abee2a59990f9a40b6912a467ec5"
+    },
+    {
+      "name": "female-adult-01.glb",
+      "bytes": 2636556,
+      "sha256": "222efd4ee203b56f69a8a151c954af550a3e1037e27fcaaa4966b8abab60a729"
+    },
+    {
+      "name": "female-adult-03.glb",
+      "bytes": 3253636,
+      "sha256": "28d22ea93ff4a6f50a7c83afe3d5b557ef376863a5d226a986924427dc37faae"
+    },
+    {
+      "name": "female-adult-04.glb",
+      "bytes": 2777168,
+      "sha256": "3b5d31f9b471f96a1228e64fdcaeae2f37c7f674de2f1b8d2caf262a66bdbce2"
+    },
+    {
+      "name": "female-adult-05.glb",
+      "bytes": 2749852,
+      "sha256": "17bbce4e9ae474a74a4d700b291cba18dbd23a21b0357b6c57244733a79bb58e"
+    },
+    {
+      "name": "female-adult-06.glb",
+      "bytes": 2236024,
+      "sha256": "491be8d53b1d44995acf5d135eeab4c9b1827a339248938d6069e6a3396fa1a8"
+    },
+    {
+      "name": "female-adult-08.glb",
+      "bytes": 2568608,
+      "sha256": "9f641eedde3e2578184bd7a8fa32bc6d85c3652a7ac7835c1b500456b8b7e7b1"
+    },
+    {
+      "name": "female-adult-09.glb",
+      "bytes": 2737032,
+      "sha256": "7b99dac54d179b71106d8a3e86530e5391fda1b63f2e150cf1ac6bf770a874f4"
+    },
+    {
+      "name": "male-adult-02.glb",
+      "bytes": 2289676,
+      "sha256": "cf2df76810f86f28b9f31616ed437e1650d4d569340d4b32a6af263d68f4b1d1"
+    },
+    {
+      "name": "male-adult-03.glb",
+      "bytes": 2305584,
+      "sha256": "59063f5268c83f9831884e16c9baa9c44715b96e49ce7acc2c1b8d891b53476c"
+    },
+    {
+      "name": "male-adult-05.glb",
+      "bytes": 2319084,
+      "sha256": "f42bd829203d38dcdaaf5fb9a073b15038ed6844c963db6cd834aaf12135c45b"
+    },
+    {
+      "name": "male-adult-06.glb",
+      "bytes": 2489644,
+      "sha256": "c7036aa4cb0de1149564132abeb9737767746b2aaa274d5147ea67131a3cac67"
+    },
+    {
+      "name": "male-adult-07.glb",
+      "bytes": 2045172,
+      "sha256": "4c2299e38ade60940f3b2f33d2e867bf81a600bb274443916068bc4a44e68da7"
+    },
+    {
+      "name": "female-child-01.glb",
+      "bytes": 1950852,
+      "sha256": "016b438c6a097c6f8250b2f28ce21da93702393b8109d93ec7941dd9e64551d1"
+    },
+    {
+      "name": "female-child-02.glb",
+      "bytes": 1867052,
+      "sha256": "95123436487dcfb83dbb251fca41322acf0f9e3b71a7779cb88cd6e8512cd7e9"
+    },
+    {
+      "name": "male-child-01.glb",
+      "bytes": 1855908,
+      "sha256": "40553dc33802dbd33f5bbdbe9c7e175b3a331b8dce13b2f0d8cfc5eb3022c274"
+    },
+    {
+      "name": "male-child-02.glb",
+      "bytes": 1993036,
+      "sha256": "dc9346d12f9d304e133bf36ea41642bab2030620309414f7627cf96bbaca7322"
+    },
+    {
+      "name": "teen-character-rigged.glb",
+      "bytes": 14054756,
+      "sha256": "8609b3751ba6a9fb222a9832c1b94a0810eb20fbfaa26345e65faaeb3cb2032e"
     }
-  ]
+  ],
+  "sources": {
+    "teen-character": {
+      "url": "https://grab3d.com/models/characters/teen-character/",
+      "license": "CC0-1.0",
+      "aiAssisted": true,
+      "triangles": 751096,
+      "animations": [
+        "walk",
+        "run"
+      ]
+    }
+  }
 }

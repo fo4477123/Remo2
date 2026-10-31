@@ -2,9 +2,9 @@
 
 Replace the geometric adult figures with textured, smooth-skinned external human assets. FFXV is a reference for adult proportions, believable faces, hair and everyday clothing; this release does not claim matching a AAA production's asset fidelity.
 
-Use Microsoft Rocketbox's MIT-licensed adult models, converted locally to glTF with bundled textures and license. Keep the 175 cm protagonist, collision radius, first/third-person camera, seating/cycling, walking/running and NPC dialogue contracts. Street residents retain distance-based visibility and lower polygon levels so increasing the population does not multiply expensive close-up meshes. Indoor residents also use the new models. No downloaded model is required from a third-party host at runtime.
+Use 25 independent local GLB character modules: 10 adult men, 10 adult women, and 5 child/teen profiles. The adult and four younger-child models come from Microsoft's MIT-licensed Rocketbox library; the fifth youth is a separately rigged CC0 teen model. Models are bundled locally, so runtime needs no third-party host. The teen source is AI-assisted and its original mesh is high-poly; keep it to one ambient crowd slot and use the existing crowd LOD outside close range. Preserve the 175 cm protagonist, collision radius, first/third-person camera, seating/cycling, walking/running and NPC dialogue contracts. Named NPCs receive an unused model from their age/gender pool where possible; ambient residents retain distance-based visibility and lower polygon levels.
 
-Acceptance: the hero and both male/female residents render with UV skin/clothing/hair textures; animation bends weighted joints instead of separating body pieces; idle, walk, run, interaction and seated poses remain usable; characters have grounded feet and face the travel direction. Validate actual WebGPU and WebGL rendering, screenshots, nearby NPC dialogue, street geometry budgets, vehicle movement, heading-up minimap and venue entry. Preserve existing progress and navigation.
+Acceptance: the hero, adult men/women, children and teen render from distinct local models; animation bends weighted joints instead of separating body pieces; idle, walk, run, interaction and seated poses remain usable; characters have grounded feet and face the travel direction. Preserve existing progress and navigation.
 
 ## Street event expansion
 

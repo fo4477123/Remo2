@@ -1,0 +1,12 @@
+Teen Character 3D model
+Source: https://grab3d.com/models/characters/teen-character/
+Download: https://grab3d.com/dl/teen-character-rigged/teen-character-rigged.glb
+License: CC0 1.0 Universal (Public Domain Dedication)
+
+The model, textures, and images are dedicated to the public domain to the
+extent possible under law. Origin disclosure from the creator: AI-assisted;
+the base mesh and textures were generated with an AI image-to-3D tool, then
+cleaned, scaled, textured, and checked in Blender.
+
+The source GLB has 751,096 triangles and includes walk/run animation clips.
+This project uses a distance-based lower-detail mesh for the character.

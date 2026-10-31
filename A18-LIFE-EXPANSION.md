@@ -23,3 +23,13 @@ The original city conversion sent south-positive OSM Y directly into the north-p
 City saves carry `geoVersion:2`. Older parked vehicle positions reflect around CAD Y=800 and their headings are converted once; valid migrated positions apply whether data finished loading before or after save restoration. Existing claimed rewards and home figure remain sticky. Map UI displays north/east markers.
 
 Performance refinement: the community exterior's repeated railings/fins are instanced by material, and distant parked vehicles are hidden by quality-dependent distance. Venue scenes are built lazily, static furniture is material-batched, and only the active venue animates fish, water and projection.
+
+## Neighbours and optional commissions
+
+The A18 cast now includes 23 additional named residents, venue helpers and visitors, distributed across the station, IKEA-inspired showroom, outlet, tea space, water learning pavilion, COZZI-inspired lobby, Xpark-inspired gallery, cinema, temple exhibit, civic reading room and the mapped street district. Each has a conversation target and distinct role; named residents now draw different character models from the 25-model roster, with stable color treatments by ID. City pedestrians continue to stream under the existing quality/LOD limits.
+
+Eight optional commissions connect those conversations to existing play: greet station neighbours, sketch the station/plaza route, collect five shop stamps, ride a YouBike to the water centre, activate the water-cycle demo, visit the station/outlet with a family, start a short-film screening, and finish the civic exhibit after the temple walk. Each uses the established accept/progress/claim flow and grants a unique living-room memory card. Existing saved claims and the Sweet Home reward state remain compatible.
+
+## Character appearance variety
+
+The character system now uses 25 independent model files: 10 adult men, 10 adult women, and 5 child or teen profiles. Character IDs receive a unique model within each named roster until the pool is exhausted, while ambient pedestrians use the 24 non-protagonist models, leaving the hero model reserved. The 24 restrained clothing color treatments add further variety while preserving each model's source silhouette; the protagonist keeps the established urban-man model.
