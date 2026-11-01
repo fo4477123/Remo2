@@ -112,3 +112,12 @@ Official photos/PDFs were used as design references only and are not redistribut
 - 建築位置與輪廓：本地 OSM way 109836992，© OpenStreetMap contributors / ODbL。高度 28m 為依公開外觀進行的遊戲近似，非實測建築高度。
 - 立面特徵參考 [桃園觀光局](https://travel.tycg.gov.tw/zh-tw/consume/detail/1772)、[觀光局外觀照片](https://travel.tycg.gov.tw/content/images/attractions/12325/1024x768_files635897459861518395.jpg)；實地外觀圖片僅用來比對，未內嵌或再散布。文化石貼圖、圓窗、玻璃曲面、招牌與模型均為原創。
 - [官方樓層導覽](https://www.metrowalk.com.tw/newweb/1F.html)列出 GBF、1F–5F；GBF 餐飲生活、2F 親子、3F 休閒、4F 遊樂、5F 影城參考各樓層官網。遊戲中店舖位置、室內配置、NPC、街機及短片均為原創設計。
+
+
+## A17 district expansion (2026-11-01)
+
+- A17 platform geometry: OSM ways 1228832766 and 1228832798; station node 1256740763. Reuses the existing 2026-10-26 attributed OSM extract, with the same geographic origin. The map now covers A17–A18 without restoring A19.
+- [Taoyuan Metro A17 official station information](https://www.tymetro.com.tw/tymetro-new/tw/_pages/travel-guide/A17), [official exterior photo](https://www.tymetro.com.tw/tymetro-new/upload/station/20171019093607_0.jpg), and [official floor plan](https://www.tymetro.com.tw/tymetro-new/upload/station/20211207114848_1.png) guide the paired canopy, elevated platforms, entrance canopy and depot sheds. Reference files remain in ignored QA storage; game models and texture patterns are original geometry/canvas work.
+- [Taoyuan Museum of Fine Arts publication](https://tmofa.tycg.gov.tw/images/upload/publication/33_60092df32d088.pdf) describes the calligraphy museum as five seal-like buildings next to the pond; the local mapped outline is used for a low dark pavilion reconstruction.
+- [Sunlight Arena operator](https://www.tysa.com.tw/information) and [official venue spaces](https://www.afmc.gov.tw/LocationSpace) guide an open lawn/ring-walk venue. The OSM civic polygon is treated as open air instead of an enclosing building. No temporary concert stage is represented as permanent architecture.
+- The provided Google panorama at 25.0240355,121.2207277 was recorded, but its public thumbnail request returned HTTP 403. Google imagery was not observed, embedded or redistributed. Unverified residential facades and elevations are architectural estimates on actual footprints, not a claim of an exact Street View reconstruction.

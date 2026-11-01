@@ -1,0 +1,10 @@
+# A17–A18 release validation — 2026-11-01
+
+- `qa-a17-layout.cjs`: 1,337 footprint buildings, 1,417 road paths, two OSM A17 platform polygons, low-rise museum and open-air arena treatment. The at-grade public-road graph connects A18 to A17 with 6,014 reachable graph nodes.
+- `qa-a18-layout.cjs`: 12,760 independent road/pavement versus footprint intersection checks pass. `qa-city-geo.cjs` passes geographic handedness, heading-up minimap, footprint round trips and old parking-coordinate migration.
+- `qa-a17.cjs webgl`, `qa-output/run-2vto26`: all four new destination entries are free; A17 navigation has 203 route points; station interaction works; 115 added fixture/stair collision polygons clear the drivable road rectangles. Actual scene screenshots were reviewed from the street, station overview, depot, museum and arena. Low-quality views record 94–162 draw calls and 284,578–316,104 triangles with no runtime errors.
+- `qa-a17.cjs webgpu`, `qa-output/run-0o5Rgo`: the same final-version navigation, station interaction, open-arena and 115-fixture clearance checks pass on actual WebGPU. Tested views record 94–171 draw calls and 288,195–318,057 triangles; runtime errors: zero.
+- `qa-a18.cjs webgl`, `qa-output/run-lYNkWm`: retained A18 destination routes, activities, original quest IDs, claimed rewards and mirrored-parking save migration pass. Tested low-quality A18 views record 106–289 draw calls and 300,206–428,109 triangles. These measurements describe these test views, not a universal device frame-rate guarantee.
+- All modified runtime scripts and preparation/check scripts pass syntax checks; `git diff --check` passes. Loader versions are bumped along the full engine → scene → detail → finishes → home → game module chain, as well as the district JSON request.
+
+The street models use actual source plan geometry, public official station/venue references, and estimated unverified residential elevations. The Google Street View preview request was denied with HTTP 403 and is not presented as an observed reference. Station upper floors are exterior modeling; the road-level interaction is a site information/memory interaction.

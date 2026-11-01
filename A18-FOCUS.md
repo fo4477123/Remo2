@@ -13,3 +13,6 @@ Latest character/driving request: replace the large-headed hero with an original
 Validate five site IDs/coordinates and footprint/road clearance in Node; run browser interaction, route, movement, vehicle, saved quest and render-budget checks on WebGL and native WebGPU. Inspect screenshots of all five destinations. Run the owned Model Y and home/community continuity checks. Publish using the existing GitHub Pages workflow after checks pass.
 
 Sources: [OSM](https://www.openstreetmap.org/copyright), [THSR plan](https://www.thsrc.com.tw/event/map/Taoyuan.pdf), [Gloria plan](https://www.gloriaoutlets.com/files/GO_CenterMap/CM_Download/MAP202501.pdf), [water centre operator](https://www.ctci-hec.com.tw/Page2_2.aspx?Mbar=2), [IKEA store](https://www.ikea.com.tw/zh/store/tao-yuan/info).
+
+
+2026-11-01: the user has explicitly expanded the playable area back to A17. The earlier A18-only restriction is superseded by A17-EXPANSION.md; A19 and other distant regions remain outside this release. The geographic origin, old destinations and save coordinates remain unchanged.
