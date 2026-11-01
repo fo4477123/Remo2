@@ -158,9 +158,19 @@
   const quality=document.createElement('select');quality.setAttribute('aria-label','畫質');quality.innerHTML='<option value="high">高畫質</option><option value="balanced">順暢模式</option>';quality.style.cssText='padding:7px;border:1px solid #c9c8bb;background:#f8f6ef;border-radius:4px';document.querySelector('.toolbar').append(quality);
   quality.onchange=()=>{const high=quality.value==='high';renderer.setPixelRatio(high?Math.min(devicePixelRatio,2):1);daylight.forEach(l=>l.castShadow=high);sun.shadow.needsUpdate=true;};
   const aim=document.createElement('span');aim.textContent='·';aim.style.cssText='display:none;position:absolute;left:50%;top:50%;font-size:28px;color:white;pointer-events:none;text-shadow:0 1px 3px black';view.append(aim);
-  const gameButton=document.createElement('button');gameButton.textContent='遊戲式滑鼠視角';gameButton.onclick=async()=>{try{if(!walking)renderButton.click();await canvas.requestPointerLock();}catch{help.textContent='目前瀏覽器未允許鎖定滑鼠，仍可拖曳轉頭。';}};document.querySelector('.toolbar').append(gameButton);
-  const originalMove=canvas.onpointermove;canvas.onpointermove=e=>{if(document.pointerLockElement===canvas&&walking){walkYaw+=e.movementX*.0025;lookPitch=Math.max(-1,Math.min(1,lookPitch-e.movementY*.0025));}else originalMove(e);};
-  document.addEventListener('pointerlockchange',()=>{const locked=document.pointerLockElement===canvas;aim.style.display=locked?'block':'none';help.textContent=locked?'WASD 走動 · 移動滑鼠轉頭 · Esc 釋放滑鼠':'拖曳轉頭 · WASD 移動 · 小地圖定位 · Esc 返回鳥瞰';});
+  const locked=()=>document.pointerLockElement===canvas;
+  function updateLookHelp(failed=false){const text=locked()?'WASD 移動 · 移動滑鼠轉頭 · Esc 釋放滑鼠':failed?'滑鼠鎖定未啟用，可按住畫面拖曳轉頭':'WASD 移動 · 按住拖曳轉頭 · 點畫面啟用滑鼠視角';help.textContent=text;const hint=view.querySelector('.explore-hint');if(hint)hint.textContent=text+' · E 操作 · J 手札';view.dispatchEvent(new Event('lookcontrolschange'));}
+  let requestingLook=false,wantsLook=false;
+  function releaseLook(){wantsLook=false;if(locked())document.exitPointerLock();}
+  async function requestLook(){if(locked())return true;if(requestingLook||!walking||canvas.hidden||document.querySelector('dialog[open]'))return false;requestingLook=wantsLook=true;try{if(!canvas.requestPointerLock)throw new Error('Pointer lock unavailable');await canvas.requestPointerLock();if(!wantsLook)releaseLook();return locked();}catch{wantsLook=false;updateLookHelp(true);return false;}finally{requestingLook=false;}}
+  const gameButton=document.createElement('button');gameButton.textContent='遊戲式滑鼠視角';gameButton.onclick=()=>{if(!walking)renderButton.click();requestLook();};document.querySelector('.toolbar').append(gameButton);
+  // Pointer lock guarantees relative mousemove events; handle those once, rather
+  // than relying on pointermove or counting both event streams on some browsers.
+  const originalMove=canvas.onpointermove;canvas.onpointermove=e=>{if(!locked())originalMove(e);};
+  document.addEventListener('mousemove',e=>{if(!locked()||!walking)return;const dx=Number.isFinite(e.movementX)?e.movementX:0,dy=Number.isFinite(e.movementY)?e.movementY:0;walkYaw+=dx*.0025;lookPitch=Math.max(-1,Math.min(1,lookPitch-dy*.0025));});
+  document.addEventListener('pointerlockchange',()=>{drag=null;if(locked()&&(!wantsLook||!walking||canvas.hidden)){releaseLook();return;}if(!locked())wantsLook=false;aim.style.display=locked()?'block':'none';updateLookHelp();});
+  document.addEventListener('pointerlockerror',()=>updateLookHelp(true));
+  B1_REVIEW.lookControls={request:requestLook,release:releaseLook,locked,updateHelp:updateLookHelp};
   document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode!=='render'&&document.pointerLockElement)document.exitPointerLock();}));
   // A small instrumentation hook for browser QA without placing technical data in the UI.
   let previous=performance.now(),samples=[];function measure(now){samples.push(now-previous);previous=now;if(samples.length>90)samples.shift();window.B1_REVIEW.frameMs=samples.reduce((a,b)=>a+b,0)/samples.length;requestAnimationFrame(measure);}requestAnimationFrame(measure);
@@ -205,5 +215,5 @@
     const loaderModule=document.createElement('script');loaderModule.type='module';loaderModule.textContent="import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/loaders/GLTFLoader.js'; window.B1_GLTFLoader=GLTFLoader; window.dispatchEvent(new Event('b1-gltf-loader-ready'));";document.head.append(loaderModule);
   }
   }
-  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261101-a17-district1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
+  const homeScript=document.createElement('script');homeScript.src='studio-home.js?v=20261101-camera-input1';homeScript.onerror=()=>loadFailure('空間介面');document.head.append(homeScript);
 })();

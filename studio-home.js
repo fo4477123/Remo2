@@ -1,6 +1,6 @@
 /* Warm-home walkthrough: phone input, rendering budget, and design validation. */
 (() => {
-  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261025-gpu1';document.head.append(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='studio-home.css?v=20261101-camera-input1';document.head.append(css);
   const mobile=matchMedia('(pointer:coarse)').matches||innerWidth<850;
   document.body.classList.add('home-ready');
   // Full-height walls and real windows are the default; cutaway is opt-in.
@@ -104,16 +104,25 @@
   stick.onpointermove=e=>{if(e.pointerId===movePointer)moveStick(e);};
   stick.onpointerup=stick.onpointercancel=stick.onlostpointercapture=()=>{movePointer=null;for(const k of ['w','a','s','d'])keys.delete(k);knob.style.transform='translate(0,0)';};
   const oldDown=canvas.onpointerdown,oldMove=canvas.onpointermove,oldUp=canvas.onpointerup;
-  canvas.onpointerdown=e=>{if(lookPointer!==null)return;lookPointer=e.pointerId;oldDown(e);};
-  canvas.onpointermove=e=>{if(document.pointerLockElement===canvas||e.pointerId===lookPointer)oldMove(e);};
-  canvas.onpointerup=canvas.onpointercancel=canvas.onlostpointercapture=e=>{if(e.pointerId===lookPointer){lookPointer=null;oldUp(e);}};
+  canvas.onpointerdown=e=>{if(document.pointerLockElement===canvas||lookPointer!==null||e.button!==0)return;lookPointer=e.pointerId;oldDown(e);if(walking&&view.classList.contains('immersive')&&e.pointerType==='mouse')B1_REVIEW.lookControls.request();};
+  const finishLook=e=>{if(e.pointerId===lookPointer){lookPointer=null;oldUp(e);}};
+  canvas.onpointermove=e=>{if(e.pointerId===lookPointer&&e.pointerType==='mouse'&&!(e.buttons&1)){finishLook(e);return;}if(document.pointerLockElement===canvas||e.pointerId===lookPointer)oldMove(e);};
+  canvas.onpointerup=canvas.onpointercancel=finishLook;
+  // A lock attempt can release capture while the mouse is still held. Keep the
+  // drag fallback alive until release/cancel, including movement off the canvas.
+  canvas.onlostpointercapture=e=>{if(e.pointerType!=='mouse'||!(e.buttons&1))finishLook(e);};
+  document.addEventListener('pointermove',e=>{if(e.target!==canvas&&e.pointerType==='mouse'&&e.pointerId===lookPointer)canvas.onpointermove(e);});
+  document.addEventListener('pointerup',finishLook);document.addEventListener('pointercancel',finishLook);
+  document.addEventListener('pointerlockchange',()=>{lookPointer=null;drag=null;});
   window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearMovement();});
-  const tourBefore=setTour;setTour=function(enabled){clearMovement();tourBefore(enabled);if(enabled)lookPitch=selected==='bath'?-.48:-.22;else{wallToggle.checked=false;wallToggle.dispatchEvent(new Event('change'));}document.body.classList.toggle('is-walking',enabled);renderer.shadowMap.needsUpdate=true;};
+  const tourBefore=setTour;setTour=function(enabled){clearMovement();if(!enabled)B1_REVIEW.lookControls.release();tourBefore(enabled);if(enabled)lookPitch=selected==='bath'?-.48:-.22;else{wallToggle.checked=false;wallToggle.dispatchEvent(new Event('change'));}document.body.classList.toggle('is-walking',enabled);renderer.shadowMap.needsUpdate=true;};
   B1_REVIEW.setTour=setTour;
   document.body.classList.toggle('is-walking',walking);
   help.textContent=mobile?'左下移動・右側拖曳轉頭・上方切換房間':'WASD 移動・拖曳轉頭・上方選擇房間';
   const immersive=document.createElement('button');immersive.className='immersive-button';immersive.textContent='沉浸參觀';
-  immersive.onclick=()=>{const on=!view.classList.contains('immersive');view.classList.toggle('immersive',on);document.body.classList.toggle('immersed',on);immersive.textContent=on?'結束全畫面':'沉浸參觀';if(on&&!walking){select('living');renderButton.click();}};view.append(immersive);
+  immersive.onclick=()=>{const on=!view.classList.contains('immersive');view.classList.toggle('immersive',on);document.body.classList.toggle('immersed',on);immersive.textContent=on?'結束全畫面':'沉浸參觀';if(on){if(!walking){select('living');renderButton.click();}if(matchMedia('(pointer:fine)').matches)B1_REVIEW.lookControls.request();}else B1_REVIEW.lookControls.release();};view.append(immersive);
+  const mouseLook=document.createElement('button');mouseLook.className='mouse-look-button';mouseLook.type='button';mouseLook.onclick=()=>{if(B1_REVIEW.lookControls.locked())B1_REVIEW.lookControls.release();else B1_REVIEW.lookControls.request();};
+  function updateMouseLook(){const locked=B1_REVIEW.lookControls.locked();mouseLook.textContent=locked?'Esc・釋放滑鼠':'啟用滑鼠轉頭';mouseLook.setAttribute('aria-pressed',String(locked));}view.addEventListener('lookcontrolschange',updateMouseLook);updateMouseLook();view.append(mouseLook);
   const capture=document.createElement('button');capture.id='capture-view';capture.textContent='儲存 3D 視角';capture.title='將目前即時渲染儲存為 PNG';capture.onclick=()=>{renderer.render(scene,camera);const link=document.createElement('a');link.download=`B1-${selected}-3d-render.png`;link.href=canvas.toDataURL('image/png');link.click();};document.querySelector('.toolbar').append(capture);
   // Curated photoreal render gallery: these are high-detail design views, while
   // the canvas above remains the measured interactive model.
@@ -140,10 +149,10 @@
   else if(mobile&&!location.hash&&!location.search){renderButton.click();}
   select(selected);
   B1_REVIEW.audit=()=>({roomHeight:ROOM_HEIGHT,kitchenHeight:KITCHEN_HEIGHT,windows:windowSpecs,roomStops:Object.fromEntries(Object.entries(stops).map(([n,p])=>[n,{x:p[0],y:p[1],free:canStand(p[0],p[1])}])),finite:scene.children.every(o=>[o.position.x,o.position.y,o.position.z].every(Number.isFinite)),calls:B1_REVIEW.sceneCalls||renderer.info.render.calls,triangles:B1_REVIEW.sceneTriangles||renderer.info.render.triangles,pointLights:retained.size,pixelRatio:renderer.getPixelRatio(),wallElevations:wallGroup.children.every(m=>Math.abs(m.position.y-m.userData.fullHeightY*m.scale.y)<.01)});
-  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261101-a17-district1';
+  const renderScript=document.createElement('script');renderScript.src='studio-render.js?v=20261101-camera-input1';
   const loadGame=()=>{
     const modules=['studio-models.js','studio-refine.js','studio-shell.js','studio-life.js','studio-activities.js','studio-characters.js','studio-crowd.js','studio-vehicles.js','studio-vehicle-details.js','studio-neighborhood.js','studio-community-design.js','studio-city-layout.js','studio-city-geo.js','studio-street-materials.js','studio-terrain.js','studio-urban.js','studio-a18-routing.js','studio-a18.js','studio-neighbourhood-scenery.js','studio-a17.js','studio-city.js','studio-a18-life.js','studio-a18-events.js','studio-neighbourhood-stories.js','studio-main-story.js','studio-fantasy.js','studio-metrowalk.js','studio-community.js','studio-transit.js','studio-player.js','studio-remake.js','studio-owned.js','studio-personal.js','studio-seamless.js','studio-sound.js','studio-islewhisper.js','studio-music.js','studio-furniture.js','studio-atmosphere.js','studio-game.js'];let index=0;
-    const next=async()=>{if(modules[index-1]==='studio-neighbourhood-stories.js'){try{await B1_NEW_STORIES.ready;}catch(error){console.error(error);loadFailure('街角故事');return;}}if(modules[index-1]==='studio-street-materials.js'){try{await B1_STREET_MATERIALS.ready;}catch(error){console.error(error);loadFailure('街區材質');return;}}if(modules[index-1]==='studio-vehicles.js')await B1_VEHICLES.ready;if(modules[index-1]==='studio-characters.js'){try{await B1_CHARACTERS.ready;}catch(error){console.error(error);loadFailure('人物模型');return;}}if(index===modules.length){try{await B1_ENGINE.prepare();}catch(error){console.error(error);loadFailure('WebGPU');return;}B1_REVIEW.ready=true;document.querySelector('footer span:last-child').textContent='室內 280 cm／廚房 245 cm';if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261101-a17-district1';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
+    const next=async()=>{if(modules[index-1]==='studio-neighbourhood-stories.js'){try{await B1_NEW_STORIES.ready;}catch(error){console.error(error);loadFailure('街角故事');return;}}if(modules[index-1]==='studio-street-materials.js'){try{await B1_STREET_MATERIALS.ready;}catch(error){console.error(error);loadFailure('街區材質');return;}}if(modules[index-1]==='studio-vehicles.js')await B1_VEHICLES.ready;if(modules[index-1]==='studio-characters.js'){try{await B1_CHARACTERS.ready;}catch(error){console.error(error);loadFailure('人物模型');return;}}if(index===modules.length){try{await B1_ENGINE.prepare();}catch(error){console.error(error);loadFailure('WebGPU');return;}B1_REVIEW.ready=true;document.querySelector('footer span:last-child').textContent='室內 280 cm／廚房 245 cm';if(B1_REVIEW.gameReady&&window.B1_COMMUNITY)loading.remove();else loadFailure('社區探索');return;}const s=document.createElement('script');s.src=modules[index++]+'?v=20261101-camera-input1';s.onload=next;s.onerror=()=>loadFailure('社區互動');document.head.append(s);};next();
   };
   renderScript.onload=loadGame;renderScript.onerror=loadGame;document.head.append(renderScript);
   canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();clearMovement();loading.textContent='圖形記憶體暫時不足，請重新載入頁面。';view.append(loading);});
