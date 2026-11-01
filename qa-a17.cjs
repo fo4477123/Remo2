@@ -29,7 +29,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
 
 
  await ev('B1_CITY.start();keys.clear()');
- const state=await ev('B1_CITY.snapshot()');assert.equal(state.focus,'A17-A18');assert(state.a17.platforms.length===2);assert(state.a17.facadeBuildings>=30);assert(state.a17.windows>250);assert.equal(state.a17.depotBuildings,2);assert(state.a17.streetLights>10);console.log('A17 geometry',state.a17);
+ const state=await ev('B1_CITY.snapshot()');assert.equal(state.focus,'A17-A19');assert(state.a17.platforms.length===2);assert(state.a17.facadeBuildings>=30);assert(state.a17.windows>250);assert.equal(state.a17.depotBuildings,2);assert(state.a17.streetLights>10);console.log('A17 geometry',state.a17);
  const ids=['linghang','calligraphy-park','calligraphy-museum','sunshine-theatre'];for(const id of ids){const l=state.landmarks.find(l=>l.id===id);assert(l&&l.free,'Accessible destination '+id);}
  await ev('B1_CITY.navigate("linghang")');const route=await ev('B1_CITY.routeGeometry()');assert(route.length>30,'Home/A18 navigation reaches A17');console.log('A17 navigation points',route.length);
  await ev('(()=>{const l=B1_CITY.snapshot().landmarks.find(l=>l.id==="linghang");[walkX,walkY]=l.entry;B1_PLAYER.setMode("first");keys.clear();})()');await sleep(600);assert.equal(await ev('B1_COMMUNITY.useTarget("city-linghang")'),true,'Station interaction');assert(await ev('document.querySelector("dialog.city-activity").open'),'Station dialog open');await ev('document.querySelector("dialog.city-activity").close()');
