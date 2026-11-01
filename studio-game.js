@@ -36,7 +36,7 @@
   const intro=el('section','explore-intro');intro.setAttribute('aria-label','暖木日常探索');
   intro.innerHTML=`<div><p class="explore-eyebrow">B1 · QINGPU 8TH × 9TH STREET</p><h2>走進暖木日常</h2><p>九個住宅空間、雙棟社區與青埔街區。開車、騎車或沿街漫步，讓每次探索都成為家裡的新收藏。</p></div>`;
   const introActions=el('div','explore-intro-actions'),start=button('開始探索',()=>goRoom('living'),'explore-primary');
-  const journalButton=button('探索手札',()=>openJournal());introActions.append(start,journalButton,button('A17–A19 生活圈',()=>B1_CITY.start()));intro.append(introActions);workspace.prepend(intro);
+  const journalButton=button('探索手札',()=>openJournal());introActions.append(start,journalButton,button('青埔生活圈',()=>B1_CITY.start()));intro.append(introActions);workspace.prepend(intro);
   const progress=el('div','explore-progress');progress.innerHTML=`<span class="explore-progress-label"></span><progress max="${9+missions.length}" value="0" aria-label="探索完成進度"></progress><span class="explore-save"></span>`;intro.append(progress);
   const hud=el('div','explore-hud');hud.innerHTML='<span class="explore-eyebrow">WARM HOME / EXPLORE</span><strong>暖木日常</strong><small>隨意走走，或打開探索手札</small>';view.append(hud);
   const crosshair=el('span','explore-crosshair');crosshair.setAttribute('aria-hidden','true');view.append(crosshair);
@@ -146,6 +146,6 @@
     nearby=chooseTarget();prompt.hidden=marker.hidden=!nearby;hint.hidden=!walking||canvas.hidden||journal.open||Boolean(nearby);if(nearby){prompt.textContent=`E · ${nearby.verbs?nearby.verbs[nearby.on?1:0]:`${nearby.on?'關閉':'打開'}${nearby.name}`}`;prompt.setAttribute('aria-label',prompt.textContent);const p=W(nearby.x,nearby.y,nearby.h).project(camera);marker.hidden=Math.abs(p.x)>1||Math.abs(p.y)>1||p.z>1;marker.style.left=`${(p.x+1)*canvas.clientWidth/2}px`;marker.style.top=`${(1-p.y)*canvas.clientHeight/2}px`;}
     if(visited.size===9&&completed().length===missions.length&&!completeNotified){completeNotified=true;notify('暖木日常探索完成！所有空間與日常任務已收集。');chime();}
   }
-  window.B1_GAME={recordAction:award,save:persist,notify,celebrate,setTour,tick,goRoom,toggle,setMood,visible,chooseTarget:()=>chooseTarget()?.id||null,openJournal,snapshot:()=>({visited:[...visited],actions:[...actions],completed:completed().map(m=>m.id),scene:sceneMode,currentRoom,actors:Object.fromEntries(actors.map(a=>[a.id,{open:a.on,progress:a.p}])),saveOK}),roomList};
+  window.B1_GAME={get mood(){return sceneMode;},recordAction:award,save:persist,notify,celebrate,setTour,tick,goRoom,toggle,setMood,visible,chooseTarget:()=>chooseTarget()?.id||null,openJournal,snapshot:()=>({visited:[...visited],actions:[...actions],completed:completed().map(m=>m.id),scene:sceneMode,currentRoom,actors:Object.fromEntries(actors.map(a=>[a.id,{open:a.on,progress:a.p}])),saveOK}),roomList};
   updateProgress();updateLifeControls();setMood(sceneMode);window.B1_COMMUNITY?.attachGame(B1_GAME);B1_REVIEW.gameReady=true;
 })();
