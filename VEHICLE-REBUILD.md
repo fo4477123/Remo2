@@ -1,5 +1,13 @@
 # Vehicle rebuild — 2026-11-03
 
+## 2026-11-04 coachwork v5
+
+Revised all passenger bodies with stronger lower-door concavity, a rounded glass cross-section, narrower window surrounds and continuous surface normals at the bonnet/shoulder joins. Rounded detail normals are welded across the split BoxGeometry faces. Transparent batches no longer cast opaque shadows. Paint uses a stronger metallic clearcoat, while painted shells skip self-shadow reception to avoid shadow-map striping; they still cast ground shadows.
+
+Passenger wheels now use solid swept spoke geometry with machined edge strips, drilled brake discs and alternating tread blocks. Tiny tread details use a lower subdivision count. T/K receive revised paint/glass and smoother corner tessellation. Geometry remains original procedural interpretation; this revision does not establish manufacturer-level exterior accuracy or equivalence to the imported Model Y.
+
+Validation: `node qa-vehicle-rebuild.cjs`, including all 13 street vehicles and the imported Y from front/side/rear, wheel rotation, detail switching, headlight material isolation and mobile gallery layout. Screenshots remain in local ignored `qa-output/`.
+
 User outcome: add Foxtron Model D and Tesla Model 3 and bring all road vehicles closer to the owned Model Y's realistic presentation. Keep the owned Quicksilver Model Y, saves, WebGL2 default and takeover controls.
 
 ## Scope and design
