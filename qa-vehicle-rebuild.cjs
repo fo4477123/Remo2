@@ -16,7 +16,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
  const cdp=(method,params={})=>new Promise((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});ws.send(JSON.stringify({id:n,method,params}));});
  const ev=async expression=>{const r=await cdp('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
  await cdp('Runtime.enable');await cdp('Page.enable');await cdp('Network.enable');
- await cdp('Network.setBlockedURLs',{urls:['https://*','http://cdn.*']});
+ await cdp('Network.setBlockedURLs',{urls:['https://*','http://cdn.*',...(process.argv.includes('--fallback')?['*model-3-2018.glb']:[])]});
  await cdp('Page.addScriptToEvaluateOnNewDocument',{source:'localStorage.setItem("b1-gpu-quality-v1","low")'});
  const mode=process.env.B1_RENDERER||process.argv[2]||'webgl';await cdp('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/vehicle-gallery.html`});
  const wait=async(ex,msg,limit=120000)=>{const end=Date.now()+limit;while(Date.now()<end){if(await ev(ex))return;await sleep(200);}throw Error(msg+' '+JSON.stringify(await ev('({load:document.querySelector("#status")?.textContent})')));};
@@ -29,5 +29,10 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
 
 
 
- await require('./qa-vehicle-rebuild-scenario.cjs')({ev,cdp,sleep,shot,assert});assert.equal(exceptions.length,0);await cdp('Browser.close');
+ if(process.argv.includes('--fallback')){
+ assert(await ev("!B1_VEHICLE_IMPORTS.status.loaded&&Boolean(B1_VEHICLE_IMPORTS.status.error)"),'Failed asset status is recorded');
+ assert(await ev("B1_VEHICLE_GALLERY.show('model-3').wheels.length===4"),'Fallback still renders with four wheels');
+ assert(await ev("B1_VEHICLE_GALLERY.models.get('model-3').spec.interpretation===true"),'Fallback is not misrepresented as imported');
+ await shot('model-3-fallback');
+}else await require('./qa-vehicle-rebuild-scenario.cjs')({ev,cdp,sleep,shot,assert});assert.equal(exceptions.length,0);await cdp('Browser.close');
 })().catch(e=>{console.error(e);process.exitCode=1;}).finally(()=>{ws?.close();browser?.kill();server.close();});

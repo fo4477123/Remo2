@@ -121,3 +121,8 @@ Official photos/PDFs were used as design references only and are not redistribut
 - [Taoyuan Museum of Fine Arts publication](https://tmofa.tycg.gov.tw/images/upload/publication/33_60092df32d088.pdf) describes the calligraphy museum as five seal-like buildings next to the pond; the local mapped outline is used for a low dark pavilion reconstruction.
 - [Sunlight Arena operator](https://www.tysa.com.tw/information) and [official venue spaces](https://www.afmc.gov.tw/LocationSpace) guide an open lawn/ring-walk venue. The OSM civic polygon is treated as open air instead of an enclosing building. No temporary concert stage is represented as permanent architecture.
 - The provided Google panorama at 25.0240355,121.2207277 was recorded, but its public thumbnail request returned HTTP 403. Google imagery was not observed, embedded or redistributed. Unverified residential facades and elevations are architectural estimates on actual footprints, not a claim of an exact Street View reconstruction.
+
+
+## Imported street Model 3 (2026-11-04)
+
+- [Tesla 2018 Model 3](https://sketchfab.com/3d-models/tesla-2018-model-3-5ef9b845aaf44203b6d04e2c677e444f) by Ameer Studio, CC BY 4.0. Public copy, modifications and attribution: [MODEL-3-CREDITS](assets/models/vehicles/MODEL-3-CREDITS.md). This model replaces only Model 3 near detail; it is not Highland.

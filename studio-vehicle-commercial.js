@@ -28,8 +28,9 @@
         rod([side*W*.30,H*.84,-L*.35],[side*W*.30,H*.84,L*.34],1.7,alloy);
       }
       box([0,H-9,0],[W-4,18,L-26],paint,8);
-      box([0,H+8,-L*.10],[W*.56,25,L*.43],paint,6,details);
-      for(let i=0;i<22;i++)box([0,H+21,-L*.30+i*20],[W*.47,1.2,2],black,.3,details);
+      // Model T stores traction batteries in its chassis. Keep the roof free of
+      // the large generic rooftop pack used in the earlier interpretation.
+      group.userData.batteryLocation='chassis';
       box([0,H*.39,L/2-8],[W-10,H*.1,24],paint,10);
       box([0,H*.68,L/2-8],[W-18,H*.49,8],glass,4);
       box([0,H*.92,L/2-9],[W-16,H*.12,10],black,4);

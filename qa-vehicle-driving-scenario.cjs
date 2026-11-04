@@ -2,6 +2,8 @@ module.exports=async({ev,cdp,sleep,shot,assert,key})=>{
   await ev('B1_CITY.start()');await sleep(1500);
   assert.equal(await ev('B1_CITY.traffic().snapshot().models.length'),13);
   assert(await ev("B1_CITY.ownedVehicle().group.userData.features.includes('licensed-2025-model')"),'Original owned Model Y remains imported');
+  assert(await ev("B1_VEHICLE_IMPORTS.status.loaded"),'Imported Model 3 loaded in actual city');
+  assert(await ev("B1_TAIWAN_TRAFFIC.create('model-3').features.includes('licensed-2018-model')"),'Street traffic uses downloaded Model 3');
   // Find a clear street pose, replace a stopped traffic instance with each new body,
   // then use F and W through the actual game handlers. No synthetic mount API.
   await ev(`window.__ownedBefore=B1_CITY.ownedVehicle();window.__trafficBefore=B1_CITY.traffic().cars.length`);

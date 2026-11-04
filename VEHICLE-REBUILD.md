@@ -1,5 +1,22 @@
 # Vehicle rebuild — 2026-11-03
 
+## 2026-11-04 imported Model 3 release
+
+The near-detail street Model 3 now uses Ameer Studio's licensed 2018 model, labelled by its actual year. The prior procedural Highland remains only a load-failure fallback. Source textures and interior are retained; four wheel pivots are extracted, fixed pieces are batched, and geometry is simplified from 684,315 to 319,143 triangles. The 7.3 MB prepared local asset needs no third-party download during play. Existing far-detail traffic and near-detail count limits remain. Attribution: assets/models/vehicles/MODEL-3-CREDITS.md. Preparation and acceptance: MODEL-3-INTEGRATION.md.
+
+Bria and Cavira also receive distinct production-inspired wheel geometry, closed tyre profiles, open alloy barrels, shaped lower door panels, narrower panel gaps, revised light strips and charge-flap/camera details. Model T has no raised roof battery enclosure. These Foxtron meshes remain approximate original interpretations; this release does not claim Forza-level fidelity.
+
+## 2026-11-04 Cavira / Bria / Highland corrections
+
+- Model T: removed the large generic roof enclosure and its grille, and marked traction battery location as chassis. No new rooftop equipment is invented. The geometry check rejects a raised roof pack (maximum body height 321 cm).
+- Model B now uses Bria production references (431.5 × 188.5 × 153.5 cm, 280 cm wheelbase); Model C uses Cavira (469.5 × 190.5 × 162.5 cm, 292 cm wheelbase). Existing IDs stay stable. Both have revised cabin profiles, dark roofs, separate matrix LED modules, different lower intakes, bonnet S-duct apertures and front fender markers. Display names explicitly identify their reference.
+- Model 3: reduced front bumper bulge, revised roof profile and swept headlight outline, replaced protruding round lamps with recessed narrow modules, thinned DRLs, added black handles and rear TESLA lettering, and revised the C-shaped rear lamp outline.
+- Reference photos are inspected locally and not redistributed. These remain original game interpretations; the update does not imply licensed CAD precision.
+
+Sources: [Cavira official launch and image](https://www.foxtronev.com/news-center/cavira-official-launch), [Cavira dimensions](https://www.twmotor.com.tw/buy/main_products.php?pid=2820), [Bria production front image and specifications](https://autos.yahoo.com.tw/new-cars/trim/foxtron-bria-2026-pioneer/spec), and the Tesla reference below.
+
+Validation: all 13 street vehicles and the imported Y render through `node qa-vehicle-rebuild.cjs`; new assertions cover Model T roof height/battery metadata and the named Cavira/Bria references. Front/side/rear captures include T/B/C/3.
+
 ## 2026-11-04 coachwork v5
 
 Revised all passenger bodies with stronger lower-door concavity, a rounded glass cross-section, narrower window surrounds and continuous surface normals at the bonnet/shoulder joins. Rounded detail normals are welded across the split BoxGeometry faces. Transparent batches no longer cast opaque shadows. Paint uses a stronger metallic clearcoat, while painted shells skip self-shadow reception to avoid shadow-map striping; they still cast ground shadows.
