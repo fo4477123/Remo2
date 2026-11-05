@@ -21,5 +21,9 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
   // Registry selection, reference toggle, drag and mobile framing use the public UI.
   await ev(`document.querySelector('#model').value='fox-d';document.querySelector('#model').dispatchEvent(new Event('change'));document.querySelector('#compare').click()`);
   assert(await ev("document.querySelector('#name').textContent.includes('Model Y')"));await ev("document.querySelector('#compare').click()");assert(await ev("document.querySelector('#name').textContent.includes('Model D')"));
+  await ev("document.querySelector('[data-angle=side]').click();document.querySelector('#compare3').click()");
+  assert(await ev("document.querySelector('#name').textContent.includes('Model 3')&&document.querySelector('#compare3').getAttribute('aria-pressed')==='true'"));
+  await shot('model-3-side-comparison');
+  await ev("document.querySelector('#compare3').click()");assert(await ev("document.querySelector('#name').textContent.includes('Model D')"));
   await cdp('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await sleep(300);assert(await ev('document.documentElement.scrollWidth<=innerWidth'),'Mobile width');await shot('gallery-mobile');
 };

@@ -40,4 +40,16 @@
   shapes['model-3'].width=[[-.5,.89],[-.39,.98],[-.29,1],[-.08,.965],[.29,1],[.40,.975],[.5,.90]];
   shapes['fox-b'].width=[[-.5,.91],[-.36,.99],[-.30,1],[-.03,.96],[.32,1],[.43,.97],[.5,.91]];
   shapes['fox-c'].width=[[-.5,.93],[-.40,.98],[-.31,1],[-.06,.97],[.31,1],[.43,.97],[.5,.92]];
+  // Cavira official side photograph: low bonnet nose, substantial black window
+  // pillars, rising rear belt and two horizontal projector modules per side.
+  shapes['fox-c'].belt=[[-.5,.66],[-.36,.725],[-.16,.715],[.12,.70],[.27,.68],[.39,.635],[.5,.595]];
+  shapes['fox-c'].cabin=[[-.465,.73,.435],[-.335,.975,.373],[-.11,1,.37],[.065,.98,.37],[.255,.68,.44]];
+  p['fox-c'].head=[[0,.606],[.97,.623],[.94,.554],[.77,.546],[.64,.576],[0,.578]];
+  p['fox-c'].drl=[[.035,.599],[.92,.616]];
+  p['fox-c'].projectors=[[.78,.571],[.89,.581]];
+  p['fox-c'].source='https://www.foxtronev.com/models/explore/cavira';
+  Object.assign(shapes['fox-c'],{productionPillars:true,bodyHandles:true,blackMirrors:true});
+  Object.assign(shapes['fox-b'],{productionPillars:true,blackMirrors:true});
+  p['fox-b'].source='https://www-assets.cloud.foxtronev.com/files/specifications/bria/en/FOXTRON-BRIA-Brochure-EN-2026-v2.pdf';
+  for(const key of ['head','drl','projectors'])p['fox-b'][key]=p['fox-b'][key].map(([x,y])=>[x,y*.93]);
 })();

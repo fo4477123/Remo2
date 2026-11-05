@@ -6,7 +6,7 @@ window.W=(x,y,z=0)=>new T.Vector3(x,z,y);
 window.B1_MODELS={rounded(x,y,w,d,h,m,z,parent){const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,z+h/2,y);parent.add(o);return o;}};
 const status=document.querySelector('#status'),select=document.querySelector('#model'),compare=document.querySelector('#compare'),spin=document.querySelector('#spin');
 try{
-  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261105-cabin1';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
+  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261105-fox2';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
   if(!await B1_VEHICLES.ready)throw Error('Model Y 對照資產載入失敗，請重新整理。');
   await B1_VEHICLE_IMPORTS.ready;
   const renderer=new T.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
@@ -28,9 +28,11 @@ try{
   const floor=new T.Mesh(new T.PlaneGeometry(30000,30000),mat('#c9ced2',.92));floor.rotation.x=-Math.PI/2;floor.position.y=-.7;floor.receiveShadow=true;scene.add(floor);
   const models=new Map(),owned=B1_VEHICLES.createModelY();owned.spec={...owned.spec,id:'model-y',name:'Tesla Model Y · 閃電銀',axle:owned.spec.wheelbase};models.set('model-y',owned);scene.add(owned.group);
   for(const s of [...B1_TAIWAN_TRAFFIC.specs,owned.spec])select.add(new Option(s.name,s.id));
-  let current='model-3',comparing=false;
+  let current='model-3',comparing=false,benchmark='model-y',currentAngle='front';
+  const compare3=document.querySelector('#compare3');
   function show(id,angle='front'){
-    if(!models.has(id)){const v=B1_TAIWAN_TRAFFIC.create(id,id==='fox-d'?'#7d96a6':id==='fox-k'?'#e0e2de':'#a9b3bc');models.set(id,v);scene.add(v.group);}
+    currentAngle=angle;
+    if(!models.has(id)){const v=B1_TAIWAN_TRAFFIC.create(id,id==='fox-c'?'#167bc4':id==='fox-b'?'#a32936':id==='fox-d'?'#7d96a6':id==='fox-k'?'#e0e2de':'#a9b3bc');models.set(id,v);scene.add(v.group);}
     for(const [key,v]of models)v.group.visible=key===id;
     select.value=id;const car=models.get(id),s=car.spec,k=Math.max(1,s.length/490);controls.target.set(0,s.height*.48,0);camera.position.set(...(angle==='side'?[760*k,170*k,0]:angle==='rear'?[390*k,215*k,-690*k]:[390*k,215*k,690*k]));controls.sync();controls.update();
     camera.near=angle==='interior'?.3:1;camera.updateProjectionMatrix();
@@ -41,9 +43,12 @@ try{
     if(id==='model-3'&&s.interpretation)document.querySelector('#spec').textContent+=' · 外部模型載入失敗，暫用備援模型';
     renderer.render(scene,camera);return car;
   }
-  select.value=current;select.disabled=compare.disabled=false;select.addEventListener('change',()=>{current=select.value;comparing=false;compare.setAttribute('aria-pressed','false');show(current);});
-  compare.addEventListener('click',()=>{comparing=!comparing;compare.setAttribute('aria-pressed',String(comparing));show(comparing?'model-y':current);});
-  document.querySelectorAll('[data-angle]').forEach(b=>b.addEventListener('click',()=>show(comparing?'model-y':current,b.dataset.angle)));
+  select.value=current;select.disabled=compare.disabled=false;select.addEventListener('change',()=>{current=select.value;comparing=false;compare.setAttribute('aria-pressed','false');compare3.setAttribute('aria-pressed','false');show(current);});
+  function toggleBenchmark(id){const angle=currentAngle;comparing=benchmark===id?!comparing:true;benchmark=id;compare.setAttribute('aria-pressed',String(comparing&&id==='model-y'));compare3.setAttribute('aria-pressed',String(comparing&&id==='model-3'));show(comparing?benchmark:current,angle);}
+  compare.addEventListener('click',()=>toggleBenchmark('model-y'));
+  compare3.addEventListener('click',()=>toggleBenchmark('model-3'));
+  compare3.disabled=false;
+  document.querySelectorAll('[data-angle]').forEach(b=>b.addEventListener('click',()=>show(comparing?benchmark:current,b.dataset.angle)));
   spin.addEventListener('click',()=>{controls.autoRotate=!controls.autoRotate;spin.setAttribute('aria-pressed',String(controls.autoRotate));});
   function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
   addEventListener('resize',resize);resize();show(current);status.hidden=true;

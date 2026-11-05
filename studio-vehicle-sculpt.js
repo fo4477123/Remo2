@@ -18,7 +18,7 @@
   function batch(parent){const buckets=new Map();for(const o of [...parent.children])if(o.isMesh&&!o.userData.keep){if(!buckets.has(o.material))buckets.set(o.material,[]);buckets.get(o.material).push(o);}for(const [material,list]of buckets){if(list.length<2)continue;const p=[],n=[],uv=[];for(const o of list){o.updateMatrix();const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrix);const v=g.attributes.position,no=g.attributes.normal,u=g.attributes.uv;for(let i=0;i<v.count;i++){p.push(v.getX(i),v.getY(i),v.getZ(i));n.push(no.getX(i),no.getY(i),no.getZ(i));uv.push(u?u.getX(i):0,u?u.getY(i):0);}g.dispose();o.removeFromParent();o.geometry.dispose();}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(p,3));geo.setAttribute('normal',new T.Float32BufferAttribute(n,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.computeBoundingSphere();const o=new T.Mesh(geo,material);o.castShadow=!material.transparent;o.receiveShadow=!material.userData.noSelfShadow;parent.add(o);}}
   function smoothNormals(g){const p=g.attributes.position,n=g.attributes.normal,buckets=new Map();for(let i=0;i<p.count;i++){const key=[p.getX(i),p.getY(i),p.getZ(i)].map(v=>Math.round(v*1000)).join(',');if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(i);}for(const ids of buckets.values()){if(ids.length<2)continue;const normal=new T.Vector3();for(const i of ids)normal.add(new T.Vector3(n.getX(i),n.getY(i),n.getZ(i)));normal.normalize();for(const i of ids)n.setXYZ(i,normal.x,normal.y,normal.z);}n.needsUpdate=true;}
   function build(s,color){
-    const leather=s.id==='fox-c'?mat('#d5d2c7',.78):mat('#313a40',.82);
+    const leather=['fox-b','fox-c'].includes(s.id)?mat('#d5d2c7',.78):mat('#313a40',.82);
     const root=new T.Group(),wheels=[],lamps=[],cfg={...looks[s.id],...B1_VEHICLE_FACES.profiles[s.id]},shape=shapes[s.id],L=s.length,W=s.width,H=s.height,A=s.axle/2,suv=['suv','crossover'].includes(s.body),R=shape.wheelRadius||(s.id==='fox-d'?39:suv?35:33),paint=new T.MeshPhysicalMaterial({color,roughness:.21,metalness:.72,clearcoat:1,clearcoatRoughness:.08,envMapIntensity:1.25}),roofPaint=['sentra','kicks','fox-a','fox-b','fox-c','fox-d'].includes(s.id)?trim:paint;
     paint.userData.noSelfShadow=true;root.name='sculpted-'+s.id;const parts={body:0,lamps:0,cabin:0,wheel:0};
     function mesh(g,m,p=[0,0,0],name='',parent=root){const o=new T.Mesh(g,m);o.position.set(...p);o.name=name;o.castShadow=!m.transparent;o.receiveShadow=!m.userData.noSelfShadow;parent.add(o);return o;}
@@ -43,7 +43,7 @@
     const profile=B1_VEHICLE_FACES.profiles[s.id],faceScale=['sedan','hatch'].includes(s.body)?.90:1,frontTop=H*Math.max(...profile.head.map(p=>p[1]))*faceScale+5,rearTop=H*(profile.tailOutline?Math.max(...profile.tailOutline.map(p=>p[1])):profile.rearH||.66)+5;
     const belt=z=>{const base=H*sample(shape.belt,z/L),t=Math.max(0,Math.min(1,(Math.abs(z/L)-.28)/.22)),blend=t*t*(3-2*t);return base+Math.max(0,(z>0?(s.id==='model-3'?0:frontTop):rearTop)-H*sample(shape.belt,z>0?.5:-.5))*blend;},width=z=>W/2*sample(shape.width,z/L),edge=z=>belt(z)-5+(s.id==='model-3'?12*Math.max(0,(z/L-.28)/.22):0);
     // Both lights and coachwork project onto the same rounded end surface.
-    const endInset=(x,y,sign=1)=>{const top=topY(sign*L/2,Math.min(1,Math.abs(x)/(width(sign*L/2)*.96))),v=Math.max(0,Math.min(1,(y-19)/(top-19))),corner=(s.id==='model-3'?34:28)*Math.pow(Math.abs(x)/(W/2),4);return corner+(s.id==='model-3'?10:12)*Math.pow((v-.46)/.54,2);};
+    const endInset=(x,y,sign=1)=>{const top=topY(sign*L/2,Math.min(1,Math.abs(x)/(width(sign*L/2)*.96))),v=Math.max(0,Math.min(1,(y-19)/(top-19))),corner=(s.id==='model-3'?34:28)*Math.pow(Math.abs(x)/(W/2),4),sculpt=sign>0&&s.id==='fox-c'?7*Math.exp(-Math.pow((v-.68)/.18,2)):0;return corner+(s.id==='model-3'?10:12)*Math.pow((v-.46)/.54,2)+sculpt;};
     const noseZ=(x,z,y=45)=>z-Math.sign(z)*Math.pow(Math.abs(z)/(L/2),12)*endInset(x,y,Math.sign(z));
     const sideX=(z,v)=>width(z)*(.91+.09*Math.sin(v*Math.PI*.79))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
       -(shape.panelDepth||0)*Math.exp(-Math.pow((v-.34)/.20,2))*Math.exp(-Math.pow(z/(A*.83),6))
@@ -75,6 +75,9 @@
       // Painted C pillar, black B pillar and the individual rear quarter window.
       patch(12,10,(t,v)=>{const q=glassSide(rear+(roofRear-rear)*t*(s.id==='model-3'?.30:s.id==='fox-d'?.32:.55),v,side);q[0]+=side*.35;return q;},roofPaint,'rear-pillar-'+s.id);
       const bZ=s.id==='kicks'?-L*.075:-L*.055;
+      if(shape.productionPillars){
+        for(const [centre,span]of [[bZ,9],[rear+(roofRear-rear)*.76,12]])patch(8,8,(t,v)=>{const q=glassSide(centre+(t-.5)*span,v,side);q[0]+=side*.65;return q;},trim,'production-window-pillar');
+      }
       for(const [z,r,m]of [[bZ,2.4,trim],[rear+(roofRear-rear)*.79,1.5,roofPaint],[front-3,1.5,paint]])tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,0,side)),1.05,roofPaint);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,1,side)),.7,['altis','kuga'].includes(s.id)?metal:trim);
@@ -82,13 +85,22 @@
       tube(Array.from({length:30},(_,i)=>{const z=-L*.39+L*.77*i/29;return[side*(sideX(z,.80)+.25),19+(edge(z)-19)*.80,z];}),.25,paint);
       tube(Array.from({length:22},(_,i)=>{const z=-L*.30+L*.59*i/21;return[side*(sideX(z,.18)+.3),19+(edge(z)-19)*.18,z];}),suv?2:1.2,suv?trim:paint);
       for(const seamZ of [-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
-      for(const z of [-L*.175,L*.12])box([side*(sideX(z,.90)+.7),19+(edge(z)-19)*.90,z],[1.8,2.7,15],s.id==='model-3'?trim:s.id==='kicks'||s.id==='altis'?metal:paint,1);
+      for(const z of [-L*.175,L*.12]){
+        const x=side*(sideX(z,.90)+.7),y=19+(edge(z)-19)*.90;
+        if(shape.bodyHandles){const recess=mesh(new T.SphereGeometry(1,24,12),trim,[x,y,z],'handle-recess');recess.scale.set(.7,2.4,8);const handle=mesh(new T.SphereGeometry(1,24,12),paint,[x+side*1.1,y+.3,z],'body-color-pull-handle');handle.scale.set(1.4,1.4,7.5);}
+        else box([x,y,z],[1.8,2.7,15],s.id==='model-3'?trim:s.id==='kicks'||s.id==='altis'?metal:paint,1);
+      }
       for(const axle of [-A,A]){
         const arch=Array.from({length:37},(_,i)=>{const a=i/36*Math.PI,y=R+Math.sin(a)*(R+4.2),z=axle+Math.cos(a)*(R+4.2);const sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)+.25);return[x,y,noseZ(x,z,y)];});tube(arch,suv?3:1.05,suv?trim:paint);
         // Wheel-well backing closes the cut edge without an opaque cylinder through the tyre.
         patch(24,5,(t,v)=>{const a=t*Math.PI,z=axle+Math.cos(a)*(R+4.3),y=R+Math.sin(a)*(R+4.3);const sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-v*14);return[x,y,noseZ(x,z,y)];},trim,'inner-arch');
       }
-      const mz=front-12,mh=belt(mz)+9;rod([side*W*.435,mh,mz],[side*(W/2+7),mh+1,mz],1.8,trim);const mirror=mesh(new T.SphereGeometry(1,22,14),paint,[side*(W/2+7),mh+3,mz],'mirror');mirror.scale.set(8,4.8,9);box([side*(W/2+7),mh+3,mz-6],[11,6,.6],darkMetal,1);box([side*(W/2+7),mh+2,mz+8],[10,1,1],led,.3);
+      const mz=front-12,mh=belt(mz)+9;rod([side*W*.435,mh,mz],[side*(W/2+7),mh+1,mz],1.8,trim);const mirror=mesh(new T.SphereGeometry(1,32,20),shape.blackMirrors?trim:paint,[side*(W/2+7),mh+3,mz],'mirror');mirror.scale.set(8,4.8,9);box([side*(W/2+7),mh+3,mz-6],[11,6,.6],darkMetal,1);box([side*(W/2+7),mh+2,mz+8],[10,1,1],led,.3);
+      if(s.id==='fox-c'){
+        const tailPoints=Array.from({length:20},(_,i)=>{const z=-L*.49+i/19*L*.085,v=.96,x=side*(sideX(z,v)+.8),y=19+(edge(z)-19)*v;return[x,y,noseZ(x,z,y)];});
+        tube(tailPoints,2.1,trim);tube(tailPoints.map(p=>[p[0]+side*.7,p[1]+.3,p[2]]),.8,red);
+        tube(Array.from({length:24},(_,i)=>{const z=-A+R+6+i/23*(2*A-2*R-12);return[side*(sideX(z,.12)+.6),24,z];}),.6,metal);
+      }
     }
     if(s.body!=='sedan'){const z=roofRear-4,h=cabin(z).h;box([0,h-.2,z],[W*.73,3.5,16],roofPaint,2);box([0,h-1,z-8],[W*.40,1.5,1.3],red,.4);}
     if(suv&&!s.id.startsWith('fox-'))for(const side of [-1,1])tube(Array.from({length:15},(_,i)=>{const z=roofRear+8+(roofFront-roofRear-18)*i/14;return[side*W*.30,cabin(z).h+1,z];}),1.4,s.id==='kicks'?trim:metal);
@@ -118,8 +130,9 @@
         if(s.id==='model-3'){
           const z0=front-5;patch(12,4,(t,v)=>{const z=z0-13*t,q=glassSide(z,v*.13+.86,sign);q[0]+=sign*.3;return q;},trim,'mirror-sail-panel');
         }
-        if(s.id==='fox-b')for(let i=0;i<7;i++){
-          const z=rear+(roofRear-rear)*(.13+i*.045),a=glassSide(z,.19,sign),b=glassSide(z,.72,sign);a[0]+=sign*.7;b[0]+=sign*.7;tube([a,b],.55,darkMetal);
+        if(s.id==='fox-b')for(let i=0;i<9;i++)for(let j=0;j<5;j++){
+          const z=rear+(roofRear-rear)*(.16+j*.062),v=.18+i*.068,q=glassSide(z,v,sign),size=.55+i*.10;
+          box([q[0]+sign*.9,q[1],q[2]],[.3,size,size],darkMetal,.1);
         }
       }
     }
@@ -135,15 +148,32 @@
     box([0,31,0],[W*.86,5,L*.60],trim,3);for(const side of [-1,1]){const x=side*W*.23;box([x,53,-L*.015],[46,13,52],leather,6);const seat=box([x,88,-L*.075],[45,64,12],leather,6);seat.rotation.x=-.11;box([x,Math.min(119,cabin(-L*.09).h-14),-L*.09],[25,18,13],leather,4);for(const dx of [-17,17])box([x+dx,57,-L*.015],[7,12,44],leather,3);for(const z of [-L*.12,L*.12])tube([[side*W*.437,50,z-25],[side*W*.435,80,z],[side*W*.434,90,z+25]],2,leather);parts.cabin+=6;}
     box([0,52,-L*.225],[W*.78,14,46],leather,5);box([0,76,-L*.25],[W*.78,48,12],leather,6);for(const x of [-W*.22,0,W*.22])box([x,Math.min(110,cabin(-L*.25).h-13),-L*.25],[22,15,10],leather,4);
     const dashY=belt(L*.24)-12,fox=s.id==='fox-b'||s.id==='fox-c',cavira=s.id==='fox-c';
+    if(fox){
+      const thread=mat('#8d8b85',.9);
+      for(const side of [-1,1]){
+        const x=side*W*.23;
+        for(const dx of [-17,17])tube([[x+dx,64,-L*.075+5],[x+dx,86,-L*.075+7],[x+dx*.75,108,-L*.075+9]],.16,thread);
+        if(s.id==='fox-b'){
+          const beltMat=mat('#9e2535',.88);
+          const strap=box([side*W*.365,84,-L*.08],[3.5,63,.8],beltMat,.1);strap.rotation.z=side*-.10;
+          box([side*W*.13,59,-L*.02],[2,6,3],trim,.5);box([side*W*.13,62,-L*.02],[2,1,2],beltMat,.2);
+        }
+      }
+      if(s.id==='fox-b'){
+        const ambient=mat('#ae3346',.5,{emissive:0xc42e3e,emissiveIntensity:.55});
+        tube([[-W*.40,dashY+10,L*.20],[0,dashY+11,L*.235],[W*.40,dashY+10,L*.20]],.35,ambient);
+        for(const side of [-1,1])tube([[side*W*.418,91,-L*.15],[side*W*.418,91,L*.13]],.3,ambient);
+      }
+    }
     // Firewall and inner door cards hide the wheel wells from the passenger compartment.
     box([0,60,L*.235],[W*.87,62,5],trim,1);
     box([0,dashY,L*.22],[W*.84,18,28],trim,4);
     for(const side of [-1,1]){
-      box([side*W*.423,66,-L*.015],[5,58,L*.40],leather,2);
-      box([side*W*.40,70,L*.025],[8,7,46],trim,2);
-      tube([[side*W*.405,84,-L*.13],[side*W*.405,84,L*.12]],.65,metal);
+      box([side*W*.37,66,-L*.015],[3,58,L*.36],leather,1);
+      box([side*W*.35,70,L*.025],[8,7,46],trim,2);
+      tube([[side*W*.36,84,-L*.13],[side*W*.36,84,L*.12]],.65,metal);
     }
-    box([0,dashY-10,L*.186],[W*.80,8,5],leather,2);
+    box([0,dashY-10,L*.186],[W*.80,8,5],s.id==='fox-b'?trim:leather,2);
     box([0,dashY+1,L*.185],[W*.76,3.5,2],trim,.5);
     for(let x=-W*.35;x<W*.36;x+=3.2)box([x,dashY+1,L*.181],[.35,2.5,.5],darkMetal,.1);
     box([0,60,L*.025],[25,22,65],trim,3);

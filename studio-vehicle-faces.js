@@ -36,10 +36,27 @@
     if(['model-3','fox-b','fox-c'].includes(s.id)){
       const canvas=document.createElement('canvas');canvas.width=512;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='#b5bec4';ctx.font='38px sans-serif';ctx.textAlign='center';ctx.fillText(s.id==='model-3'?'T E S L A':'F O X T R O N',256,46);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const m=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.65,roughness:.32}),back=s.id==='model-3',y=H*(back?.53:.48),badge=mesh(new T.PlaneGeometry(back?48:58,7.25),m,[0,y,back?rearZ(0,y)-1.5:frontZ(0,y)+1.2],'rear-or-front-wordmark');if(back)badge.rotation.y=Math.PI;
     }
+    if(s.id==='fox-b'){
+      const bumper=[[-.88,.34],[-.52,.41],[.52,.41],[.88,.34],[.82,.17],[-.82,.17]].map(([x,y])=>[x*W*.45,y*H]);
+      poly(bumper,trim,(x,y)=>rearZ(x,y)-.9,'bria-rear-diffuser');
+      for(const x of [-W*.20,0,W*.20])box([x,27,rearZ(x,27)-1],[1.4,12,4],trim,.4);
+      for(const side of [-1,1])tube([[side*W*.31,H*.245,rearZ(side*W*.31,H*.245)-2],[side*W*.40,H*.245,rearZ(side*W*.40,H*.245)-2]],.9,red);
+    }
     // The name also acts as a testable vehicle identity when viewed from the front/rear.
     const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const o=mesh(new T.PlaneGeometry(34,12),material,[0,side>0?H*.25:H*.36,side>0?frontZ(0,H*.25)+4.4:rearZ(0,H*.36)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
     const rearBand=p.tailOutline||{focus:[[.24,.63],[.68,.63],[.94,.68],[.90,.59],[.69,.54]],altis:[[.24,.64],[.70,.63],[.94,.67],[.88,.57],[.58,.54]],sentra:[[.23,.64],[.73,.63],[.93,.67],[.88,.55],[.61,.53]],kicks:[[.30,.75],[.66,.76],[.94,.79],[.91,.66],[.60,.62]],kuga:[[.23,.68],[.69,.68],[.94,.72],[.91,.61],[.59,.60]],'corolla-cross':[[.22,.71],[.67,.71],[.94,.74],[.92,.64],[.60,.63]]}[s.id];
-    for(const side of [-1,1]){const contour=rearBand.map(([x,y])=>[side*x*W*.45,y*H]),tailZ=(x,y)=>rearZ(x,y)-.45;poly(contour,darkMetal,tailZ,'tail-smoke-housing');poly(contour.map(([x,y])=>[x,y-(s.id==='model-3'?.35:1)]),red,(x,y)=>tailZ(x,y)-.45,'tail-'+p.tailStyle);tube(contour.slice(0,3).map(([x,y])=>[x,y,tailZ(x,y)-1]),.75,red,root,true);}
+    for(const side of [-1,1]){
+      if(s.id==='fox-b'){
+        const rearPoly=(points,m,depth)=>poly(points.map(([x,y])=>[side*x*W*.45,y*H]),m,(x,y)=>rearZ(x,y)-depth,'bria-matrix-tail');
+        rearPoly([[.03,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.03,.67]],trim,1);
+        rearPoly([[.05,.710],[.92,.710],[.92,.695],[.05,.695]],red,1.6);
+        for(let row=0;row<4;row++)for(let col=0;col<5-row;col++){
+          const x=.75+col*.044+row*.018,y=.657-row*.017;
+          rearPoly([[x-.014,y-.004],[x+.014,y-.004],[x+.014,y+.005],[x-.014,y+.005]],red,1.8);
+        }
+        continue;
+      }
+      const contour=rearBand.map(([x,y])=>[side*x*W*.45,y*H]),tailZ=(x,y)=>rearZ(x,y)-.45;poly(contour,darkMetal,tailZ,'tail-smoke-housing');poly(contour.map(([x,y])=>[x,y-(s.id==='model-3'?.35:1)]),red,(x,y)=>tailZ(x,y)-.45,'tail-'+p.tailStyle);tube(contour.slice(0,3).map(([x,y])=>[x,y,tailZ(x,y)-1]),.75,red,root,true);}
     return {generation:p.generation,face:p.pattern,tail:p.tailStyle,source:p.source};
   }
   window.B1_VEHICLE_FACES={profiles,build};
