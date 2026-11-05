@@ -18,6 +18,7 @@
   function batch(parent){const buckets=new Map();for(const o of [...parent.children])if(o.isMesh&&!o.userData.keep){if(!buckets.has(o.material))buckets.set(o.material,[]);buckets.get(o.material).push(o);}for(const [material,list]of buckets){if(list.length<2)continue;const p=[],n=[],uv=[];for(const o of list){o.updateMatrix();const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrix);const v=g.attributes.position,no=g.attributes.normal,u=g.attributes.uv;for(let i=0;i<v.count;i++){p.push(v.getX(i),v.getY(i),v.getZ(i));n.push(no.getX(i),no.getY(i),no.getZ(i));uv.push(u?u.getX(i):0,u?u.getY(i):0);}g.dispose();o.removeFromParent();o.geometry.dispose();}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(p,3));geo.setAttribute('normal',new T.Float32BufferAttribute(n,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.computeBoundingSphere();const o=new T.Mesh(geo,material);o.castShadow=!material.transparent;o.receiveShadow=!material.userData.noSelfShadow;parent.add(o);}}
   function smoothNormals(g){const p=g.attributes.position,n=g.attributes.normal,buckets=new Map();for(let i=0;i<p.count;i++){const key=[p.getX(i),p.getY(i),p.getZ(i)].map(v=>Math.round(v*1000)).join(',');if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(i);}for(const ids of buckets.values()){if(ids.length<2)continue;const normal=new T.Vector3();for(const i of ids)normal.add(new T.Vector3(n.getX(i),n.getY(i),n.getZ(i)));normal.normalize();for(const i of ids)n.setXYZ(i,normal.x,normal.y,normal.z);}n.needsUpdate=true;}
   function build(s,color){
+    const leather=s.id==='fox-c'?mat('#d5d2c7',.78):mat('#313a40',.82);
     const root=new T.Group(),wheels=[],lamps=[],cfg={...looks[s.id],...B1_VEHICLE_FACES.profiles[s.id]},shape=shapes[s.id],L=s.length,W=s.width,H=s.height,A=s.axle/2,suv=['suv','crossover'].includes(s.body),R=shape.wheelRadius||(s.id==='fox-d'?39:suv?35:33),paint=new T.MeshPhysicalMaterial({color,roughness:.21,metalness:.72,clearcoat:1,clearcoatRoughness:.08,envMapIntensity:1.25}),roofPaint=['sentra','kicks','fox-a','fox-b','fox-c','fox-d'].includes(s.id)?trim:paint;
     paint.userData.noSelfShadow=true;root.name='sculpted-'+s.id;const parts={body:0,lamps:0,cabin:0,wheel:0};
     function mesh(g,m,p=[0,0,0],name='',parent=root){const o=new T.Mesh(g,m);o.position.set(...p);o.name=name;o.castShadow=!m.transparent;o.receiveShadow=!m.userData.noSelfShadow;parent.add(o);return o;}
@@ -52,9 +53,14 @@
     const archBase=z=>Math.max(19,...[-A,A].map(a=>Math.abs(z-a)<R+4?R+Math.sqrt((R+4)**2-(z-a)**2):19));
     for(const side of [-1,1])patch(176,18,(t,v)=>{const z=-L/2+t*L,bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*sideX(z,sv);return[x,y,noseZ(x,z,y)];},paint,'continuous-wheel-opening-'+s.id);
     const c=shape.cabin.map(p=>[...p]),rear=c[0][0]*L,roofRear=c[1][0]*L,roofFront=c[3][0]*L,front=c[4][0]*L;c[0][1]=(belt(rear)+5)/H;c[4][1]=(belt(front)+5)/H;
-    for(const [start,end]of [[-L/2,rear],[front,L/2]])patch(32,32,(t,u)=>{const z=start+(end-start)*t,a=u*2-1,x=sideX(z,1)*a;return[x,topY(z,a),noseZ(x,z,topY(z,a))];},paint,'formed-hood-deck-'+s.id);
+    for(const [start,end]of [[-L/2,rear],[front,L/2]]){
+      const duct=(s.id==='fox-b'||s.id==='fox-c')&&start===front;
+      const spans=duct?[[start,L*.405,-1,1],[L*.405,L*.46,-1,-.61],[L*.405,L*.46,.61,1],[L*.46,end,-1,1]]:[[start,end,-1,1]];
+      for(const [z0,z1,a0,a1]of spans)patch(32,32,(t,u)=>{const z=z0+(z1-z0)*t,a=a0+(a1-a0)*u,x=sideX(z,1)*a;return[x,topY(z,a),noseZ(x,z,topY(z,a))];},paint,'formed-hood-deck-'+s.id);
+    }
     for(const sign of [-1,1])patch(20,42,(t,u)=>{const z=sign*L/2,a=u*2-1,y=19+(topY(z,a)-19)*t,x=a*sideX(z,(y-19)/(edge(z)-19));return[x,y,noseZ(x,z,y)];},paint,sign>0?'formed-front-bumper':'formed-rear-bumper');
-    patch(36,18,(t,u)=>{const z=rear+(front-rear)*t,a=u*2-1;return[a*width(z)*.94,belt(z)-3,z];},trim,'cabin-waist-cover');
+    // The cabin must remain open above the floor; a waist-height cap hid the interior.
+    patch(36,18,(t,u)=>{const z=rear+(front-rear)*t,a=u*2-1;return[a*width(z)*.90,33,z];},trim,'cabin-floor');
     box([0,21,0],[W*.83,7,L*.91],trim,3);
     const cabin=(z)=>({z,w:W*sample(c,z/L,2),h:H*sample(c,z/L,1)});
     function roofAt(z,a){const p=cabin(z);return[a*p.w,p.h-8*a*a,z];}
@@ -97,7 +103,9 @@
     }
     if(s.id==='fox-b'||s.id==='fox-c'){
       // Dark S-duct aperture on the bonnet, behind its painted leading lip.
-      patch(8,26,(t,u)=>{const z=L*(.405+t*.055),a=(u*2-1)*.61,x=sideX(z,1)*a;return[x,topY(z,a)+.16,noseZ(x,z,topY(z,a))];},trim,'s-duct-bonnet-aperture');
+      patch(8,26,(t,u)=>{const z=L*(.405+t*.055),a=(u*2-1)*.61,x=sideX(z,1)*a;return[x,topY(z,a)-2.8,noseZ(x,z,topY(z,a))];},trim,'s-duct-recessed-channel');
+      for(const end of [.405,.46])patch(3,26,(t,u)=>{const z=L*end,a=(u*2-1)*.61,x=sideX(z,1)*a;return[x,topY(z,a)-2.8*t,noseZ(x,z,topY(z,a))];},paint,'s-duct-painted-lip');
+      for(const side of [-1,1])patch(8,3,(t,u)=>{const z=L*(.405+t*.055),a=side*.61,x=sideX(z,1)*a;return[x,topY(z,a)-2.8*u,noseZ(x,z,topY(z,a))];},trim,'s-duct-side-wall');
       const amber=mat('#c87627',.4);for(const side of [-1,1]){const z=A+R*.73,v=.63,x=side*(sideX(z,v)+.9),y=19+(edge(z)-19)*v;box([x,y,z],[1.2,12,2.4],amber,.4);}
     }
     if(shape.wheelStyle){
@@ -125,7 +133,40 @@
     if(suv&&!s.id.startsWith('fox-'))for(const sign of [-1,1])tube(Array.from({length:25},(_,i)=>{const x=(i/24-.5)*W*.60;return[x,22,noseZ(x,sign*L/2,22)+sign];}),1.4,metal);
     // Seats, dashboard, console, instrument cluster, steering and door cards are actual geometry.
     box([0,31,0],[W*.86,5,L*.60],trim,3);for(const side of [-1,1]){const x=side*W*.23;box([x,53,-L*.015],[46,13,52],leather,6);const seat=box([x,88,-L*.075],[45,64,12],leather,6);seat.rotation.x=-.11;box([x,Math.min(119,cabin(-L*.09).h-14),-L*.09],[25,18,13],leather,4);for(const dx of [-17,17])box([x+dx,57,-L*.015],[7,12,44],leather,3);for(const z of [-L*.12,L*.12])tube([[side*W*.437,50,z-25],[side*W*.435,80,z],[side*W*.434,90,z+25]],2,leather);parts.cabin+=6;}
-    box([0,52,-L*.225],[W*.78,14,46],leather,5);box([0,76,-L*.25],[W*.78,48,12],leather,6);for(const x of [-W*.22,0,W*.22])box([x,Math.min(110,cabin(-L*.25).h-13),-L*.25],[22,15,10],leather,4);box([0,belt(L*.24)-12,L*.22],[W*.84,22,28],leather,4);box([0,62,L*.055],[20,20,60],leather,3);box([0,78,L*.095],[8,12,8],darkMetal,2);box([0,64,-L*.045],[18,9,22],leather,3);const display=box([0,belt(L*.24)-3,L*.19],[25,17,2],trim,1);box([0,belt(L*.24)-3,L*.188],[22,14,.5],mat('#4b7582',.4,{emissive:0x274b5b,emissiveIntensity:.25}),.5);const steering=mesh(new T.TorusGeometry(15.5,1.5,10,40),trim,[-W*.235,belt(L*.22)-5,L*.135],'steering-wheel');steering.rotation.x=-.35;for(const a of [0,2.1,4.2])rod([-W*.235,belt(L*.22)-5,L*.135],[-W*.235+Math.sin(a)*13,belt(L*.22)-5+Math.cos(a)*13,L*.135],1.5,trim);
+    box([0,52,-L*.225],[W*.78,14,46],leather,5);box([0,76,-L*.25],[W*.78,48,12],leather,6);for(const x of [-W*.22,0,W*.22])box([x,Math.min(110,cabin(-L*.25).h-13),-L*.25],[22,15,10],leather,4);
+    const dashY=belt(L*.24)-12,fox=s.id==='fox-b'||s.id==='fox-c',cavira=s.id==='fox-c';
+    // Firewall and inner door cards hide the wheel wells from the passenger compartment.
+    box([0,60,L*.235],[W*.87,62,5],trim,1);
+    box([0,dashY,L*.22],[W*.84,18,28],trim,4);
+    for(const side of [-1,1]){
+      box([side*W*.423,66,-L*.015],[5,58,L*.40],leather,2);
+      box([side*W*.40,70,L*.025],[8,7,46],trim,2);
+      tube([[side*W*.405,84,-L*.13],[side*W*.405,84,L*.12]],.65,metal);
+    }
+    box([0,dashY-10,L*.186],[W*.80,8,5],leather,2);
+    box([0,dashY+1,L*.185],[W*.76,3.5,2],trim,.5);
+    for(let x=-W*.35;x<W*.36;x+=3.2)box([x,dashY+1,L*.181],[.35,2.5,.5],darkMetal,.1);
+    box([0,60,L*.025],[25,22,65],trim,3);
+    box([0,73,-L*.04],[24,8,26],leather,3);
+    for(const z of [L*.035,L*.08]){
+      const cup=mesh(new T.CylinderGeometry(4.7,4.7,1,24),trim,[0,72,z]);
+      const rim=mesh(new T.TorusGeometry(4.9,.55,6,32),metal,[0,72.6,z]);rim.rotation.x=Math.PI/2;
+    }
+    const screenMat=mat('#73929e',.4,{emissive:0x274b5b,emissiveIntensity:.3});
+    const sw=cavira?22:fox?34:25,sh=cavira?38:fox?20:17,sy=cavira?dashY-1:dashY+9;
+    box([0,sy,L*.169],[sw+2,sh+2,2],trim,1);
+    box([0,sy,L*.166],[sw,sh,.5],screenMat,.4);
+    // Original geometric interface, no copied manufacturer screen texture.
+    for(let row=0;row<3;row++)for(let col=0;col<3;col++)box([(col-1)*sw*.27,sy+(row-1)*sh*.24,L*.165],[sw*.19,sh*.14,.2],metal,.3);
+    const sx=W*.235,wy=dashY+7,wz=L*.13;
+    box([sx,dashY+10,L*.19],[25,12,2],trim,1);
+    box([sx,dashY+10,L*.187],[22,9,.5],screenMat,.4);
+    const steering=mesh(new T.TorusGeometry(15.5,1.6,12,56),trim,[sx,wy,wz],'steering-wheel');steering.rotation.x=-.25;
+    box([sx,wy,wz-1],[15,8,5],trim,2);
+    for(const side of [-1,1])rod([sx+side*5,wy,wz],[sx+side*13,wy-2,wz],2,metal);
+    rod([sx,wy-3,wz],[sx,wy-13,wz],1.8,trim);
+    for(let i=0;i<7;i++)box([(i-3)*3,sy-sh/2-2,L*.166],[2.6,1.4,.6],metal,.2);
+
     if(s.id==='fox-d'){for(const x of [-W*.23,W*.23]){box([x,50,-L*.34],[40,12,36],leather,5);box([x,78,-L*.38],[40,44,10],leather,5);box([x,107,-L*.38],[23,15,10],leather,4);}}
     // Closed revolved tyre sections and open alloy barrels expose the brake hardware.
     // These three production references have genuinely different wheel topology.

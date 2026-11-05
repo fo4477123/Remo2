@@ -6,14 +6,14 @@ window.W=(x,y,z=0)=>new T.Vector3(x,z,y);
 window.B1_MODELS={rounded(x,y,w,d,h,m,z,parent){const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,z+h/2,y);parent.add(o);return o;}};
 const status=document.querySelector('#status'),select=document.querySelector('#model'),compare=document.querySelector('#compare'),spin=document.querySelector('#spin');
 try{
-  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261104-import3a';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
+  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261105-cabin1';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
   if(!await B1_VEHICLES.ready)throw Error('Model Y 對照資產載入失敗，請重新整理。');
   await B1_VEHICLE_IMPORTS.ready;
   const renderer=new T.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
   const scene=new T.Scene();scene.background=new T.Color('#dce1e5');
   const camera=new T.PerspectiveCamera(36,innerWidth/innerHeight,1,10000),spherical=new T.Spherical(850,1.3,.5),target=new T.Vector3();
   let drag=null,last=performance.now();
-  const controls={target,autoRotate:false,sync(){spherical.setFromVector3(camera.position.clone().sub(target));},update(){const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;if(this.autoRotate&&!drag)spherical.theta+=dt*.16;spherical.phi=Math.max(.15,Math.min(Math.PI*.49,spherical.phi));spherical.radius=Math.max(300,Math.min(4200,spherical.radius));camera.position.copy(target).add(new T.Vector3().setFromSpherical(spherical));camera.lookAt(target);}};
+  const controls={target,autoRotate:false,sync(){spherical.setFromVector3(camera.position.clone().sub(target));},update(){const now=performance.now(),dt=Math.min(.05,(now-last)/1000);last=now;if(this.autoRotate&&!drag)spherical.theta+=dt*.16;spherical.phi=Math.max(.15,Math.min(Math.PI*.49,spherical.phi));spherical.radius=Math.max(8,Math.min(4200,spherical.radius));camera.position.copy(target).add(new T.Vector3().setFromSpherical(spherical));camera.lookAt(target);}};
   const canvas=renderer.domElement;
   canvas.addEventListener('pointerdown',e=>{if(drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,pan:e.button===2};canvas.setPointerCapture(e.pointerId);});
   canvas.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag.x=e.clientX;drag.y=e.clientY;if(drag.pan){target.x-=Math.cos(spherical.theta)*dx*spherical.radius*.001;target.z+=Math.sin(spherical.theta)*dx*spherical.radius*.001;target.y+=dy*spherical.radius*.001;}else{spherical.theta-=dx*.005;spherical.phi-=dy*.005;}});
@@ -33,6 +33,10 @@ try{
     if(!models.has(id)){const v=B1_TAIWAN_TRAFFIC.create(id,id==='fox-d'?'#7d96a6':id==='fox-k'?'#e0e2de':'#a9b3bc');models.set(id,v);scene.add(v.group);}
     for(const [key,v]of models)v.group.visible=key===id;
     select.value=id;const car=models.get(id),s=car.spec,k=Math.max(1,s.length/490);controls.target.set(0,s.height*.48,0);camera.position.set(...(angle==='side'?[760*k,170*k,0]:angle==='rear'?[390*k,215*k,-690*k]:[390*k,215*k,690*k]));controls.sync();controls.update();
+    camera.near=angle==='interior'?.3:1;camera.updateProjectionMatrix();
+    if(angle==='wheel'){const w=car.wheels[0],p=w.getWorldPosition(new T.Vector3());controls.target.copy(p);camera.position.copy(p).add(new T.Vector3(p.x<0?-135:135,28,60));controls.sync();controls.update();}
+    camera.fov=angle==='interior'?82:36;camera.updateProjectionMatrix();
+    if(angle==='interior'){controls.target.set(-s.width*.08,s.height*.59,s.length*.20);camera.position.set(0,s.height*.78,-s.length*.08);controls.sync();controls.update();}
     document.querySelector('#name').textContent=s.name;document.querySelector('#spec').textContent=`長 ${s.length} × 寬 ${s.width} × 高 ${s.height} cm${s.estimatedDimensions?' · 尺寸為外觀估算':''}`;
     if(id==='model-3'&&s.interpretation)document.querySelector('#spec').textContent+=' · 外部模型載入失敗，暫用備援模型';
     renderer.render(scene,camera);return car;
