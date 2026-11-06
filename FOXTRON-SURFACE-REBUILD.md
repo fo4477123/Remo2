@@ -39,3 +39,11 @@ Rechecked the Bria official brochure pages 2-4 and Cavira official side/front ph
 Rear sail panels now have independent slanted boundaries in the curved side glazing coordinates. Bria has its opaque patterned panel; Cavira has a triangulated quarter-light aperture. Removed overlapping generic rear pillar tubes and relocated the Bria graphic onto its new panel. Analytic bumper normals remove triangulation fan highlights around the intake.
 
 These are still photo-derived approximations; body silhouette, optics and material fidelity are not equivalent to manufacturer CAD or the imported Model 3. Gallery front/profile/hood views expose the current result for comparison.
+
+## Surface and optical fit follow-up
+
+The central inlet recess now blends out before the outboard lamp pockets instead of distorting the entire nose. Front tessellation bounds edge lengths in centimetres to improve narrow-triangle curvature. Rounded projector faces and their reflector borders follow the front surface. The rear spoiler and brake strip now share the revised downward trailing profile.
+
+Rear side and hatch glazing have separate privacy tint. The black canopy has a clear-coated finish; body paint uses a less metallic base. Machined wheel faces no longer overlap the black casting, and radial depth gives the spokes a dished section. Added nose and C-pillar gallery close-ups and a focused --foxtron QA mode.
+
+The remaining broad body silhouette and small trim proportions are still approximate; this update does not establish a factory-accurate reconstruction.

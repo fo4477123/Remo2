@@ -19,11 +19,11 @@
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
     for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);front(head,darkMetal,s.id==='model-3'?1.0:2);line([...head,head[0]],.38,s.nose==='ev'?trim:metal,2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'?.55:1.1,led,2.9));
       const centre=p.head.reduce((a,v)=>[a[0]+v[0]/p.head.length,a[1]+v[1]/p.head.length],[0,0]),lensCount=p.projectors?p.projectors.length:s.id==='fox-d'?0:s.id==='focus'?2:s.id==='kuga'?2:1;for(let i=0;i<lensCount;i++){const x=side*(p.projectors?.[i]?.[0]??(centre[0]+(i?-.08:.04)))*W*.45,y=scale([0,p.projectors?.[i]?.[1]??(centre[1]-.005)])[1];if(p.lensStyle==='foxtron-projector'){
-          const z=frontZ(x,y),w=s.id==='fox-b'?7.8:7.2,h=s.id==='fox-b'?3.5:3.2;
-          box([x,y,z+2.3],[w+1.4,h+1.2,1.6],trim,.8);
-          box([x,y,z+2.7],[w,h,1.3],metal,.7);
-          const lens=box([x,y,z+3.4],[w-1.3,h-.65,.7],led,.6);lamps.push(lens);
-          for(const dx of [-1.6,1.6])box([x+dx,y,z+3.8],[.2,h-.8,.12],metal,.05);
+          const w=s.id==='fox-b'?7.8:7.2,h=s.id==='fox-b'?3.5:3.2;
+          const optic=(width,height,radius,m,depth)=>{const points=[];for(let corner=0;corner<4;corner++){const a0=corner*Math.PI/2,cx=x+(corner===0||corner===3?1:-1)*(width/2-radius),cy=y+(corner<2?1:-1)*(height/2-radius);for(let k=0;k<=5;k++){const a=a0+k/5*Math.PI/2;points.push([cx+radius*Math.cos(a),cy+radius*Math.sin(a)]);}}return poly(points,m,(px,py)=>frontZ(px,py)+depth,'surface-fitted-projector');};
+          optic(w+1.4,h+1.2,.9,trim,2.3);optic(w,h,.8,metal,2.55);
+          lamps.push(optic(w-1.2,h-.65,.7,led,2.8));
+          for(const dx of [-1.6,1.6])poly([[x+dx-.12,y-h*.3],[x+dx+.12,y-h*.3],[x+dx+.12,y+h*.3],[x+dx-.12,y+h*.3]],metal,(px,py)=>frontZ(px,py)+2.95,'projector-optical-divider');
           continue;
         }if(p.lensStyle==='matrix'){const w=s.id==='model-3'?1.5:3.1,h=s.id==='model-3'?.45:1.9;poly([[x-w,y-h],[x+w,y-h],[x+w,y+h],[x-w,y+h]],led,(x,y)=>frontZ(x,y)+2.55,'recessed-led-module');continue;}const lens=mesh(new T.SphereGeometry(1,20,14),metal,[x,y,frontZ(x,y)+2.2],'lamp-reflector');lens.scale.set(s.id==='altis'?4.5:3.7,2.8,1.2);const bulb=mesh(new T.SphereGeometry(1,18,12),led,[x,y,frontZ(x,y)+3.3],'projector-lens');bulb.scale.set(s.id==='altis'?3:2.5,2.1,.7);lamps.push(bulb);}
       if(s.id==='altis'){front(mirror([[.71,.45],[.85,.44],[.88,.21],[.73,.19]]),trim,2);line(mirror([[.69,.47],[.83,.44],[.86,.20],[.73,.19]]),1.35,metal);const fog=mesh(new T.SphereGeometry(3,20,12),led,to3([side*.79,.24],4),'round-foglamp');fog.scale.z=.5;}
