@@ -17,3 +17,11 @@ Changes:
 - Added a hood / S-Duct inspection camera to the gallery.
 
 Visual fidelity still requires refinement: the models remain photo-derived procedural reconstructions. Automated geometry and interaction checks cannot certify an exact factory-body match.
+
+## Panel follow-up
+
+Independent longitudinal bonnet and canopy stations now control Bria and Cavira. The lower front intake is triangulated as a hole in the painted shell, with inner walls and recessed grille components. Spoilers have curved upper and lower surfaces, closed end caps and rear aero blades. Door hollow and shoulder positions vary along the body length.
+
+Cavira rear lower valance, silver lower edge and plate height were additionally checked against a full rear view from the launch event: https://www.mobile01.com/topicdetail.php?f=1562&t=7263119 . This supplements the cropped factory rear photograph; it is not a factory CAD source.
+
+The gallery provides front, side and rear orthographic views and a panel visibility control for inspecting the complete silhouette. These views make remaining mismatches visible and do not constitute proof of exact reproduction.

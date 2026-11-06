@@ -70,4 +70,12 @@
     belt:[[-.5,.715],[-.36,.725],[-.16,.715],[.12,.70],[.27,.665],[.39,.615],[.5,.600]],
     panelDepth:5.6,shoulder:1.0
   });
+  // Individual bonnet and canopy stations, traced against the official side views.
+  shapes['fox-b'].cabin=[[-.474,.73,.43],[-.35,.965,.364],[-.13,1,.355],[.045,.975,.355],[.23,.67,.43]];
+  shapes['fox-c'].cabin=[[-.475,.73,.435],[-.355,.968,.373],[-.12,1,.37],[.055,.984,.37],[.225,.685,.44]];
+  shapes['fox-b'].bonnet=[[.23,.693],[.30,.674],[.37,.642],[.44,.613],[.50,.596]];
+  shapes['fox-c'].bonnet=[[.225,.697],[.30,.675],[.37,.645],[.44,.619],[.50,.600]];
+  // Bumper sections blend depth across the width instead of extruding a wavy slab.
+  shapes['fox-b'].noseSection=[[0,7],[.18,1],[.36,4],[.57,7],[.76,3],[1,6]];
+  shapes['fox-c'].noseSection=[[0,6],[.18,1],[.34,4],[.58,6],[.78,3],[1,6]];
 })();
