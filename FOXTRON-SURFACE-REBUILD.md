@@ -55,3 +55,9 @@ Rechecked the official Cavira side/front and Bria brochure views against gallery
 The flatter arch trim exposed a pre-existing open wheel house; added interior backing behind all four articulated wheels. Regression rays now check that the sky cannot be seen through the gap above each tyre. Removed the bonnet fender-crown function from the rear deck and made the glazing crown taper at both ends, eliminating painted lobes intersecting the rear windscreen.
 
 The models remain procedural approximations. In particular, the exact bumper curvature, door sculpting and rear optical housings still need more faithful reconstruction. Geometry validation does not establish visual parity with the real vehicles.
+
+## Shared rear-glazing boundary
+
+Follow-up to the reported body-line and rear-glass mismatch: the shell used longitudinal end contraction while the glazing remained in uncontracted coordinates. Rear glazing and sail-panel coordinates now use the same end contraction, blended out towards the roof. Their lower edge follows the deck height with a small seal offset. The window sill interpolates full 3D edge coordinates instead of leaving its longitudinal component fixed.
+
+Sectioned side panels now use one moderate door hollow and wheel flare, rather than compounding generic sine displacement, deep panel offsets and shoulder ridges. Rounded upper section stations replace the flat ledge, and the side panels use their own geometric normals. Focused geometry, wheel-house, duct, lettering, LOD and wheel animation checks passed; rear/side screenshots inspected. This repairs the structural mismatch but is not a claim of exact OEM body fidelity.

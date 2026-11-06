@@ -117,4 +117,7 @@
   p['fox-c'].drl=[[.012,.597],[.55,.596],[.82,.594],[.96,.590]];
   p['fox-b'].head=[[.60,.599],[.97,.594],[.95,.504],[.78,.501],[.65,.523]];
   p['fox-c'].head=[[.60,.602],[.97,.598],[.95,.536],[.78,.529],[.64,.551]];
+  // Gentle continuous shoulder sections. The old layered sine / crease /
+  // hollow offsets compounded into an exaggerated inward bow of the doors.
+  for(const id of ['fox-b','fox-c'])shapes[id].sideSection=[[0,.94],[.12,.96],[.28,.955],[.50,.975],[.73,1],[.88,.995],[.95,.982],[.985,.960],[1,.935]];
 })();

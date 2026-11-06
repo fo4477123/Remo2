@@ -28,7 +28,7 @@
     function patch(rows,cols,fn,m,name,cut=null){const p=[],idx=[],uv=[];for(let i=0;i<=rows;i++)for(let j=0;j<=cols;j++){p.push(...fn(i/rows,j/cols));uv.push(j/cols,i/rows);}for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){if(cut?.((i+.5)/rows,(j+.5)/cols))continue;const a=i*(cols+1)+j;idx.push(a,a+cols+1,a+1,a+1,a+cols+1,a+cols+2);}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
       // Match the tangent at bonnet/shoulder and bumper joins. Separate patch
       // boundaries must not make a continuous painted surface look folded.
-      if(name.startsWith('continuous-wheel')||(name.startsWith('formed-hood')&&!shape.sectionedBody)||name.startsWith('formed-front')||name.startsWith('formed-rear')){
+      if((!shape.sectionedBody&&name.startsWith('continuous-wheel'))||(name.startsWith('formed-hood')&&!shape.sectionedBody)||name.startsWith('formed-front')||name.startsWith('formed-rear')){
         const normals=g.attributes.normal,positions=g.attributes.position;
         for(let i=0;i<=rows;i++)for(let j=0;j<=cols;j++){
           const k=i*(cols+1)+j,x=positions.getX(k),z=positions.getZ(k),n=new T.Vector3(normals.getX(k),normals.getY(k),normals.getZ(k));
@@ -53,7 +53,11 @@
       }
       const corner=(s.id==='model-3'?34:28)*Math.pow(Math.abs(x)/(W/2),4);return corner+(s.id==='model-3'?10:12)*Math.pow((v-.46)/.54,2);};
     const noseZ=(x,z,y=45)=>z-Math.sign(z)*Math.pow(Math.abs(z)/(L/2),12)*endInset(x,y,Math.sign(z));
-    const sideX=(z,v)=>width(z)*(shape.sectionedBody?sample(shape.sideSection,Math.max(0,Math.min(1,v))):(.91+.09*Math.sin(v*Math.PI*.79)))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
+    const sideX=(z,v)=>shape.sectionedBody?
+      width(z)*sample(shape.sideSection,Math.max(0,Math.min(1,v)))
+      +1.4*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/48,2))))*Math.exp(-Math.pow((v-.63)/.32,2))
+      -(s.id==='fox-b'?4:3.5)*Math.exp(-Math.pow((v-(.29+.10*Math.exp(-Math.pow((z+A*.7)/70,2))))/.24,2))*Math.exp(-Math.pow(z/(A*.92),4)):
+      width(z)*(.91+.09*Math.sin(v*Math.PI*.79))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
       -(shape.panelDepth||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.29+.13*Math.exp(-Math.pow((z+A*.7)/60,2)):.34))/.20,2))*Math.exp(-Math.pow(z/(A*.83),6))
       +(shape.shoulder||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.76-.12*z/L:.80))/.105,2))*Math.exp(-Math.pow(z/(L*.46),6));
     const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?(z<0?1.5*(1-u*u)-1.5*Math.pow(u,4):2.5*(1-u*u)+4.5*Math.exp(-Math.pow((Math.abs(u)-.78)/.19,2))-3*Math.pow(Math.abs(u),8)):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
@@ -105,9 +109,10 @@
     const cabin=(z)=>({z,w:W*sample(c,z/L,2),h:H*sample(c,z/L,1)});
     const privacyGlass=glass.clone();privacyGlass.color.set('#202c33');privacyGlass.opacity=.94;
     const glassCrown=z=>shape.sectionedBody?8-6*Math.max(Math.exp(-Math.pow((z-rear)/22,2)),Math.exp(-Math.pow((z-front)/22,2))):8;
-    function roofAt(z,a){const p=cabin(z);return[a*p.w,p.h-glassCrown(z)*a*a,z];}
-    function glassSide(z,v,side){const p=cabin(z),base=belt(z)+1,crown=glassCrown(z);return[side*(p.w+(width(z)*.916-p.w)*v+2.4*Math.sin(v*Math.PI)),p.h-crown+(base-p.h+crown)*v,z];}
-    for(const z of [rear,front])patch(3,32,(t,u)=>{const a=u*2-1,top=roofAt(z,a),x=sideX(z,1)*a,y=topY(z,a),end=[x,y,noseZ(x,z,y)];return top.map((v,i)=>v*(1-t)+end[i]*t);},paint,'sealed-glazing-cowl');
+    const rearBlend=z=>shape.sectionedBody?Math.pow(Math.max(0,Math.min(1,(roofRear-z)/(roofRear-rear))),3):0;
+    function roofAt(z,a){const p=cabin(z),x=a*p.w,b=rearBlend(z),end=cabin(rear),target=topY(rear,a*end.w/sideX(rear,1))+.25,y=p.h-glassCrown(z)*a*a+b*(target-(end.h-glassCrown(rear)*a*a));return[x,y,z+b*(noseZ(x,z,y)-z)];}
+    function glassSide(z,v,side){const p=cabin(z),x=side*(p.w+(width(z)*.916-p.w)*v+2.4*Math.sin(v*Math.PI)),b=rearBlend(z),base=(belt(z)+1)*(1-b)+(topY(z,x/sideX(z,1))+.25)*b,top=roofAt(z,side),y=top[1]+(base-top[1])*v;return[x,y,z+b*(noseZ(x,z,y)-z)];}
+    for(const z of [rear,front])patch(3,32,(t,u)=>{const a=u*2-1,top=roofAt(z,a),x=sideX(z,1)*a,y=topY(z,a),end=[x,y,noseZ(x,z,y)];return top.map((v,i)=>v*(1-t)+end[i]*t);},shape.sectionedBody&&z===rear?trim:paint,'sealed-glazing-cowl');
     patch(18,32,(t,u)=>roofAt(rear+(roofRear-rear)*t,u*2-1),shape.sectionedBody?privacyGlass:glass,'rear-glass-'+s.id);
     patch(32,32,(t,u)=>roofAt(roofRear+(roofFront-roofRear)*t,u*2-1),s.id==='model-3'?roofGlass:roofPaint,'roof-crown-'+s.id);
     patch(22,32,(t,u)=>roofAt(roofFront+(front-roofFront)*t,u*2-1),glass,'windscreen-'+s.id);
@@ -117,7 +122,7 @@
         patch(40,16,(t,v)=>glassSide(rear+(split-rear)*t,v,side),privacyGlass,'rear-privacy-glazing');
         patch(40,16,(t,v)=>glassSide(split+(front-split)*t,v,side),glass,'front-door-glazing');
       }else patch(64,10,(t,v)=>glassSide(rear+(front-rear)*t,v,side),glass,'window-outline-'+s.id);
-      patch(64,8,(t,v)=>{const z=rear+(front-rear)*t,q=glassSide(z,1,side);return[side*sideX(z,1)*(1-v)+q[0]*v,edge(z)*(1-v)+q[1]*v,z];},paint,'closed-window-sill-'+s.id);
+      patch(64,8,(t,v)=>{const z=rear+(front-rear)*t,q=glassSide(z,1,side),x=side*sideX(z,1),body=[x,edge(z),shape.sectionedBody?noseZ(x,z,edge(z)):z];return body.map((n,i)=>n*(1-v)+q[i]*v);},paint,'closed-window-sill-'+s.id);
       // Painted C pillar, black B pillar and the individual rear quarter window.
       if(shape.sail){
         const sail=shape.sail,outline=[[rear/L,0],[sail.top,0],[sail.bottom,1],[rear/L,1]].map(p=>new T.Vector2(...p)),hole=(sail.quarter||[]).map(p=>new T.Vector2(...p)),vertices=[...outline,...hole],tri=T.ShapeUtils.triangulateShape(outline,hole.length?[hole]:[]),pos=[];
