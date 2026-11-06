@@ -78,4 +78,13 @@
   // Bumper sections blend depth across the width instead of extruding a wavy slab.
   shapes['fox-b'].noseSection=[[0,7],[.18,1],[.36,4],[.57,7],[.76,3],[1,6]];
   shapes['fox-c'].noseSection=[[0,6],[.18,1],[.34,4],[.58,6],[.78,3],[1,6]];
+  // Separate the front S-Duct mouth from the two outboard lamp housings.
+  p['fox-b'].ductInlet=[[-.67,.584],[.67,.584],[.61,.534],[-.61,.534]];
+  p['fox-c'].ductInlet=[[-.66,.589],[.66,.589],[.60,.544],[-.60,.544]];
+  p['fox-b'].head=[[.64,.613],[.97,.632],[.94,.515],[.76,.512],[.64,.548]];
+  p['fox-b'].drl=[[.018,.606],[.92,.620]];
+  p['fox-b'].projectors=[[.82,.575],[.82,.544]];
+  p['fox-c'].head=[[.64,.606],[.97,.623],[.94,.551],[.77,.548],[.64,.576]];
+  p['fox-c'].projectors=[[.78,.573],[.88,.582]];
+  p['fox-b'].lensStyle=p['fox-c'].lensStyle='foxtron-projector';
 })();

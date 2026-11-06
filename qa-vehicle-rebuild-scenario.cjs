@@ -6,6 +6,10 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
     if(id==='fox-t'){assert(report.size[1]<=321,'Model T has no elevated rooftop pack');assert.equal(await ev("B1_VEHICLE_GALLERY.models.get('fox-t').group.userData.batteryLocation"),'chassis');}
     if(id==='fox-b')assert(await ev("B1_VEHICLE_GALLERY.models.get('fox-b').spec.name.includes('Bria')"));
     if(id==='fox-c')assert(await ev("B1_VEHICLE_GALLERY.models.get('fox-c').spec.name.includes('Cavira')"));
+    if(id==='fox-b'||id==='fox-c'){
+      const mouth=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)}),s=c.spec,p=B1_VEHICLE_FACES.profiles[s.id],y=(p.ductInlet[0][1]+p.ductInlet[2][1])*s.height/2;c.group.updateMatrixWorld(true);const ray=new T.Raycaster(new T.Vector3(0,y,s.length/2+30),new T.Vector3(0,0,-1)),hits=ray.intersectObject(c.high,true);return {firstDepth:hits[0]?.distance,lamps:c.lamps.length};})()`);
+      console.log(id,'front duct',mouth);assert(mouth.firstDepth>40,id+' forward duct mouth has no surface cap');assert(mouth.lamps>=1,id+' headlight meshes survive material batching');
+    }
     if(id==='model-3'){
       assert(report.features.includes('licensed-2018-model'),'Downloaded Model 3 is actually used');
       assert(await ev("Math.abs(new T.Box3().setFromObject(B1_VEHICLE_GALLERY.models.get('model-3').high).getSize(new T.Vector3()).z-469.4)<2"),'Imported Model 3 length is in centimetres');

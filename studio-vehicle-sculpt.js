@@ -73,7 +73,7 @@
       for(let i=1;i<=32;i++){const v=i/32,y=19+(topY(z,1)-19)*v;outline.push(new T.Vector2(sideX(z,v),y));}
       for(let i=1;i<=48;i++){const a=1-2*i/48;outline.push(new T.Vector2(a*sideX(z,1),topY(z,a)));}
       for(let i=31;i>0;i--){const v=i/32,y=19+(topY(z,-1)-19)*v;outline.push(new T.Vector2(-sideX(z,v),y));}
-      const hole=profile.grille.map(([x,y])=>new T.Vector2(x*W*.45,y*H)),all=[...outline,...hole],tri=T.ShapeUtils.triangulateShape(outline,[hole]),pos=[];
+      const hole=profile.grille.map(([x,y])=>new T.Vector2(x*W*.45,y*H)),mouth=profile.ductInlet.map(([x,y])=>new T.Vector2(x*W*.45,y*H)),all=[...outline,...hole,...mouth],tri=T.ShapeUtils.triangulateShape(outline,[hole,mouth]),pos=[];
       for(const ids of tri){const [a,b,c]=ids.map(i=>all[i]),point=(i,j)=>{const x=a.x+(b.x-a.x)*i/8+(c.x-a.x)*j/8,y=a.y+(b.y-a.y)*i/8+(c.y-a.y)*j/8;return[x,y,noseZ(x,z,y)];};for(let i=0;i<8;i++)for(let j=0;j<8-i;j++){pos.push(...point(i,j),...point(i+1,j),...point(i,j+1));if(i+j<7)pos.push(...point(i+1,j),...point(i+1,j+1),...point(i,j+1));}}
       const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();smoothNormals(g);mesh(g,paint,[0,0,0],'perforated-front-bumper');
       for(let i=0;i<hole.length;i++){const a=hole[i],b=hole[(i+1)%hole.length];patch(4,20,(t,u)=>{const x=a.x+(b.x-a.x)*u,y=a.y+(b.y-a.y)*u;return[x,y,noseZ(x,z,y)-5*t];},trim,'recessed-intake-wall');}
@@ -147,7 +147,12 @@
     if(s.id==='fox-b'||s.id==='fox-c'){
       // Dark S-duct aperture on the bonnet, behind its painted leading lip.
       for(const wall of [0,1])patch(12,64,(t,u)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),z=wall?lip:back,x=sideX(z,1)*a,y=topY(z,a)-duct.depth*t;return[x,y,noseZ(x,z,topY(z,a))];},paint,'s-duct-inner-wall');
-      patch(12,64,(t,u)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),z=back+(lip-back)*t,x=sideX(z,1)*a;return[x,topY(z,a)-duct.depth-1.5*Math.sin(t*Math.PI),noseZ(x,z,topY(z,a))];},trim,'s-duct-curved-throat');
+      // Connect the forward-facing mouth to the bonnet outlet. No front cap or
+      // shallow pocket closes the channel between the two openings.
+      const mouth=profile.ductInlet,entryTop=mouth[0][1]*H,entryBottom=mouth[2][1]*H;
+      const passage=(t,u,upper)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),outZ=upper?lip:back,outX=sideX(outZ,1)*a,outY=topY(outZ,a)-duct.depth,inX=(u*2-1)*(upper?mouth[1][0]:mouth[2][0])*W*.45,inY=upper?entryTop:entryBottom,inZ=noseZ(inX,L/2,inY),x=inX+(outX-inX)*t,y=inY+(outY-inY)*t,z=inZ+(noseZ(outX,outZ,topY(outZ,a))-inZ)*t;return[x,y,z];};
+      for(const upper of [false,true])patch(32,64,(t,u)=>passage(t,u,upper),trim,'s-duct-connected-'+(upper?'roof':'floor'));
+      for(const side of [0,1])patch(32,8,(t,v)=>{const a=passage(t,side,false),b=passage(t,side,true);return a.map((n,i)=>n+(b[i]-n)*v);},trim,'s-duct-connected-side');
       const amber=mat('#c87627',.4);for(const side of [-1,1]){const z=A+R*.73,v=.63,x=side*(sideX(z,v)+.9),y=19+(edge(z)-19)*v;box([x,y,z],[1.2,12,2.4],amber,.4);}
     }
     if(shape.wheelStyle){

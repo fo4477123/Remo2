@@ -25,3 +25,9 @@ Independent longitudinal bonnet and canopy stations now control Bria and Cavira.
 Cavira rear lower valance, silver lower edge and plate height were additionally checked against a full rear view from the launch event: https://www.mobile01.com/topicdetail.php?f=1562&t=7263119 . This supplements the cropped factory rear photograph; it is not a factory CAD source.
 
 The gallery provides front, side and rear orthographic views and a panel visibility control for inspecting the complete silhouette. These views make remaining mismatches visible and do not constitute proof of exact reproduction.
+
+## Forward S-Duct inlet repair
+
+The previous bonnet outlet was a pocket behind an intact front fascia. The upper forward mouth is now a second hole in the triangulated bumper shell, connected to the bonnet outlet by upper, lower and side tunnel surfaces. The old pocket floor is removed. A frontal ray at the inlet midpoint must travel beyond the fascia plane before hitting the inner channel.
+
+The two outboard headlamp housings no longer span the center mouth. Bria uses vertically stacked reflector/lens units; Cavira uses horizontal pairs. Running-light ribbons remain separate from the housings. The projector meshes use the existing headlight batching/clone path.
