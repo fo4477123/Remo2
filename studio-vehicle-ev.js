@@ -111,4 +111,10 @@
     for(const key of ['head','drl','projectors'])p[id][key]=p[id][key].map(([x,y])=>[x,y-.012]);
     p[id].ductInlet=p[id].ductInlet.map(([x,y],i)=>[x,y-(i<2?.012:0)]);
   }
+  // The outboard signature follows the leading bonnet edge downward; the
+  // previous rising ribbon protruded above the actual painted silhouette.
+  p['fox-b'].drl=[[.012,.593],[.55,.592],[.82,.590],[.96,.587]];
+  p['fox-c'].drl=[[.012,.597],[.55,.596],[.82,.594],[.96,.590]];
+  p['fox-b'].head=[[.60,.599],[.97,.594],[.95,.504],[.78,.501],[.65,.523]];
+  p['fox-c'].head=[[.60,.602],[.97,.598],[.95,.536],[.78,.529],[.64,.551]];
 })();

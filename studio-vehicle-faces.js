@@ -16,6 +16,12 @@
     const grilleZ=(x,y)=>frontZ(x,y)-(s.id==='fox-b'||s.id==='fox-c'?6:0);
     const gs=p.grille.map(scale),xs=gs.map(p=>p[0]),ys=gs.map(p=>p[1]);for(let y=Math.min(...ys)+4,row=0;y<Math.max(...ys)-3;y+=5.5,row++)for(let x=Math.min(...xs)+3;x<Math.max(...xs)-2;x+=8){const q=[x+(row%2?4:0),y];if(!inside(q,gs))continue;if(p.pattern==='body-color-perforated'){const w=s.id==='fox-d'?4.5:5.2,h=s.id==='fox-d'?1.8:2.5;poly([[q[0]-w/2,y-h/2],[q[0]+w/2,y-h/2],[q[0]+w/2,y+h/2],[q[0]-w/2,y+h/2]],trim,(x,y)=>grilleZ(x,y)+.85,'recessed-grille-perforation');}else if(p.pattern==='slats'||p.pattern==='horizontal-shield'){box([q[0],y,grilleZ(q[0],y)+2],[7.4,p.pattern==='slats'?1:2,1],darkMetal,.35);}else if(p.pattern==='vertical-mesh'){box([q[0],y,grilleZ(q[0],y)+2],[.7,5.2,1],metal,.25);box([q[0],y,grilleZ(q[0],y)+1.8],[7,.65,.8],darkMetal,.2);}else{const points=Array.from({length:7},(_,i)=>[q[0]+3.4*Math.sin(i*Math.PI/3),y+2.15*Math.cos(i*Math.PI/3),grilleZ(q[0],y)+2]);tube(points,p.pattern==='body-color-perforated'?1.1:.45,p.pattern==='body-color-perforated'?paint:darkMetal);}}
     if(p.pattern==='v-motion')line([[-.55,.59],[-.43,.41],[-.28,.32],[.28,.32],[.43,.41],[.55,.59]],2.5,metal);
+    // A smoked optical bridge supports the light guide across the centre
+    // inlet; the luminous ribbon must not appear suspended above the bonnet.
+    if(s.id==='fox-b'||s.id==='fox-c')for(const sign of [-1,1]){
+      const top=p.drl.map(([x,y])=>[sign*x,y+.006]),bottom=[...p.drl].reverse().map(([x,y])=>[sign*x,y-.011]);front([...top,...bottom],trim,1.6);
+    }
+    if(s.id==='fox-b')for(const sign of [-1,1])front([[.90,.508],[.97,.51],[.94,.18],[.85,.18],[.87,.36]].map(([x,y])=>[sign*x,y]),trim,.9);
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
     for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);front(head,darkMetal,s.id==='model-3'?1.0:2);line([...head,head[0]],.38,s.nose==='ev'?trim:metal,2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'?.55:1.1,led,2.9));
       const centre=p.head.reduce((a,v)=>[a[0]+v[0]/p.head.length,a[1]+v[1]/p.head.length],[0,0]),lensCount=p.projectors?p.projectors.length:s.id==='fox-d'?0:s.id==='focus'?2:s.id==='kuga'?2:1;for(let i=0;i<lensCount;i++){const x=side*(p.projectors?.[i]?.[0]??(centre[0]+(i?-.08:.04)))*W*.45,y=scale([0,p.projectors?.[i]?.[1]??(centre[1]-.005)])[1];if(p.lensStyle==='foxtron-projector'){

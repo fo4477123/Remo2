@@ -56,7 +56,7 @@
     const sideX=(z,v)=>width(z)*(shape.sectionedBody?sample(shape.sideSection,Math.max(0,Math.min(1,v))):(.91+.09*Math.sin(v*Math.PI*.79)))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
       -(shape.panelDepth||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.29+.13*Math.exp(-Math.pow((z+A*.7)/60,2)):.34))/.20,2))*Math.exp(-Math.pow(z/(A*.83),6))
       +(shape.shoulder||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.76-.12*z/L:.80))/.105,2))*Math.exp(-Math.pow(z/(L*.46),6));
-    const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?2.5*(1-u*u)+4.5*Math.exp(-Math.pow((Math.abs(u)-.78)/.19,2))-3*Math.pow(Math.abs(u),8):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
+    const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?(z<0?1.5*(1-u*u)-1.5*Math.pow(u,4):2.5*(1-u*u)+4.5*Math.exp(-Math.pow((Math.abs(u)-.78)/.19,2))-3*Math.pow(Math.abs(u),8)):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
     // Continuous curved body skin, separately formed wheel shoulders, recessed sill and hood crown.
     const archBase=z=>Math.max(19,...[-A,A].map(a=>Math.abs(z-a)<R+4?R+Math.sqrt((R+4)**2-(z-a)**2):19));
     for(const side of [-1,1])patch(176,18,(t,v)=>{const z=-L/2+t*L,bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*sideX(z,sv);return[x,y,noseZ(x,z,y)];},paint,'continuous-wheel-opening-'+s.id);
@@ -104,8 +104,9 @@
     box([0,21,0],[W*.83,7,L*.91],trim,3);
     const cabin=(z)=>({z,w:W*sample(c,z/L,2),h:H*sample(c,z/L,1)});
     const privacyGlass=glass.clone();privacyGlass.color.set('#202c33');privacyGlass.opacity=.94;
-    function roofAt(z,a){const p=cabin(z);return[a*p.w,p.h-8*a*a,z];}
-    function glassSide(z,v,side){const p=cabin(z),base=belt(z)+1;return[side*(p.w+(width(z)*.916-p.w)*v+2.4*Math.sin(v*Math.PI)),p.h-8+(base-p.h+8)*v,z];}
+    const glassCrown=z=>shape.sectionedBody?8-6*Math.max(Math.exp(-Math.pow((z-rear)/22,2)),Math.exp(-Math.pow((z-front)/22,2))):8;
+    function roofAt(z,a){const p=cabin(z);return[a*p.w,p.h-glassCrown(z)*a*a,z];}
+    function glassSide(z,v,side){const p=cabin(z),base=belt(z)+1,crown=glassCrown(z);return[side*(p.w+(width(z)*.916-p.w)*v+2.4*Math.sin(v*Math.PI)),p.h-crown+(base-p.h+crown)*v,z];}
     for(const z of [rear,front])patch(3,32,(t,u)=>{const a=u*2-1,top=roofAt(z,a),x=sideX(z,1)*a,y=topY(z,a),end=[x,y,noseZ(x,z,y)];return top.map((v,i)=>v*(1-t)+end[i]*t);},paint,'sealed-glazing-cowl');
     patch(18,32,(t,u)=>roofAt(rear+(roofRear-rear)*t,u*2-1),shape.sectionedBody?privacyGlass:glass,'rear-glass-'+s.id);
     patch(32,32,(t,u)=>roofAt(roofRear+(roofFront-roofRear)*t,u*2-1),s.id==='model-3'?roofGlass:roofPaint,'roof-crown-'+s.id);
@@ -134,8 +135,12 @@
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,0,side)),1.05,roofPaint);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,1,side)),.7,['altis','kuga'].includes(s.id)?metal:trim);
       // Body creases follow the real rising belt line, with long lower-door concavity.
-      tube(Array.from({length:30},(_,i)=>{const z=-L*.39+L*.77*i/29,v=shape.sectionedBody?.76-.12*z/L:.80;return[side*(sideX(z,v)+.25),19+(edge(z)-19)*v,z];}),.25,paint);
-      tube(Array.from({length:22},(_,i)=>{const z=-L*.30+L*.59*i/21;return[side*(sideX(z,.18)+.3),19+(edge(z)-19)*.18,z];}),suv?2:1.2,suv?trim:paint);
+      if(!shape.sectionedBody){
+        tube(Array.from({length:30},(_,i)=>{const z=-L*.39+L*.77*i/29,v=.80;return[side*(sideX(z,v)+.25),19+(edge(z)-19)*v,z];}),.25,paint);
+        tube(Array.from({length:22},(_,i)=>{const z=-L*.30+L*.59*i/21;return[side*(sideX(z,.18)+.3),19+(edge(z)-19)*.18,z];}),suv?2:1.2,suv?trim:paint);
+      }else{
+        patch(48,6,(t,u)=>{const z=-A+R+4+t*(2*A-2*R-8),v=u*.095;return[side*(sideX(z,v)+.45),19+(edge(z)-19)*v,z];},trim,'formed-rocker-cladding');
+      }
       for(const seamZ of [-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
       for(const z of [-L*.175,L*.12]){
         const x=side*(sideX(z,.90)+.7),y=19+(edge(z)-19)*.90;
@@ -143,7 +148,16 @@
         else box([x,y,z],[1.8,2.7,15],s.id==='model-3'?trim:s.id==='kicks'||s.id==='altis'?metal:paint,1);
       }
       for(const axle of [-A,A]){
-        const arch=Array.from({length:37},(_,i)=>{const a=i/36*Math.PI,y=R+Math.sin(a)*(R+4.2),z=axle+Math.cos(a)*(R+4.2);const sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)+.25);return[x,y,noseZ(x,z,y)];});tube(arch,suv?3:1.05,suv?trim:paint);
+        if(shape.sectionedBody){
+          // Close the inside of the wheel house behind the articulated wheel.
+          // The old upper strip left the opposite sky visible around the tyre.
+          const radius=R+8,angle=Math.asin((R-19)/radius),pos=[],x=side*(W/2-27);
+          for(let i=0;i<72;i++){const a=-angle+(Math.PI+2*angle)*i/72,b=-angle+(Math.PI+2*angle)*(i+1)/72;pos.push(x,R,axle,x,R+radius*Math.sin(a),axle+radius*Math.cos(a),x,R+radius*Math.sin(b),axle+radius*Math.cos(b));}
+          const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();mesh(g,trim,[0,0,0],'closed-wheel-house');
+        }
+        const arch=Array.from({length:37},(_,i)=>{const a=i/36*Math.PI,y=R+Math.sin(a)*(R+4.2),z=axle+Math.cos(a)*(R+4.2);const sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)+.25);return[x,y,noseZ(x,z,y)];});
+        if(shape.sectionedBody)patch(64,8,(t,u)=>{const a=t*Math.PI,r=R+4.1+3.6*u,y=R+Math.sin(a)*r,z=axle+Math.cos(a)*r,sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)+.4+Math.sin(u*Math.PI)*.65);return[x,y,noseZ(x,z,y)];},trim,'flat-wheel-arch-cladding');
+        else tube(arch,suv?3:1.05,suv?trim:paint);
         // Wheel-well backing closes the cut edge without an opaque cylinder through the tyre.
         patch(24,5,(t,v)=>{const a=t*Math.PI,z=axle+Math.cos(a)*(R+4.3),y=R+Math.sin(a)*(R+4.3);const sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-v*14);return[x,y,noseZ(x,z,y)];},trim,'inner-arch');
       }

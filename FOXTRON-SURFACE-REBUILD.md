@@ -47,3 +47,11 @@ The central inlet recess now blends out before the outboard lamp pockets instead
 Rear side and hatch glazing have separate privacy tint. The black canopy has a clear-coated finish; body paint uses a less metallic base. Machined wheel faces no longer overlap the black casting, and radial depth gives the spokes a dished section. Added nose and C-pillar gallery close-ups and a focused --foxtron QA mode.
 
 The remaining broad body silhouette and small trim proportions are still approximate; this update does not establish a factory-accurate reconstruction.
+
+## Contour and shell closure follow-up
+
+Rechecked the official Cavira side/front and Bria brochure views against gallery renders. Lowered the outboard DRL to follow the bonnet leading edge and added its smoked bridge. Bria now includes the outboard black air-curtain regions. Replaced the cylindrical rocker and arch trim with formed surface strips.
+
+The flatter arch trim exposed a pre-existing open wheel house; added interior backing behind all four articulated wheels. Regression rays now check that the sky cannot be seen through the gap above each tyre. Removed the bonnet fender-crown function from the rear deck and made the glazing crown taper at both ends, eliminating painted lobes intersecting the rear windscreen.
+
+The models remain procedural approximations. In particular, the exact bumper curvature, door sculpting and rear optical housings still need more faithful reconstruction. Geometry validation does not establish visual parity with the real vehicles.

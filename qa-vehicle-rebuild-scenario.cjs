@@ -11,6 +11,8 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
       console.log(id,'front duct',mouth);assert(mouth.firstDepth>40,id+' forward duct mouth has no surface cap');assert(mouth.lamps>=1,id+' headlight meshes survive material batching');
       const ramp=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)});let badge;c.high.traverse(o=>{if(o.name==='ramp-conforming-foxtron-wordmark')badge=o;});if(!badge)return null;const p=badge.geometry.attributes.position,z=Array.from({length:p.count},(_,i)=>p.getZ(i));return {depth:Math.max(...z)-Math.min(...z),vertices:p.count};})()`);
       assert(ramp&&ramp.depth>1&&ramp.vertices>100,id+' wordmark follows inclined surface instead of a flat plane');
+      const wells=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)}),s=c.spec,r=B1_VEHICLE_SCULPT.shapes[s.id].wheelRadius;c.group.updateMatrixWorld(true);return [-1,1].flatMap(side=>[-1,1].map(axle=>{const ray=new T.Raycaster(new T.Vector3(side*(s.width+20),2*r+2,axle*s.axle/2),new T.Vector3(-side,0,0));return ray.intersectObject(c.high,true)[0]?.distance??Infinity;}));})()`);
+      assert(wells.every(d=>Number.isFinite(d)&&d<190),id+' wheel houses block the background above all four tyres');
     }
     if(id==='model-3'){
       assert(report.features.includes('licensed-2018-model'),'Downloaded Model 3 is actually used');
