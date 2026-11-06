@@ -7,7 +7,7 @@ module.exports=async({ev,cdp,sleep,shot,assert,key})=>{
   // Find a clear street pose, replace a stopped traffic instance with each new body,
   // then use F and W through the actual game handlers. No synthetic mount API.
   await ev(`window.__ownedBefore=B1_CITY.ownedVehicle();window.__trafficBefore=B1_CITY.traffic().cars.length`);
-  for(const id of ['fox-d','model-3','fox-k','fox-t']){
+  for(const id of ['fox-b','fox-c','fox-d','model-3','fox-k','fox-t']){
     await ev(`B1_CITY.dismount();keys.clear()`);
     const setup=await ev(`(()=>{const traffic=B1_CITY.traffic(),c=traffic.cars.find(c=>c.p&&c.vehicle.group.visible&&c.path&&c.path.length-c.s>45);if(!c)return false;c.speed=0;const old=c.vehicle,v=B1_TAIWAN_TRAFFIC.create(${JSON.stringify(id)},'#a9b3bc');old.group.parent.add(v.group);v.group.position.copy(old.group.position);v.group.rotation.copy(old.group.rotation);old.group.removeFromParent();c.vehicle=v;v.group.visible=true;let standing=null;for(const [dx,dy]of [[300,0],[-300,0],[0,300],[0,-300]])if(B1_CITY.pedestrianClear(c.p[0]+dx,c.p[1]+dy,30)){standing=[c.p[0]+dx,c.p[1]+dy];break;}if(!standing)return false;walkX=standing[0];walkY=standing[1];window.dispatchEvent(new KeyboardEvent('keydown',{key:'f'}));return B1_CITY.snapshot().mode;})()`);
     assert.equal(setup,'borrowed',id+' takeover');await sleep(100);await key('h');

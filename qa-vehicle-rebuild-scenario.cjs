@@ -12,7 +12,7 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
       const asset=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get('model-3');return {name:c.spec.name,lamps:c.lamps.length,parts:c.wheels.map(w=>w.children.length),pivots:c.wheels.map(w=>w.position.toArray())};})()`);
       assert(asset.name.includes('2018')&&!asset.name.includes('Highland'));assert(asset.lamps>=2);assert(asset.parts.every(n=>n>0));assert.equal(new Set(asset.pivots.map(p=>Math.sign(p[0])+','+Math.sign(p[2]))).size,4,'One pivot in each wheel quadrant');
     }
-    for(const angle of ['front','side','rear',...(['fox-b','fox-c','model-3'].includes(id)?['wheel','interior']:[])]){await ev(`B1_VEHICLE_GALLERY.show(${JSON.stringify(id)},${JSON.stringify(angle)});true`);await shot(id+'-'+angle);}
+    for(const angle of ['front','side','rear',...(['fox-b','fox-c','model-3'].includes(id)?['hood','wheel','interior']:[])]){await ev(`B1_VEHICLE_GALLERY.show(${JSON.stringify(id)},${JSON.stringify(angle)});true`);await shot(id+'-'+angle);}
     if(id!=='model-y'){
       const lod=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)});c.setDetail(false);const far=c.detail();c.setDetail(true);const near=c.detail(),before=c.wheels.map(w=>w.rotation.x);c.animateWheels(.5);return {far,near,rotates:c.wheels.every((w,i)=>Math.abs(w.rotation.x-before[i]-.5)<.001)};})()`);assert(!lod.far&&lod.near&&lod.rotates,id+' LOD / rolling');
     }

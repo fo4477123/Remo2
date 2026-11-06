@@ -52,4 +52,22 @@
   Object.assign(shapes['fox-b'],{productionPillars:true,blackMirrors:true});
   p['fox-b'].source='https://www-assets.cloud.foxtronev.com/files/specifications/bria/en/FOXTRON-BRIA-Brochure-EN-2026-v2.pdf';
   for(const key of ['head','drl','projectors'])p['fox-b'][key]=p['fox-b'][key].map(([x,y])=>[x,y*.93]);
+  // Photo-derived section controls in centimetres / fractions of body dimensions.
+  // These are modelling controls, not manufacturer CAD measurements.
+  Object.assign(shapes['fox-b'],{
+    sectionedBody:true,duct:{rear:.433,front:.463,half:.77,depth:7.5},
+    sideSection:[[0,.89],[.14,.94],[.32,.925],[.50,.955],[.73,1.012],[.88,1.015],[1,.975]],
+    noseSection:[[0,6],[.18,0],[.36,3],[.57,12],[.76,7],[1,10]],
+    tailSection:[[0,9],[.22,1],[.40,2],[.60,13],[.80,8],[1,14]],
+    belt:[[-.5,.72],[-.35,.73],[-.15,.705],[.12,.69],[.27,.66],[.39,.615],[.5,.595]],
+    panelDepth:6.8,shoulder:1.0
+  });
+  Object.assign(shapes['fox-c'],{
+    sectionedBody:true,duct:{rear:.449,front:.466,half:.76,depth:6},
+    sideSection:[[0,.895],[.14,.94],[.32,.93],[.53,.965],[.76,1.012],[.90,1.008],[1,.972]],
+    noseSection:[[0,5],[.18,0],[.34,3],[.58,11],[.78,7],[1,10]],
+    tailSection:[[0,7],[.22,0],[.42,3],[.61,11],[.80,7],[1,13]],
+    belt:[[-.5,.715],[-.36,.725],[-.16,.715],[.12,.70],[.27,.665],[.39,.615],[.5,.600]],
+    panelDepth:5.6,shoulder:1.0
+  });
 })();

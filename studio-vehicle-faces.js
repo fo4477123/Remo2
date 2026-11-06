@@ -35,6 +35,7 @@
     if(s.id==='fox-d'){for(const side of [-1,1]){front([[side*.77,.48],[side*.90,.48],[side*.90,.25],[side*.79,.25]],trim,1.5);for(const y of [.30,.40])line([[side*.85,y],[side*.85,y+.055]],1.5,led,2.3);}}
     if(['model-3','fox-b','fox-c'].includes(s.id)){
       const canvas=document.createElement('canvas');canvas.width=512;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='#b5bec4';ctx.font='38px sans-serif';ctx.textAlign='center';ctx.fillText(s.id==='model-3'?'T E S L A':'F O X T R O N',256,46);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const m=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.65,roughness:.32}),back=s.id==='model-3',y=H*(back?.53:.48),badge=mesh(new T.PlaneGeometry(back?48:58,7.25),m,[0,y,back?rearZ(0,y)-1.5:frontZ(0,y)+1.2],'rear-or-front-wordmark');if(back)badge.rotation.y=Math.PI;
+      if(s.id==='fox-b'||s.id==='fox-c'){const rear=mesh(new T.PlaneGeometry(55,6.8),m,[0,H*.61,rearZ(0,H*.61)-1.2],'foxtron-tailgate-wordmark');rear.rotation.y=Math.PI;}
     }
     if(s.id==='fox-b'){
       const bumper=[[-.88,.34],[-.52,.41],[.52,.41],[.88,.34],[.82,.17],[-.82,.17]].map(([x,y])=>[x*W*.45,y*H]);
@@ -46,6 +47,14 @@
     const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const o=mesh(new T.PlaneGeometry(34,12),material,[0,side>0?H*.25:H*.36,side>0?frontZ(0,H*.25)+4.4:rearZ(0,H*.36)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
     const rearBand=p.tailOutline||{focus:[[.24,.63],[.68,.63],[.94,.68],[.90,.59],[.69,.54]],altis:[[.24,.64],[.70,.63],[.94,.67],[.88,.57],[.58,.54]],sentra:[[.23,.64],[.73,.63],[.93,.67],[.88,.55],[.61,.53]],kicks:[[.30,.75],[.66,.76],[.94,.79],[.91,.66],[.60,.62]],kuga:[[.23,.68],[.69,.68],[.94,.72],[.91,.61],[.59,.60]],'corolla-cross':[[.22,.71],[.67,.71],[.94,.74],[.92,.64],[.60,.63]]}[s.id];
     for(const side of [-1,1]){
+      if(s.id==='fox-c'){
+        const rp=(points,m,d)=>poly(points.map(([x,y])=>[side*x*W*.45,y*H]),m,(x,y)=>rearZ(x,y)-d,'cavira-optical-tail');
+        rp([[.015,.726],[.96,.726],[.97,.662],[.75,.658],[.63,.695],[.015,.699]],trim,.6);
+        rp([[.025,.716],[.94,.716],[.95,.706],[.025,.706]],red,1.2);
+        rp([[.67,.701],[.73,.666],[.94,.666],[.94,.678],[.76,.678],[.71,.701]],red,1.4);
+        for(const x of [.79,.88])rp([[x-.032,.686],[x+.032,.686],[x+.042,.694],[x-.025,.698]],red,1.6);
+        continue;
+      }
       if(s.id==='fox-b'){
         const rearPoly=(points,m,depth)=>poly(points.map(([x,y])=>[side*x*W*.45,y*H]),m,(x,y)=>rearZ(x,y)-depth,'bria-matrix-tail');
         rearPoly([[.03,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.03,.67]],trim,1);

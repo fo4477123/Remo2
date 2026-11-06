@@ -28,7 +28,7 @@
     function patch(rows,cols,fn,m,name,cut=null){const p=[],idx=[],uv=[];for(let i=0;i<=rows;i++)for(let j=0;j<=cols;j++){p.push(...fn(i/rows,j/cols));uv.push(j/cols,i/rows);}for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){if(cut?.((i+.5)/rows,(j+.5)/cols))continue;const a=i*(cols+1)+j;idx.push(a,a+cols+1,a+1,a+1,a+cols+1,a+cols+2);}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
       // Match the tangent at bonnet/shoulder and bumper joins. Separate patch
       // boundaries must not make a continuous painted surface look folded.
-      if(name.startsWith('continuous-wheel')||name.startsWith('formed-hood')||name.startsWith('formed-front')||name.startsWith('formed-rear')){
+      if(name.startsWith('continuous-wheel')||(name.startsWith('formed-hood')&&!shape.sectionedBody)||name.startsWith('formed-front')||name.startsWith('formed-rear')){
         const normals=g.attributes.normal,positions=g.attributes.position;
         for(let i=0;i<=rows;i++)for(let j=0;j<=cols;j++){
           const k=i*(cols+1)+j,x=positions.getX(k),z=positions.getZ(k),n=new T.Vector3(normals.getX(k),normals.getY(k),normals.getZ(k));
@@ -41,22 +41,29 @@
       const o=mesh(g,m,[0,0,0],name);o.material.side=T.DoubleSide;return o;}
 
     const profile=B1_VEHICLE_FACES.profiles[s.id],faceScale=['sedan','hatch'].includes(s.body)?.90:1,frontTop=H*Math.max(...profile.head.map(p=>p[1]))*faceScale+5,rearTop=H*(profile.tailOutline?Math.max(...profile.tailOutline.map(p=>p[1])):profile.rearH||.66)+5;
-    const belt=z=>{const base=H*sample(shape.belt,z/L),t=Math.max(0,Math.min(1,(Math.abs(z/L)-.28)/.22)),blend=t*t*(3-2*t);return base+Math.max(0,(z>0?(s.id==='model-3'?0:frontTop):rearTop)-H*sample(shape.belt,z>0?.5:-.5))*blend;},width=z=>W/2*sample(shape.width,z/L),edge=z=>belt(z)-5+(s.id==='model-3'?12*Math.max(0,(z/L-.28)/.22):0);
+    const belt=z=>{const base=H*sample(shape.belt,z/L),t=Math.max(0,Math.min(1,(Math.abs(z/L)-.28)/.22)),blend=t*t*(3-2*t);return base+(shape.sectionedBody?0:Math.max(0,(z>0?(s.id==='model-3'?0:frontTop):rearTop)-H*sample(shape.belt,z>0?.5:-.5))*blend);},width=z=>W/2*sample(shape.width,z/L),edge=z=>shape.sectionedBody?topY(z,1):belt(z)-5+(s.id==='model-3'?12*Math.max(0,(z/L-.28)/.22):0);
     // Both lights and coachwork project onto the same rounded end surface.
-    const endInset=(x,y,sign=1)=>{const top=topY(sign*L/2,Math.min(1,Math.abs(x)/(width(sign*L/2)*.96))),v=Math.max(0,Math.min(1,(y-19)/(top-19))),corner=(s.id==='model-3'?34:28)*Math.pow(Math.abs(x)/(W/2),4),sculpt=sign>0&&s.id==='fox-c'?7*Math.exp(-Math.pow((v-.68)/.18,2)):0;return corner+(s.id==='model-3'?10:12)*Math.pow((v-.46)/.54,2)+sculpt;};
+    const endInset=(x,y,sign=1)=>{const top=topY(sign*L/2,Math.min(1,Math.abs(x)/(width(sign*L/2)*.96))),v=Math.max(0,Math.min(1,(y-19)/(top-19)));
+      if(shape.sectionedBody)return 22*Math.pow(Math.abs(x)/(W/2),4)+sample(sign>0?shape.noseSection:shape.tailSection,v);
+      const corner=(s.id==='model-3'?34:28)*Math.pow(Math.abs(x)/(W/2),4);return corner+(s.id==='model-3'?10:12)*Math.pow((v-.46)/.54,2);};
     const noseZ=(x,z,y=45)=>z-Math.sign(z)*Math.pow(Math.abs(z)/(L/2),12)*endInset(x,y,Math.sign(z));
-    const sideX=(z,v)=>width(z)*(.91+.09*Math.sin(v*Math.PI*.79))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
+    const sideX=(z,v)=>width(z)*(shape.sectionedBody?sample(shape.sideSection,Math.max(0,Math.min(1,v))):(.91+.09*Math.sin(v*Math.PI*.79)))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
       -(shape.panelDepth||0)*Math.exp(-Math.pow((v-.34)/.20,2))*Math.exp(-Math.pow(z/(A*.83),6))
       +(shape.shoulder||0)*Math.exp(-Math.pow((v-.80)/.105,2))*Math.exp(-Math.pow(z/(L*.46),6));
-    const topY=(z,u)=>belt(z)+3.5*(1-u*u)-5*Math.pow(Math.abs(u),5)+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
+    const topY=(z,u)=>belt(z)+(shape.sectionedBody?2.5*(1-u*u)+4.5*Math.exp(-Math.pow((Math.abs(u)-.78)/.19,2))-3*Math.pow(Math.abs(u),8):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
     // Continuous curved body skin, separately formed wheel shoulders, recessed sill and hood crown.
     const archBase=z=>Math.max(19,...[-A,A].map(a=>Math.abs(z-a)<R+4?R+Math.sqrt((R+4)**2-(z-a)**2):19));
     for(const side of [-1,1])patch(176,18,(t,v)=>{const z=-L/2+t*L,bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*sideX(z,sv);return[x,y,noseZ(x,z,y)];},paint,'continuous-wheel-opening-'+s.id);
     const c=shape.cabin.map(p=>[...p]),rear=c[0][0]*L,roofRear=c[1][0]*L,roofFront=c[3][0]*L,front=c[4][0]*L;c[0][1]=(belt(rear)+5)/H;c[4][1]=(belt(front)+5)/H;
+    const duct=shape.duct;
+    const ductBounds=a=>{const q=Math.min(1,Math.abs(a)/(duct?.half||1)),mid=(duct.rear+duct.front)/2,span=(duct.front-duct.rear)/2*Math.sqrt(Math.max(0,1-q*q));return [L*(mid-span),L*(mid+span)];};
     for(const [start,end]of [[-L/2,rear],[front,L/2]]){
-      const duct=(s.id==='fox-b'||s.id==='fox-c')&&start===front;
-      const spans=duct?[[start,L*.405,-1,1],[L*.405,L*.46,-1,-.61],[L*.405,L*.46,.61,1],[L*.46,end,-1,1]]:[[start,end,-1,1]];
-      for(const [z0,z1,a0,a1]of spans)patch(32,32,(t,u)=>{const z=z0+(z1-z0)*t,a=a0+(a1-a0)*u,x=sideX(z,1)*a;return[x,topY(z,a),noseZ(x,z,topY(z,a))];},paint,'formed-hood-deck-'+s.id);
+      if(!duct||start!==front){patch(shape.sectionedBody?48:32,shape.sectionedBody?48:32,(t,u)=>{const z=start+(end-start)*t,a=u*2-1,x=sideX(z,1)*a;return[x,topY(z,a),noseZ(x,z,topY(z,a))];},paint,'formed-hood-deck-'+s.id);continue;}
+      // Exact shared boundaries create a curved aperture, with no overlaid black decal.
+      for(const band of [0,1,2,3])patch(40,64,(t,u)=>{
+        const a=band<2?(u*2-1)*duct.half:band===2?-1+u*(1-duct.half):duct.half+u*(1-duct.half),[back,lip]=ductBounds(a),z0=band===0?start:band===1?lip:start,z1=band===0?back:end,z=z0+(z1-z0)*t,x=sideX(z,1)*a;
+        return[x,topY(z,a),noseZ(x,z,topY(z,a))];
+      },paint,'formed-hood-deck-'+s.id);
     }
     for(const sign of [-1,1])patch(20,42,(t,u)=>{const z=sign*L/2,a=u*2-1,y=19+(topY(z,a)-19)*t,x=a*sideX(z,(y-19)/(edge(z)-19));return[x,y,noseZ(x,z,y)];},paint,sign>0?'formed-front-bumper':'formed-rear-bumper');
     // The cabin must remain open above the floor; a waist-height cap hid the interior.
@@ -115,9 +122,8 @@
     }
     if(s.id==='fox-b'||s.id==='fox-c'){
       // Dark S-duct aperture on the bonnet, behind its painted leading lip.
-      patch(8,26,(t,u)=>{const z=L*(.405+t*.055),a=(u*2-1)*.61,x=sideX(z,1)*a;return[x,topY(z,a)-2.8,noseZ(x,z,topY(z,a))];},trim,'s-duct-recessed-channel');
-      for(const end of [.405,.46])patch(3,26,(t,u)=>{const z=L*end,a=(u*2-1)*.61,x=sideX(z,1)*a;return[x,topY(z,a)-2.8*t,noseZ(x,z,topY(z,a))];},paint,'s-duct-painted-lip');
-      for(const side of [-1,1])patch(8,3,(t,u)=>{const z=L*(.405+t*.055),a=side*.61,x=sideX(z,1)*a;return[x,topY(z,a)-2.8*u,noseZ(x,z,topY(z,a))];},trim,'s-duct-side-wall');
+      for(const wall of [0,1])patch(12,64,(t,u)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),z=wall?lip:back,x=sideX(z,1)*a,y=topY(z,a)-duct.depth*t;return[x,y,noseZ(x,z,topY(z,a))];},paint,'s-duct-inner-wall');
+      patch(12,64,(t,u)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),z=back+(lip-back)*t,x=sideX(z,1)*a;return[x,topY(z,a)-duct.depth-1.5*Math.sin(t*Math.PI),noseZ(x,z,topY(z,a))];},trim,'s-duct-curved-throat');
       const amber=mat('#c87627',.4);for(const side of [-1,1]){const z=A+R*.73,v=.63,x=side*(sideX(z,v)+.9),y=19+(edge(z)-19)*v;box([x,y,z],[1.2,12,2.4],amber,.4);}
     }
     if(shape.wheelStyle){
@@ -145,7 +151,7 @@
     }
     if(suv&&!s.id.startsWith('fox-'))for(const sign of [-1,1])tube(Array.from({length:25},(_,i)=>{const x=(i/24-.5)*W*.60;return[x,22,noseZ(x,sign*L/2,22)+sign];}),1.4,metal);
     // Seats, dashboard, console, instrument cluster, steering and door cards are actual geometry.
-    box([0,31,0],[W*.86,5,L*.60],trim,3);for(const side of [-1,1]){const x=side*W*.23;box([x,53,-L*.015],[46,13,52],leather,6);const seat=box([x,88,-L*.075],[45,64,12],leather,6);seat.rotation.x=-.11;box([x,Math.min(119,cabin(-L*.09).h-14),-L*.09],[25,18,13],leather,4);for(const dx of [-17,17])box([x+dx,57,-L*.015],[7,12,44],leather,3);for(const z of [-L*.12,L*.12])tube([[side*W*.437,50,z-25],[side*W*.435,80,z],[side*W*.434,90,z+25]],2,leather);parts.cabin+=6;}
+    box([0,31,0],[W*.86,5,L*.60],trim,3);for(const side of [-1,1]){const x=side*W*.23;box([x,53,-L*.015],[46,13,52],leather,6);const seat=box([x,88,-L*.075],[45,64,12],leather,6);seat.rotation.x=-.11;box([x,Math.min(119,cabin(-L*.09).h-14),-L*.09],[25,18,13],leather,4);for(const dx of [-17,17])box([x+dx,57,-L*.015],[7,12,44],leather,3);if(!shape.sectionedBody)for(const z of [-L*.12,L*.12])tube([[side*W*.437,50,z-25],[side*W*.435,80,z],[side*W*.434,90,z+25]],2,leather);parts.cabin+=6;}
     box([0,52,-L*.225],[W*.78,14,46],leather,5);box([0,76,-L*.25],[W*.78,48,12],leather,6);for(const x of [-W*.22,0,W*.22])box([x,Math.min(110,cabin(-L*.25).h-13),-L*.25],[22,15,10],leather,4);
     const dashY=belt(L*.24)-12,fox=s.id==='fox-b'||s.id==='fox-c',cavira=s.id==='fox-c';
     if(fox){
