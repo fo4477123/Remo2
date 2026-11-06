@@ -31,3 +31,11 @@ The gallery provides front, side and rear orthographic views and a panel visibil
 The previous bonnet outlet was a pocket behind an intact front fascia. The upper forward mouth is now a second hole in the triangulated bumper shell, connected to the bonnet outlet by upper, lower and side tunnel surfaces. The old pocket floor is removed. A frontal ray at the inlet midpoint must travel beyond the fascia plane before hitting the inner channel.
 
 The two outboard headlamp housings no longer span the center mouth. Bria uses vertically stacked reflector/lens units; Cavira uses horizontal pairs. Running-light ribbons remain separate from the housings. The projector meshes use the existing headlight batching/clone path.
+
+## Ramp and rear sail correction
+
+Rechecked the Bria official brochure pages 2-4 and Cavira official side/front photographs. The forward channel now reaches the bonnet outlet directly, without the vertical pocket walls. Its curved painted floor uses cavity shading. The badge-bearing bumper ramp has a recessed upper section; the FOXTRON decal geometry conforms to that surface instead of occupying a vertical plane. Projectors use separate rounded rectangular optical elements.
+
+Rear sail panels now have independent slanted boundaries in the curved side glazing coordinates. Bria has its opaque patterned panel; Cavira has a triangulated quarter-light aperture. Removed overlapping generic rear pillar tubes and relocated the Bria graphic onto its new panel. Analytic bumper normals remove triangulation fan highlights around the intake.
+
+These are still photo-derived approximations; body silhouette, optics and material fidelity are not equivalent to manufacturer CAD or the imported Model 3. Gallery front/profile/hood views expose the current result for comparison.

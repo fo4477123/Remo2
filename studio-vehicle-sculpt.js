@@ -75,7 +75,12 @@
       for(let i=31;i>0;i--){const v=i/32,y=19+(topY(z,-1)-19)*v;outline.push(new T.Vector2(-sideX(z,v),y));}
       const hole=profile.grille.map(([x,y])=>new T.Vector2(x*W*.45,y*H)),mouth=profile.ductInlet.map(([x,y])=>new T.Vector2(x*W*.45,y*H)),all=[...outline,...hole,...mouth],tri=T.ShapeUtils.triangulateShape(outline,[hole,mouth]),pos=[];
       for(const ids of tri){const [a,b,c]=ids.map(i=>all[i]),point=(i,j)=>{const x=a.x+(b.x-a.x)*i/8+(c.x-a.x)*j/8,y=a.y+(b.y-a.y)*i/8+(c.y-a.y)*j/8;return[x,y,noseZ(x,z,y)];};for(let i=0;i<8;i++)for(let j=0;j<8-i;j++){pos.push(...point(i,j),...point(i+1,j),...point(i,j+1));if(i+j<7)pos.push(...point(i+1,j),...point(i+1,j+1),...point(i,j+1));}}
-      const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();smoothNormals(g);mesh(g,paint,[0,0,0],'perforated-front-bumper');
+      const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();
+      // Analytic surface normals avoid visible fans where the triangulated
+      // inlet border meets the concave badge ramp.
+      const gp=g.attributes.position,gn=g.attributes.normal;
+      for(let i=0;i<gp.count;i++){const x=gp.getX(i),y=gp.getY(i),e=.04,n=new T.Vector3(-(noseZ(x+e,z,y)-noseZ(x-e,z,y))/(2*e),-(noseZ(x,z,y+e)-noseZ(x,z,y-e))/(2*e),1).normalize();gn.setXYZ(i,n.x,n.y,n.z);}
+      mesh(g,paint,[0,0,0],'perforated-front-bumper');
       for(let i=0;i<hole.length;i++){const a=hole[i],b=hole[(i+1)%hole.length];patch(4,20,(t,u)=>{const x=a.x+(b.x-a.x)*u,y=a.y+(b.y-a.y)*u;return[x,y,noseZ(x,z,y)-5*t];},trim,'recessed-intake-wall');}
     }
 
@@ -93,12 +98,19 @@
       patch(64,10,(t,v)=>glassSide(rear+(front-rear)*t,v,side),glass,'window-outline-'+s.id);
       patch(64,8,(t,v)=>{const z=rear+(front-rear)*t,q=glassSide(z,1,side);return[side*sideX(z,1)*(1-v)+q[0]*v,edge(z)*(1-v)+q[1]*v,z];},paint,'closed-window-sill-'+s.id);
       // Painted C pillar, black B pillar and the individual rear quarter window.
-      patch(12,10,(t,v)=>{const q=glassSide(rear+(roofRear-rear)*t*(s.id==='model-3'?.30:s.id==='fox-d'?.32:.55),v,side);q[0]+=side*.35;return q;},roofPaint,'rear-pillar-'+s.id);
+      if(shape.sail){
+        const sail=shape.sail,outline=[[rear/L,0],[sail.top,0],[sail.bottom,1],[rear/L,1]].map(p=>new T.Vector2(...p)),hole=(sail.quarter||[]).map(p=>new T.Vector2(...p)),vertices=[...outline,...hole],tri=T.ShapeUtils.triangulateShape(outline,hole.length?[hole]:[]),pos=[];
+        // Tessellate in the glazing surface coordinates so the pillar is flush
+        // with the curved roof and waist, including the quarter-light aperture.
+        for(const ids of tri){const [a,b,c]=ids.map(i=>vertices[i]),at=(i,j)=>{const z=(a.x+(b.x-a.x)*i/16+(c.x-a.x)*j/16)*L,v=a.y+(b.y-a.y)*i/16+(c.y-a.y)*j/16,q=glassSide(z,v,side);q[0]+=side*.45;return q;};for(let i=0;i<16;i++)for(let j=0;j<16-i;j++){pos.push(...at(i,j),...at(i+1,j),...at(i,j+1));if(i+j<15)pos.push(...at(i+1,j),...at(i+1,j+1),...at(i,j+1));}}
+        const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();smoothNormals(g);mesh(g,roofPaint,[0,0,0],'formed-sail-panel');
+        if(hole.length)tube([...sail.quarter,sail.quarter[0]].map(([z,v])=>{const q=glassSide(z*L,v,side);q[0]+=side*.55;return q;}),.6,trim,root,true);
+      }else patch(12,10,(t,v)=>{const q=glassSide(rear+(roofRear-rear)*t*(s.id==='model-3'?.30:s.id==='fox-d'?.32:.55),v,side);q[0]+=side*.35;return q;},roofPaint,'rear-pillar-'+s.id);
       const bZ=s.id==='kicks'?-L*.075:-L*.055;
       if(shape.productionPillars){
-        for(const [centre,span]of [[bZ,9],[rear+(roofRear-rear)*.76,12]])patch(8,8,(t,v)=>{const q=glassSide(centre+(t-.5)*span,v,side);q[0]+=side*.65;return q;},trim,'production-window-pillar');
+        for(const [centre,span]of (shape.sail?[[bZ,9]]:[[bZ,9],[rear+(roofRear-rear)*.76,12]]))patch(8,8,(t,v)=>{const q=glassSide(centre+(t-.5)*span,v,side);q[0]+=side*.65;return q;},trim,'production-window-pillar');
       }
-      for(const [z,r,m]of [[bZ,2.4,trim],[rear+(roofRear-rear)*.79,1.5,roofPaint],[front-3,1.5,paint]])tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
+      for(const [z,r,m]of (shape.sail?[[front-3,1.5,paint]]:[[bZ,2.4,trim],[rear+(roofRear-rear)*.79,1.5,roofPaint],[front-3,1.5,paint]]))tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,0,side)),1.05,roofPaint);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,1,side)),.7,['altis','kuga'].includes(s.id)?metal:trim);
       // Body creases follow the real rising belt line, with long lower-door concavity.
@@ -129,7 +141,7 @@
         patch(12,48,(t,u)=>{const a=u*2-1,z=roofRear+5-23*t,p=cabin(roofRear+5);return[a*W*.395,p.h-6*a*a-.6+2.2*Math.sin(t*Math.PI)-1.2*t,z+3*a*a];},trim,'spoiler-underside');
         for(const t of [0,1])patch(2,48,(v,u)=>{const a=u*2-1,z=roofRear+5-23*t,p=cabin(roofRear+5);return[a*W*.395,p.h-6*a*a+1.4+2.2*Math.sin(t*Math.PI)-1.2*t-2*v,z+3*a*a];},foilPaint,'spoiler-edge');
         for(const side of [-1,1])patch(12,2,(t,v)=>{const a=side,z=roofRear+5-23*t,p=cabin(roofRear+5);return[a*W*.395,p.h-6+1.4+2.2*Math.sin(t*Math.PI)-1.2*t-2*v,z+3];},foilPaint,'spoiler-end-cap');
-        for(const side of [-1,1])patch(12,6,(t,v)=>{const z=roofRear-18+40*t,q=glassSide(z,v*.42,side);q[0]+=side*.7;return q;},trim,'rear-aero-blade');
+        for(const side of [-1,1])patch(12,6,(t,v)=>{const z=roofRear-18+(s.id==='fox-c'?18:40)*t,q=glassSide(z,v*.42,side);q[0]+=side*.7;return q;},trim,'rear-aero-blade');
         tube(Array.from({length:30},(_,i)=>{const a=i/29*2-1;return[a*W*.22,cabin(roofRear+5).h-6*a*a,roofRear-17+3*a*a];}),.65,red);
       }else{const z=roofRear-4,h=cabin(z).h;box([0,h-.2,z],[W*.73,3.5,16],roofPaint,2);box([0,h-1,z-8],[W*.40,1.5,1.3],red,.4);}
     }
@@ -146,12 +158,12 @@
     }
     if(s.id==='fox-b'||s.id==='fox-c'){
       // Dark S-duct aperture on the bonnet, behind its painted leading lip.
-      for(const wall of [0,1])patch(12,64,(t,u)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),z=wall?lip:back,x=sideX(z,1)*a,y=topY(z,a)-duct.depth*t;return[x,y,noseZ(x,z,topY(z,a))];},paint,'s-duct-inner-wall');
       // Connect the forward-facing mouth to the bonnet outlet. No front cap or
       // shallow pocket closes the channel between the two openings.
       const mouth=profile.ductInlet,entryTop=mouth[0][1]*H,entryBottom=mouth[2][1]*H;
-      const passage=(t,u,upper)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),outZ=upper?lip:back,outX=sideX(outZ,1)*a,outY=topY(outZ,a)-duct.depth,inX=(u*2-1)*(upper?mouth[1][0]:mouth[2][0])*W*.45,inY=upper?entryTop:entryBottom,inZ=noseZ(inX,L/2,inY),x=inX+(outX-inX)*t,y=inY+(outY-inY)*t,z=inZ+(noseZ(outX,outZ,topY(outZ,a))-inZ)*t;return[x,y,z];};
-      for(const upper of [false,true])patch(32,64,(t,u)=>passage(t,u,upper),trim,'s-duct-connected-'+(upper?'roof':'floor'));
+      const passage=(t,u,upper)=>{const a=(u*2-1)*duct.half,[back,lip]=ductBounds(a),outZ=upper?lip:back,outX=sideX(outZ,1)*a,outY=topY(outZ,a)-duct.depth,inX=(u*2-1)*(upper?mouth[1][0]:mouth[2][0])*W*.45,inY=upper?entryTop:entryBottom,inZ=noseZ(inX,L/2,inY),x=inX+(outX-inX)*t,y=inY+(outY-inY)*(upper?t:t*t),z=inZ+(noseZ(outX,outZ,topY(outZ,a))-inZ)*t;return[x,y,z];};
+      const ductPaint=paint.clone();ductPaint.userData.noSelfShadow=true;ductPaint.color.multiplyScalar(.55);ductPaint.roughness=.32;
+      for(const upper of [false,true])patch(32,64,(t,u)=>passage(t,u,upper),upper?trim:ductPaint,'s-duct-connected-'+(upper?'roof':'floor'));
       for(const side of [0,1])patch(32,8,(t,v)=>{const a=passage(t,side,false),b=passage(t,side,true);return a.map((n,i)=>n+(b[i]-n)*v);},trim,'s-duct-connected-side');
       const amber=mat('#c87627',.4);for(const side of [-1,1]){const z=A+R*.73,v=.63,x=side*(sideX(z,v)+.9),y=19+(edge(z)-19)*v;box([x,y,z],[1.2,12,2.4],amber,.4);}
     }
@@ -166,7 +178,7 @@
           const z0=front-5;patch(12,4,(t,v)=>{const z=z0-13*t,q=glassSide(z,v*.13+.86,sign);q[0]+=sign*.3;return q;},trim,'mirror-sail-panel');
         }
         if(s.id==='fox-b')for(let i=0;i<9;i++)for(let j=0;j<5;j++){
-          const z=rear+(roofRear-rear)*(.16+j*.062),v=.18+i*.068,q=glassSide(z,v,sign),size=.55+i*.10;
+          const v=.18+i*.068,z=L*(shape.sail.top+(shape.sail.bottom-shape.sail.top)*v-.016-j*.009),q=glassSide(z,v,sign),size=.55+i*.10;
           box([q[0]+sign*.9,q[1],q[2]],[.3,size,size],darkMetal,.1);
         }
       }

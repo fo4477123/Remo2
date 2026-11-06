@@ -19,9 +19,12 @@
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
     for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);front(head,darkMetal,s.id==='model-3'?1.0:2);line([...head,head[0]],.38,s.nose==='ev'?trim:metal,2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'?.55:1.1,led,2.9));
       const centre=p.head.reduce((a,v)=>[a[0]+v[0]/p.head.length,a[1]+v[1]/p.head.length],[0,0]),lensCount=p.projectors?p.projectors.length:s.id==='fox-d'?0:s.id==='focus'?2:s.id==='kuga'?2:1;for(let i=0;i<lensCount;i++){const x=side*(p.projectors?.[i]?.[0]??(centre[0]+(i?-.08:.04)))*W*.45,y=scale([0,p.projectors?.[i]?.[1]??(centre[1]-.005)])[1];if(p.lensStyle==='foxtron-projector'){
-          const reflector=mesh(new T.SphereGeometry(1,24,16),metal,[x,y,frontZ(x,y)+2.3],'foxtron-projector-reflector');reflector.scale.set(3.9,2.5,1.3);
-          const bezel=mesh(new T.TorusGeometry(1,.13,8,32),trim,[x,y,frontZ(x,y)+3.3],'foxtron-projector-bezel');bezel.scale.set(3.3,2.1,1);
-          const lens=mesh(new T.SphereGeometry(1,24,16),led,[x,y,frontZ(x,y)+3.1],'foxtron-projector-lens');lens.scale.set(2.7,1.65,.9);lamps.push(lens);continue;
+          const z=frontZ(x,y),w=s.id==='fox-b'?7.8:7.2,h=s.id==='fox-b'?3.5:3.2;
+          box([x,y,z+2.3],[w+1.4,h+1.2,1.6],trim,.8);
+          box([x,y,z+2.7],[w,h,1.3],metal,.7);
+          const lens=box([x,y,z+3.4],[w-1.3,h-.65,.7],led,.6);lamps.push(lens);
+          for(const dx of [-1.6,1.6])box([x+dx,y,z+3.8],[.2,h-.8,.12],metal,.05);
+          continue;
         }if(p.lensStyle==='matrix'){const w=s.id==='model-3'?1.5:3.1,h=s.id==='model-3'?.45:1.9;poly([[x-w,y-h],[x+w,y-h],[x+w,y+h],[x-w,y+h]],led,(x,y)=>frontZ(x,y)+2.55,'recessed-led-module');continue;}const lens=mesh(new T.SphereGeometry(1,20,14),metal,[x,y,frontZ(x,y)+2.2],'lamp-reflector');lens.scale.set(s.id==='altis'?4.5:3.7,2.8,1.2);const bulb=mesh(new T.SphereGeometry(1,18,12),led,[x,y,frontZ(x,y)+3.3],'projector-lens');bulb.scale.set(s.id==='altis'?3:2.5,2.1,.7);lamps.push(bulb);}
       if(s.id==='altis'){front(mirror([[.71,.45],[.85,.44],[.88,.21],[.73,.19]]),trim,2);line(mirror([[.69,.47],[.83,.44],[.86,.20],[.73,.19]]),1.35,metal);const fog=mesh(new T.SphereGeometry(3,20,12),led,to3([side*.79,.24],4),'round-foglamp');fog.scale.z=.5;}
       else if(s.id==='kicks'||s.id==='kuga'||s.id==='sentra'){const tall=s.id==='kicks',points=mirror([[.79,tall?.48:.42],[.91,tall?.49:.43],[.87,.22],[.75,.23]]);front(points,trim,2);for(let row=0;row<4;row++)line(mirror([[.79,.26+row*.037],[.86,.26+row*.037]]),.65,darkMetal);if(s.id!=='sentra')line(mirror([[.79,.30],[.84,.30]]),1.3,led);}
@@ -39,7 +42,15 @@
     }
     if(s.id==='fox-d'){for(const side of [-1,1]){front([[side*.77,.48],[side*.90,.48],[side*.90,.25],[side*.79,.25]],trim,1.5);for(const y of [.30,.40])line([[side*.85,y],[side*.85,y+.055]],1.5,led,2.3);}}
     if(['model-3','fox-b','fox-c'].includes(s.id)){
-      const canvas=document.createElement('canvas');canvas.width=512;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='#b5bec4';ctx.font='38px sans-serif';ctx.textAlign='center';ctx.fillText(s.id==='model-3'?'T E S L A':'F O X T R O N',256,46);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const m=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.65,roughness:.32}),back=s.id==='model-3',y=H*(back?.53:.48),badge=mesh(new T.PlaneGeometry(back?48:58,7.25),m,[0,y,back?rearZ(0,y)-1.5:frontZ(0,y)+1.2],'rear-or-front-wordmark');if(back)badge.rotation.y=Math.PI;
+      const canvas=document.createElement('canvas');canvas.width=512;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='#b5bec4';ctx.font='38px sans-serif';ctx.textAlign='center';ctx.fillText(s.id==='model-3'?'T E S L A':'F O X T R O N',256,46);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const m=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.65,roughness:.32,side:T.DoubleSide}),back=s.id==='model-3';
+      if(back){const badge=mesh(new T.PlaneGeometry(48,7.25),m,[0,H*.53,rearZ(0,H*.53)-1.5],'rear-wordmark');badge.rotation.y=Math.PI;}
+      else{
+        // Project every vertex onto the actual inclined bumper ramp. A flat
+        // vertical plane either floats in front of it or disappears into it.
+        const g=new T.PlaneGeometry(62,6.4,32,6),v=g.attributes.position;
+        for(let i=0;i<v.count;i++){const x=v.getX(i),y=v.getY(i)+H*(s.id==='fox-b'?.483:.495);v.setXYZ(i,x,y,frontZ(x,y)+.20);}
+        g.computeVertexNormals();const badge=mesh(g,m,[0,0,0],'ramp-conforming-foxtron-wordmark');badge.userData.keep=true;
+      }
       if(s.id==='fox-b'||s.id==='fox-c'){const rear=mesh(new T.PlaneGeometry(55,6.8),m,[0,H*.61,rearZ(0,H*.61)-1.2],'foxtron-tailgate-wordmark');rear.rotation.y=Math.PI;}
     }
     if(s.id==='fox-c'){

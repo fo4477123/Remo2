@@ -87,4 +87,28 @@
   p['fox-c'].head=[[.64,.606],[.97,.623],[.94,.551],[.77,.548],[.64,.576]];
   p['fox-c'].projectors=[[.78,.573],[.88,.582]];
   p['fox-b'].lensStyle=p['fox-c'].lensStyle='foxtron-projector';
+  // Separate photo-traced rear sail panels: Bria has an opaque graphic panel;
+  // Cavira has a small triangular quarter-light within its swept black surround.
+  shapes['fox-b'].sail={top:-.292,bottom:-.322};
+  shapes['fox-c'].sail={top:-.225,bottom:-.275,quarter:[[-.277,.25],[-.345,.79],[-.286,.79]]};
+  shapes['fox-b'].duct={rear:.420,front:.469,half:.75,depth:0};
+  shapes['fox-c'].duct={rear:.432,front:.470,half:.74,depth:0};
+  p['fox-b'].ductInlet=[[-.65,.592],[.65,.592],[.55,.515],[-.55,.515]];
+  p['fox-c'].ductInlet=[[-.64,.595],[.64,.595],[.54,.529],[-.54,.529]];
+  // The badge-bearing ramp recedes towards the inlet, then the upper bridge
+  // returns forward. This is a section of the body, not a floating flat badge.
+  shapes['fox-b'].noseSection=[[0,7],[.18,1],[.36,4],[.57,3],[.70,11],[.84,22],[.94,9],[1,6]];
+  shapes['fox-c'].noseSection=[[0,6],[.18,1],[.34,4],[.58,3],[.73,12],[.86,20],[.95,8],[1,6]];
+  p['fox-b'].head=[[.60,.614],[.97,.628],[.96,.518],[.78,.513],[.65,.535]];
+  p['fox-b'].projectors=[[.83,.572],[.83,.538]];
+  p['fox-c'].head=[[.60,.609],[.97,.625],[.95,.548],[.78,.541],[.64,.563]];
+  p['fox-c'].projectors=[[.77,.569],[.89,.574]];
+  p['fox-c'].drl=[[.018,.605],[.71,.614],[.96,.626]];
+  p['fox-b'].drl=[[.018,.606],[.71,.616],[.96,.628]];
+  // Keep the optical strip underneath the leading bonnet bridge at the
+  // outboard corners, instead of floating above the fender silhouette.
+  for(const id of ['fox-b','fox-c']){
+    for(const key of ['head','drl','projectors'])p[id][key]=p[id][key].map(([x,y])=>[x,y-.012]);
+    p[id].ductInlet=p[id].ductInlet.map(([x,y],i)=>[x,y-(i<2?.012:0)]);
+  }
 })();

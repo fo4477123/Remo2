@@ -9,6 +9,8 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
     if(id==='fox-b'||id==='fox-c'){
       const mouth=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)}),s=c.spec,p=B1_VEHICLE_FACES.profiles[s.id],y=(p.ductInlet[0][1]+p.ductInlet[2][1])*s.height/2;c.group.updateMatrixWorld(true);const ray=new T.Raycaster(new T.Vector3(0,y,s.length/2+30),new T.Vector3(0,0,-1)),hits=ray.intersectObject(c.high,true);return {firstDepth:hits[0]?.distance,lamps:c.lamps.length};})()`);
       console.log(id,'front duct',mouth);assert(mouth.firstDepth>40,id+' forward duct mouth has no surface cap');assert(mouth.lamps>=1,id+' headlight meshes survive material batching');
+      const ramp=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)});let badge;c.high.traverse(o=>{if(o.name==='ramp-conforming-foxtron-wordmark')badge=o;});if(!badge)return null;const p=badge.geometry.attributes.position,z=Array.from({length:p.count},(_,i)=>p.getZ(i));return {depth:Math.max(...z)-Math.min(...z),vertices:p.count};})()`);
+      assert(ramp&&ramp.depth>1&&ramp.vertices>100,id+' wordmark follows inclined surface instead of a flat plane');
     }
     if(id==='model-3'){
       assert(report.features.includes('licensed-2018-model'),'Downloaded Model 3 is actually used');
