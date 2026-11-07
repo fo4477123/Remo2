@@ -324,6 +324,23 @@
       }
     }
     const face=B1_VEHICLE_FACES.build({s,root,mesh,box,tube,rod,poly:frontPolygon,frontZ,rearZ,paint,trim,metal,darkMetal,red,led,lamps});
+    // Small, surface-fitted factory model lettering replaces generic placeholder
+    // badges on the three Taiwan-market models refined in this pass.
+    if(['focus','altis','kuga'].includes(s.id)){
+      const label=s.id==='focus'?'FOCUS':s.id==='altis'?'ALTIS  HEV':'KUGA';
+      const canvas=document.createElement('canvas');canvas.width=512;canvas.height=96;
+      const ctx=canvas.getContext('2d');ctx.clearRect(0,0,512,96);ctx.fillStyle='#667078';
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=s.id==='altis'?'600 54px Arial':'600 60px Arial';ctx.fillText(label,256,48);
+      const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
+      const lettering=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.72,roughness:.3,side:T.DoubleSide});
+      const width=s.id==='altis'?42:38, y=H*(s.body==='hatch'?.45:.44), z=rearZ(0,y)-.95;
+      const badgeGeometry=new T.PlaneGeometry(width,7.2,32,4),positions=badgeGeometry.attributes.position;
+      for(let i=0;i<positions.count;i++){
+        const x=positions.getX(i),yy=positions.getY(i)+y;
+        positions.setZ(i,rearZ(x,yy)-.95-z);
+      }
+      badgeGeometry.computeVertexNormals();mesh(badgeGeometry,lettering,[0,0,z],'factory-rear-model-lettering');
+    }
     // Sculpted bumper volumes, lower intakes and tailgate shut-lines anchor the fascia in the body.
     for(const sign of [-1,1]){
       const at=sign*L/2;
@@ -516,9 +533,20 @@
       }
       for(let i=0;i<20;i++){const a=i*Math.PI/10,drill=mesh(new T.CylinderGeometry(.75,.75,.6,6),trim,[side*8.6,Math.sin(a)*R*.50,Math.cos(a)*R*.50],'vented-brake-disc',wheel);drill.rotation.z=Math.PI/2;}
       const lip=mesh(new T.TorusGeometry(R*.705,.8,5,48),metal,[side*10.8,0,0],'diamond-cut-rim-lip',wheel);lip.rotation.y=Math.PI/2;
-      box([side*9,6,R*.43],[4,13,7],darkMetal,2,wheel);for(let i=0;i<5;i++){const a=i*Math.PI*.4;const lug=mesh(new T.CylinderGeometry(.9,.9,1.1,8),metal,[side*12,Math.sin(a)*4,Math.cos(a)*4],'wheel-lug',wheel);lug.rotation.z=Math.PI/2;}const cap=mesh(new T.CylinderGeometry(3,3,24.8,24),trim,[0,0,0],'hub-cap',wheel);cap.rotation.z=Math.PI/2;batch(wheel);wheels.push(wheel);parts.wheel+=cfg.spokes;
+      box([side*9,6,R*.43],[4,13,7],darkMetal,2,wheel);for(let i=0;i<5;i++){const a=i*Math.PI*.4;const lug=mesh(new T.CylinderGeometry(.9,.9,1.1,8),metal,[side*12,Math.sin(a)*4,Math.cos(a)*4],'wheel-lug',wheel);lug.rotation.z=Math.PI/2;}const cap=mesh(new T.CylinderGeometry(3,3,24.8,24),trim,[0,0,0],'hub-cap',wheel);cap.rotation.z=Math.PI/2;
+      if(['focus','altis','kuga'].includes(s.id)){
+        // Subtle machined annulus and inset maker mark give each wheel face a
+        // finer hub finish without changing its own spoke pattern.
+        const maker=s.id==='altis'?'TOYOTA':'FORD';
+        const mark=document.createElement('canvas');mark.width=128;mark.height=64;const c=mark.getContext('2d');
+        c.clearRect(0,0,128,64);c.fillStyle='#d9dfe1';c.font=s.id==='altis'?'bold 36px Arial':'bold 22px Arial';c.textAlign='center';c.textBaseline='middle';c.fillText(maker,64,32);
+        const markTexture=new T.CanvasTexture(mark);markTexture.colorSpace=T.SRGBColorSpace;
+        const face=mesh(new T.CircleGeometry(3.25,32),metal,[side*12.52,0,0],'maker-centre-cap',wheel);face.rotation.y=side*Math.PI/2;
+        const markMesh=mesh(new T.PlaneGeometry(s.id==='altis'?3:4,1.45),new T.MeshStandardMaterial({map:markTexture,transparent:true,depthWrite:false,roughness:.38,metalness:.65,side:T.DoubleSide}),[side*12.6,0,0],'maker-centre-mark',wheel);markMesh.rotation.y=side*Math.PI/2;
+      }
+      batch(wheel);wheels.push(wheel);parts.wheel+=cfg.spokes;
     }
-    const rider=new T.Group();rider.visible=false;root.add(rider);batch(root);let triangles=0;root.traverse(o=>{if(o.isMesh)triangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3;});root.userData.features=['curved-independent-panels','open-wheel-arches','wheel-well-liners','curved-transparent-glazing','projector-headlamps','model-specific-grille','detailed-alloy-wheels','tyre-grooves','brake-rotors-calipers',s.id==='fox-d'?'seven-seat-cabin':'five-seat-cabin','steering-dashboard','door-seams-wipers','taiwan-plates'];root.userData.triangles=triangles;return{group:root,wheels,lamps,rider,type:'car',features:root.userData.features,spec:{...s,...face,...(shape.trim?{trim:shape.trim,tyreSpec:shape.tyreSpec}:{}),color,detail:'coachwork-v5',triangles,interpretation:true}};
+    const rider=new T.Group();rider.visible=false;root.add(rider);batch(root);let triangles=0;root.traverse(o=>{if(o.isMesh)triangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3;});root.userData.features=['curved-independent-panels','open-wheel-arches','wheel-well-liners','curved-transparent-glazing','projector-headlamps','model-specific-grille','detailed-alloy-wheels','tyre-grooves','brake-rotors-calipers',s.id==='fox-d'?'seven-seat-cabin':'five-seat-cabin','steering-dashboard','door-seams-wipers','taiwan-plates',...(['focus','altis','kuga'].includes(s.id)?['factory-rear-lettering','maker-wheel-centre-caps']:[])];root.userData.triangles=triangles;return{group:root,wheels,lamps,rider,type:'car',features:root.userData.features,spec:{...s,...face,...(shape.trim?{trim:shape.trim,tyreSpec:shape.tyreSpec}:{}),color,detail:'coachwork-v6',triangles,interpretation:true}};
   }
   function create(s,color){const key=[s.id,s.length,s.width,s.height,s.axle,color].join(':');let template=cache.get(key);if(!template){template=build(s,color);cache.set(key,template);}const group=template.group.clone(true),wheels=Array.from({length:4},(_,i)=>group.getObjectByName('sculpt-wheel-'+i));return{...template,group,wheels,lamps:cloneLights(group),rider:group.children.find(o=>o.isGroup&&!o.children.length)};}
   window.B1_VEHICLE_SCULPT={create,looks,shapes,batch,cloneLights};
