@@ -69,3 +69,7 @@ Added surface-aligned rear ceramic borders, defroster wires, rubber lower seal a
 Each side shell now has exact grid boundaries around two fender slots, with return walls and a recessed backing. Slot positions and dimensions are provisional photo-derived controls, not confirmed factory measurements. They need further source comparison for exact fidelity. Independent transverse bonnet sections form a broad crown and shallow side valleys, flattening at the leading bridge; these replace the common Gaussian fender hump. The existing through S-duct is retained.
 
 Focused gallery QA passed for finite geometry, four wheels, duct clearance, lettering, wheel-house closure, LOD and rolling. Side, hood and rear renders inspected. Shape similarity remains incomplete.
+
+## Bonnet seams and front identity insert
+
+Rechecked Bria brochure page 5 close-up. Removed the generic raised painted hood tubes and used fine panel shut-lines outside the S-duct outlet. Added the bonnet leading shut-line and a small dark central identity insert with metallic graphic strokes; the DRL halves stop at the insert. Focused gallery checks passed and the front close-up was inspected. These are photo-derived interpretations and remain visually short of the factory vehicle.

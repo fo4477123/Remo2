@@ -214,7 +214,13 @@
     }
     if(suv&&!s.id.startsWith('fox-'))for(const side of [-1,1])tube(Array.from({length:15},(_,i)=>{const z=roofRear+8+(roofFront-roofRear-18)*i/14;return[side*W*.30,cabin(z).h+1,z];}),1.4,s.id==='kicks'?trim:metal);
     // Two shallow hood pressings and realistic wipers lie on the bonnet, not above the lights.
-    for(const side of [-1,1]){tube(Array.from({length:16},(_,i)=>{const z=front+9+(L/2-front-25)*i/15,a=side*(.52+.18*i/15),x=sideX(z,1)*a;return[x,topY(z,a)+.1,noseZ(x,z,topY(z,a))];}),.22,paint);tube([[side*W*.05,belt(front)+3,front+2],[side*W*.29,belt(front)+3,front-3]],.65,trim);}
+    for(const side of [-1,1]){
+      if(shape.sectionedBody){
+        tube(Array.from({length:49},(_,i)=>{const t=i/48,z=front+3+(L*.483-front-3)*t,a=side*((s.id==='fox-b'?.80:.78)+.10*t),x=sideX(z,1)*a,y=topY(z,a);return[x,y+.06,noseZ(x,z,y)];}),.10,trim);
+      }else tube(Array.from({length:16},(_,i)=>{const z=front+9+(L/2-front-25)*i/15,a=side*(.52+.18*i/15),x=sideX(z,1)*a;return[x,topY(z,a)+.1,noseZ(x,z,topY(z,a))];}),.22,paint);
+      tube([[side*W*.05,belt(front)+3,front+2],[side*W*.29,belt(front)+3,front-3]],.65,trim);
+    }
+    if(shape.sectionedBody)tube(Array.from({length:65},(_,i)=>{const a=(i/64*2-1)*.90,z=L*(.483+.008*a*a),x=sideX(z,1)*a,y=topY(z,a);return[x,y+.06,noseZ(x,z,y)];}),.10,trim);
     const frontZ=(x,y=45)=>{if(s.id==='model-3'&&y>topY(L/2,x/sideX(L/2,1))){let a=L*.25,b=L/2;for(let i=0;i<18;i++){const z=(a+b)/2;if(topY(z,x/sideX(z,1))>y)a=z;else b=z;}return noseZ(x,(a+b)/2,y)+.65;}return noseZ(x,L/2,y)+.65;},rearZ=(x,y=45)=>noseZ(x,-L/2,y)-.65;
     function frontPolygon(poly,m,zfunc=frontZ,name='face-panel'){
       const pos=[],vertices=poly.map(p=>new T.Vector2(...p)),triangles=T.ShapeUtils.triangulateShape(vertices,[]);

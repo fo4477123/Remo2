@@ -22,6 +22,11 @@
     if(s.id==='fox-b'||s.id==='fox-c')for(const sign of [-1,1]){
       const top=p.drl.map(([x,y])=>[sign*x,y+.006]),bottom=[...p.drl].reverse().map(([x,y])=>[sign*x,y-.011]);front([...top,...bottom],trim,1.6);
     }
+    if(s.id==='fox-b'||s.id==='fox-c'){
+      const cy=p.drl[0][1];
+      front([[-.048,cy+.008],[.048,cy+.008],[.038,cy-.015],[-.038,cy-.015]],darkMetal,2.6);
+      for(const sign of [-1,1])for(let i=0;i<3;i++)line([[sign*(.006+i*.009),cy+.004-i*.004],[sign*(.015+i*.009),cy-.006-i*.002]],.18,metal,2.9);
+    }
     if(s.id==='fox-b')for(const sign of [-1,1])front([[.90,.508],[.97,.51],[.94,.18],[.85,.18],[.87,.36]].map(([x,y])=>[sign*x,y]),trim,.9);
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
     for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);front(head,darkMetal,s.id==='model-3'?1.0:2);line([...head,head[0]],.38,s.nose==='ev'?trim:metal,2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'?.55:1.1,led,2.9));
