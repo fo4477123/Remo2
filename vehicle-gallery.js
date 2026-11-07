@@ -6,7 +6,7 @@ window.W=(x,y,z=0)=>new T.Vector3(x,z,y);
 window.B1_MODELS={rounded(x,y,w,d,h,m,z,parent){const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,z+h/2,y);parent.add(o);return o;}};
 const status=document.querySelector('#status'),select=document.querySelector('#model'),compare=document.querySelector('#compare'),spin=document.querySelector('#spin');
 try{
-  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261107-tailgate18';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
+  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261107-pioneer19';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
   if(!await B1_VEHICLES.ready)throw Error('Model Y 對照資產載入失敗，請重新整理。');
   await B1_VEHICLE_IMPORTS.ready;
   const renderer=new T.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
@@ -46,6 +46,7 @@ try{
     camera.fov=angle==='interior'?82:36;camera.updateProjectionMatrix();
     if(angle==='interior'){controls.target.set(-s.width*.08,s.height*.59,s.length*.20);camera.position.set(0,s.height*.78,-s.length*.08);controls.sync();controls.update();}
     document.querySelector('#name').textContent=s.name;document.querySelector('#spec').textContent=`長 ${s.length} × 寬 ${s.width} × 高 ${s.height} cm${s.estimatedDimensions?' · 尺寸為外觀估算':''}`;
+    if(s.trim==='Pioneer')document.querySelector('#spec').textContent+=` · Pioneer · ${s.tyreSpec}`;
     if(id==='model-3'&&s.interpretation)document.querySelector('#spec').textContent+=' · 外部模型載入失敗，暫用備援模型';
     renderer.render(scene,camera);return car;
   }

@@ -8,8 +8,8 @@
     {id:'kuga',name:'Ford Kuga',length:461.4,width:188.3,height:167.8,axle:271,body:'suv',nose:'ford',lamp:'swept',roof:.32,source:'https://media.lincoln.com/content/dam/fordmedia/Europe/documents/productReleases/Kuga/Kuga_Euro_TechSpec.pdf'},
     {id:'corolla-cross',name:'Toyota Corolla Cross',length:446,width:182.5,height:162,axle:264,body:'suv',nose:'cross',lamp:'bar',roof:.35,source:'https://www.toyota.com.tw/showroom/COROLLA_CROSS/fullsepc.aspx'}
     ,{id:'fox-a',name:'Foxtron Model A',length:420,width:180,height:180,axle:265,estimatedDimensions:true,body:'crossover',nose:'ev',lamp:'bar',roof:.31},
-    {id:'fox-b',name:'Foxtron Model B · Bria 參考',length:431.5,width:188.5,height:153.5,axle:280,body:'crossover',nose:'ev',lamp:'bar',roof:.31},
-    {id:'fox-c',name:'Foxtron Model C · Cavira 參考',length:469.5,width:190.5,height:162.5,axle:292,body:'suv',nose:'ev',lamp:'bar',roof:.33},
+    {id:'fox-b',name:'FOXTRON Bria Pioneer',length:431.5,width:188.5,height:153.5,axle:280,body:'crossover',nose:'ev',lamp:'bar',roof:.31},
+    {id:'fox-c',name:'FOXTRON Cavira Pioneer',length:469.5,width:190.5,height:162.5,axle:292,body:'suv',nose:'ev',lamp:'bar',roof:.33},
     {id:'fox-t',name:'Foxtron Model T 電動巴士',length:1195,width:250,height:320,axle:600,body:'bus',nose:'cross',lamp:'bar',roof:.3},
     {id:'fox-k',name:'Foxtron Model K 小貨卡',length:340,width:148,height:190,axle:205,estimatedDimensions:true,source:'https://www.honhai.com/zh-tw/press-center/press-releases/latest-news/2134',body:'truck',nose:'cross',lamp:'bar',roof:.3}
     ,{id:'fox-d',name:'Foxtron Model D',length:519.5,width:199.5,height:178.5,axle:320,body:'suv',nose:'ev',lamp:'bar',roof:.35,source:'https://www.foxtronev.com/about-us'},

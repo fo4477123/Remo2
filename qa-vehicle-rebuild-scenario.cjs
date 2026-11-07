@@ -7,6 +7,10 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
     if(id==='fox-b')assert(await ev("B1_VEHICLE_GALLERY.models.get('fox-b').spec.name.includes('Bria')"));
     if(id==='fox-c')assert(await ev("B1_VEHICLE_GALLERY.models.get('fox-c').spec.name.includes('Cavira')"));
     if(id==='fox-b'||id==='fox-c'){
+      const runningGear=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)});return {trim:c.spec.trim,tyre:c.spec.tyreSpec,axles:[-1,1].map(sign=>{const w=c.wheels.filter(w=>Math.sign(w.position.z)===sign);return Math.abs(w[0].position.x-w[1].position.x);}),diameter:new T.Box3().setFromObject(c.wheels[0]).getSize(new T.Vector3()).y};})()`);
+      assert.equal(runningGear.trim,'Pioneer');assert.equal(runningGear.tyre,id==='fox-b'?'235/40 R20':'245/45 R19');
+      assert(Math.abs(runningGear.axles[1]-163.9)<.01,'Pioneer front track from official brochure');assert(Math.abs(runningGear.axles[0]-(id==='fox-b'?163.8:163.5))<.01,'Pioneer rear track from official brochure');
+      assert(Math.abs(runningGear.diameter-(id==='fox-b'?69.6:70.31))<.8,'Pioneer tyre diameter from sidewall specification');
       assert(await ev(`(()=>{const badge=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)}).high.getObjectByName('official-tailgate-emblem');if(!badge)return false;badge.geometry.computeBoundingBox();return badge.geometry.boundingBox.max.z<0&&badge.geometry.attributes.position.count>100;})()`),id+' has a visible rear emblem mesh, not only the front badge');
       const mouth=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)}),s=c.spec,p=B1_VEHICLE_FACES.profiles[s.id],y=(p.ductInlet[0][1]+p.ductInlet[2][1])*s.height/2;c.group.updateMatrixWorld(true);const ray=new T.Raycaster(new T.Vector3(0,y,s.length/2+30),new T.Vector3(0,0,-1)),hits=ray.intersectObject(c.high,true);return {firstDepth:hits[0]?.distance,lamps:c.lamps.length};})()`);
       console.log(id,'front duct',mouth);assert(mouth.firstDepth>40,id+' forward duct mouth has no surface cap');assert(mouth.lamps>=1,id+' headlight meshes survive material batching');

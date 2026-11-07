@@ -84,13 +84,13 @@
       for(const side of [-1,1])tube([[side*W*.32,H*.23,rearZ(side*W*.32,H*.23)-1.8],[side*W*.39,H*.218,rearZ(side*W*.39,H*.218)-1.8]],.9,red);
     }
     if(s.id==='fox-b'){
-      const bumper=[[-.88,.34],[-.52,.41],[.52,.41],[.88,.34],[.82,.17],[-.82,.17]].map(([x,y])=>[x*W*.45,y*H]);
+      const bumper=[[-.88,.25],[-.65,.285],[-.40,.33],[.40,.33],[.65,.285],[.88,.25],[.82,.17],[-.82,.17]].map(([x,y])=>[x*W*.45,y*H]);
       poly(bumper,trim,(x,y)=>rearZ(x,y)-.9,'bria-rear-diffuser');
       for(const x of [-W*.20,0,W*.20])box([x,27,rearZ(x,27)-1],[1.4,12,4],trim,.4);
       for(const side of [-1,1])tube([[side*W*.31,H*.245,rearZ(side*W*.31,H*.245)-2],[side*W*.40,H*.245,rearZ(side*W*.40,H*.245)-2]],.9,red);
     }
     // The name also acts as a testable vehicle identity when viewed from the front/rear.
-    const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const plateY=side>0?H*.25:H*(s.id==='fox-c'?.275:.36);const o=mesh(new T.PlaneGeometry(34,12),material,[0,plateY,side>0?frontZ(0,plateY)+4.4:rearZ(0,plateY)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
+    const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const plateY=side>0?H*.25:H*(s.id==='fox-b'?.26:s.id==='fox-c'?.275:.36);const o=mesh(new T.PlaneGeometry(34,12),material,[0,plateY,side>0?frontZ(0,plateY)+4.4:rearZ(0,plateY)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
     const rearBand=p.tailOutline||{focus:[[.24,.63],[.68,.63],[.94,.68],[.90,.59],[.69,.54]],altis:[[.24,.64],[.70,.63],[.94,.67],[.88,.57],[.58,.54]],sentra:[[.23,.64],[.73,.63],[.93,.67],[.88,.55],[.61,.53]],kicks:[[.30,.75],[.66,.76],[.94,.79],[.91,.66],[.60,.62]],kuga:[[.23,.68],[.69,.68],[.94,.72],[.91,.61],[.59,.60]],'corolla-cross':[[.22,.71],[.67,.71],[.94,.74],[.92,.64],[.60,.63]]}[s.id];
     for(const side of [-1,1]){
       if(s.id==='fox-c'){

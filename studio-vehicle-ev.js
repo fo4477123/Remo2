@@ -125,4 +125,7 @@
   for(const id of ['fox-b','fox-c'])p[id].drl[0][0]=.052;
   shapes['fox-b'].tailSection=[[0,7],[.18,2],[.36,3],[.51,5],[.65,7],[.82,3],[1,7]];
   shapes['fox-c'].tailSection=[[0,6],[.18,1],[.37,2],[.53,5],[.68,8],[.83,4],[1,7]];
+  // Pioneer standard specification: brochure BRIA p12 / CAVIRA p1.
+  Object.assign(shapes['fox-b'],{trim:'Pioneer',wheelRadius:34.8,rimRadius:25.4,tyreWidth:23.5,frontTrack:163.9,rearTrack:163.8,panoramicRoof:true,tyreSpec:'235/40 R20'});
+  Object.assign(shapes['fox-c'],{trim:'Pioneer',wheelRadius:35.155,rimRadius:24.13,tyreWidth:24.5,frontTrack:163.9,rearTrack:163.5,panoramicRoof:true,tyreSpec:'245/45 R19'});
 })();

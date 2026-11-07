@@ -107,3 +107,7 @@ The tailgate wordmark has a separate texture and panel: 64 pixel letter-centre s
 The previous official emblem geometry was front-only. Added a separate rear-facing emblem in the central optical-band insert on both Bria and Cavira, following the rear surface. It is retained as an independently named mesh and checked by gallery QA so omission cannot be hidden by front-badge validation.
 
 Replaced the partial floating rear-panel lines with independent smooth three-sided tailgate boundaries that terminate at the optical-band joints. Reduced oscillation of the rear depth sections and removed the forced upper normal bias on the sectioned rear skin. Added the tailgate/emblem close-up camera. Final focused checks passed and rear close-ups inspected. These repairs do not establish exact factory shape fidelity.
+
+## Pioneer baseline locked
+
+User selected both Pioneer variants. See FOXTRON-PIONEER-BASELINE.md for primary sources, exact nominal running-gear values, standard equipment and remaining uncertainty. Updated actual tyre/rim sizes, wheel-pivot tracks, glass roof, black upholstery and variant labels. Reduced the oversized Bria lower black bumper and corrected rear plate height; removed duplicate generic reflectors. Focused checks now measure official track and tyre-diameter targets, and passed. Full shape fidelity is not complete.

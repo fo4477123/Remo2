@@ -18,7 +18,7 @@
   function batch(parent){const buckets=new Map();for(const o of [...parent.children])if(o.isMesh&&!o.userData.keep){if(!buckets.has(o.material))buckets.set(o.material,[]);buckets.get(o.material).push(o);}for(const [material,list]of buckets){if(list.length<2)continue;const p=[],n=[],uv=[];for(const o of list){o.updateMatrix();const g=o.geometry.index?o.geometry.toNonIndexed():o.geometry.clone();g.applyMatrix4(o.matrix);const v=g.attributes.position,no=g.attributes.normal,u=g.attributes.uv;for(let i=0;i<v.count;i++){p.push(v.getX(i),v.getY(i),v.getZ(i));n.push(no.getX(i),no.getY(i),no.getZ(i));uv.push(u?u.getX(i):0,u?u.getY(i):0);}g.dispose();o.removeFromParent();o.geometry.dispose();}const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(p,3));geo.setAttribute('normal',new T.Float32BufferAttribute(n,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.computeBoundingSphere();const o=new T.Mesh(geo,material);o.castShadow=!material.transparent;o.receiveShadow=!material.userData.noSelfShadow;parent.add(o);}}
   function smoothNormals(g){const p=g.attributes.position,n=g.attributes.normal,buckets=new Map();for(let i=0;i<p.count;i++){const key=[p.getX(i),p.getY(i),p.getZ(i)].map(v=>Math.round(v*1000)).join(',');if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(i);}for(const ids of buckets.values()){if(ids.length<2)continue;const normal=new T.Vector3();for(const i of ids)normal.add(new T.Vector3(n.getX(i),n.getY(i),n.getZ(i)));normal.normalize();for(const i of ids)n.setXYZ(i,normal.x,normal.y,normal.z);}n.needsUpdate=true;}
   function build(s,color){
-    const leather=['fox-b','fox-c'].includes(s.id)?mat('#d5d2c7',.78):mat('#313a40',.82);
+    const leather=mat(['fox-b','fox-c'].includes(s.id)?'#252b30':'#313a40',.82);
     const root=new T.Group(),wheels=[],lamps=[],cfg={...looks[s.id],...B1_VEHICLE_FACES.profiles[s.id]},shape=shapes[s.id],L=s.length,W=s.width,H=s.height,A=s.axle/2,suv=['suv','crossover'].includes(s.body),R=shape.wheelRadius||(s.id==='fox-d'?39:suv?35:33),paint=new T.MeshPhysicalMaterial({color,roughness:shape.sectionedBody?.27:.21,metalness:shape.sectionedBody?.48:.72,clearcoat:1,clearcoatRoughness:.08,envMapIntensity:1.25}),roofPaint=['sentra','kicks','fox-a','fox-b','fox-c','fox-d'].includes(s.id)?(shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#151b20',roughness:.26,metalness:.25,clearcoat:1}):trim):paint;
     paint.userData.noSelfShadow=true;root.name='sculpted-'+s.id;const parts={body:0,lamps:0,cabin:0,wheel:0};
     function mesh(g,m,p=[0,0,0],name='',parent=root){const o=new T.Mesh(g,m);o.position.set(...p);o.name=name;o.castShadow=!m.transparent;o.receiveShadow=!m.userData.noSelfShadow;parent.add(o);return o;}
@@ -139,7 +139,8 @@
       for(let row=0;row<7;row++)tube(Array.from({length:33},(_,i)=>rearWindow(.13+row*.105,(i/32*2-1)*.91)),.055,heater);
       tube(Array.from({length:49},(_,i)=>rearWindow(0,i/48*2-1)),.32,trim);
     }
-    patch(32,32,(t,u)=>roofAt(roofRear+(roofFront-roofRear)*t,u*2-1),s.id==='model-3'?roofGlass:roofPaint,'roof-crown-'+s.id);
+    patch(32,32,(t,u)=>roofAt(roofRear+(roofFront-roofRear)*t,u*2-1),s.id==='model-3'?roofGlass:roofPaint,'roof-crown-'+s.id,shape.panoramicRoof?(t,u)=>t>.125&&t<.875&&u>.09375&&u<.90625:null);
+    if(shape.panoramicRoof)patch(24,32,(t,u)=>roofAt(roofRear+(roofFront-roofRear)*(.125+.75*t),(u*2-1)*.8125),roofGlass,'pioneer-panoramic-roof');
     patch(22,32,(t,u)=>roofAt(roofFront+(front-roofFront)*t,u*2-1),glass,'windscreen-'+s.id);
     if(shape.sectionedBody)for(const side of [-1,1]){
       patch(40,8,(t,v)=>{const z=roofFront+(front-roofFront)*t,q=roofAt(z,side*(.91+.09*v));q[1]+=.15;return q;},paint,'formed-a-pillar-windscreen');
@@ -295,7 +296,7 @@
         const curve=new T.CatmullRomCurve3(outline.map(([x,y])=>new T.Vector3(x*W,y*H,0)),false,'centripetal');
         tube(Array.from({length:121},(_,i)=>{const q=curve.getPoint(i/120);return[q.x,q.y,rearZ(q.x,q.y)-.10];}),.12,trim,root,true);
       }
-      const contour=(s.id==='fox-c'?[[-.32,.65],[-.31,.43],[-.27,.38],[.27,.38],[.31,.43],[.32,.65]]:s.id==='fox-b'?[[-.37,.63],[-.32,.46],[.32,.46],[.37,.63]]:[[-.42,.58],[-.37,.37],[.37,.37],[.42,.58]]).map(([x,y])=>[x*W,y*H,rearZ(x*W,y*H)]);if(!shape.sectionedBody)tube(contour,.32,trim,root,true);if(s.id!=='fox-c')box([0,H*.36,rearZ(0,H*.36)+1],[38,14,1],trim,2);if(!shape.sectionedBody)box([0,H*.54,rearZ(0,H*.54)-.6],[s.nose==='ford'?11:8,4,.8],metal,1);for(const side of [-1,1])tube(Array.from({length:9},(_,i)=>{const x=side*(W*.27+i*2);return[x,29,rearZ(x,29)-.6];}),.9,red);}
+      const contour=(s.id==='fox-c'?[[-.32,.65],[-.31,.43],[-.27,.38],[.27,.38],[.31,.43],[.32,.65]]:s.id==='fox-b'?[[-.37,.63],[-.32,.46],[.32,.46],[.37,.63]]:[[-.42,.58],[-.37,.37],[.37,.37],[.42,.58]]).map(([x,y])=>[x*W,y*H,rearZ(x*W,y*H)]);if(!shape.sectionedBody)tube(contour,.32,trim,root,true);if(!shape.sectionedBody)box([0,H*.36,rearZ(0,H*.36)+1],[38,14,1],trim,2);if(!shape.sectionedBody)box([0,H*.54,rearZ(0,H*.54)-.6],[s.nose==='ford'?11:8,4,.8],metal,1);if(!shape.sectionedBody)for(const side of [-1,1])tube(Array.from({length:9},(_,i)=>{const x=side*(W*.27+i*2);return[x,29,rearZ(x,29)-.6];}),.9,red);}
     }
     if(suv&&!s.id.startsWith('fox-'))for(const sign of [-1,1])tube(Array.from({length:25},(_,i)=>{const x=(i/24-.5)*W*.60;return[x,22,noseZ(x,sign*L/2,22)+sign];}),1.4,metal);
     // Seats, dashboard, console, instrument cluster, steering and door cards are actual geometry.
@@ -355,14 +356,14 @@
     // Closed revolved tyre sections and open alloy barrels expose the brake hardware.
     // These three production references have genuinely different wheel topology.
     function productionWheel(side,z){
-      const wheel=new T.Group();wheel.name='sculpt-wheel-'+wheels.length;wheel.position.set(side*(W/2-10.5),R,z);root.add(wheel);
-      const style=shape.wheelStyle,rr=R*(style==='highland-photon'?.715:.735);
+      const wheel=new T.Group();wheel.name='sculpt-wheel-'+wheels.length;wheel.position.set(side*(shape.frontTrack?(z>0?shape.frontTrack:shape.rearTrack)/2:W/2-10.5),R,z);root.add(wheel);
+      const style=shape.wheelStyle,rr=shape.rimRadius||R*(style==='highland-photon'?.715:.735),tyreScale=(shape.tyreWidth||22.8)/22.8;
       const cutFinish=shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#afb3b7',metalness:.92,roughness:.26,clearcoat:.35,clearcoatRoughness:.14}):metal;
       const castFinish=shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#15191c',metalness:.55,roughness:.27,clearcoat:.7,clearcoatRoughness:.12}):darkMetal;
-      const section=[[rr,-10],[R-4,-11.4],[R-1.4,-9.3],[R,-6.7],[R,6.7],[R-1.4,9.3],[R-4,11.4],[rr,10],[rr,-10]].map(p=>new T.Vector2(...p));
+      const section=[[rr,-10],[R-4,-11.4],[R-1.4,-9.3],[R,-6.7],[R,6.7],[R-1.4,9.3],[R-4,11.4],[rr,10],[rr,-10]].map(([r,x])=>new T.Vector2(r,x*tyreScale));
       const tyre=mesh(new T.LatheGeometry(section,96),rubber,[0,0,0],'production-tyre',wheel);tyre.rotation.z=Math.PI/2;
-      for(const x of [-4.8,-1.6,1.6,4.8]){const groove=mesh(new T.TorusGeometry(R+.025,.19,4,96),trim,[x,0,0],'recessed-tread-channel',wheel);groove.rotation.y=Math.PI/2;}
-      for(let i=0;i<72;i++)for(const flank of [-1,1]){const a=i*Math.PI/36;const pts=[0,1,2].map(k=>{const x=flank*(6.2+k*2.2),radius=R-.2-k*.7,theta=a+k*.013;return[x,Math.sin(theta)*radius,Math.cos(theta)*radius];});tube(pts,.16,trim,wheel);}
+      for(const x of [-4.8,-1.6,1.6,4.8]){const groove=mesh(new T.TorusGeometry(R+.025,.19,4,96),trim,[x*tyreScale,0,0],'recessed-tread-channel',wheel);groove.rotation.y=Math.PI/2;}
+      for(let i=0;i<72;i++)for(const flank of [-1,1]){const a=i*Math.PI/36;const pts=[0,1,2].map(k=>{const x=flank*(6.2+k*2.2)*tyreScale,radius=R-.2-k*.7,theta=a+k*.013;return[x,Math.sin(theta)*radius,Math.cos(theta)*radius];});tube(pts,.16,trim,wheel);}
       const barrel=mesh(new T.CylinderGeometry(rr,rr,20,72,1,true),darkMetal,[0,0,0],'open-alloy-barrel',wheel);barrel.rotation.z=Math.PI/2;
       const rotorMaterial=mat('#686c70',.48,{metalness:.75});
       const rotor=mesh(new T.CylinderGeometry(rr*.67,rr*.67,.8,64),rotorMaterial,[side*5.5,0,0],'machined-brake-disc',wheel);rotor.rotation.z=Math.PI/2;
@@ -432,7 +433,7 @@
       const lip=mesh(new T.TorusGeometry(R*.705,.8,5,48),metal,[side*10.8,0,0],'diamond-cut-rim-lip',wheel);lip.rotation.y=Math.PI/2;
       box([side*9,6,R*.43],[4,13,7],darkMetal,2,wheel);for(let i=0;i<5;i++){const a=i*Math.PI*.4;const lug=mesh(new T.CylinderGeometry(.9,.9,1.1,8),metal,[side*12,Math.sin(a)*4,Math.cos(a)*4],'wheel-lug',wheel);lug.rotation.z=Math.PI/2;}const cap=mesh(new T.CylinderGeometry(3,3,24.8,24),trim,[0,0,0],'hub-cap',wheel);cap.rotation.z=Math.PI/2;batch(wheel);wheels.push(wheel);parts.wheel+=cfg.spokes;
     }
-    const rider=new T.Group();rider.visible=false;root.add(rider);batch(root);let triangles=0;root.traverse(o=>{if(o.isMesh)triangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3;});root.userData.features=['curved-independent-panels','open-wheel-arches','wheel-well-liners','curved-transparent-glazing','projector-headlamps','model-specific-grille','detailed-alloy-wheels','tyre-grooves','brake-rotors-calipers',s.id==='fox-d'?'seven-seat-cabin':'five-seat-cabin','steering-dashboard','door-seams-wipers','taiwan-plates'];root.userData.triangles=triangles;return{group:root,wheels,lamps,rider,type:'car',features:root.userData.features,spec:{...s,...face,color,detail:'coachwork-v5',triangles,interpretation:true}};
+    const rider=new T.Group();rider.visible=false;root.add(rider);batch(root);let triangles=0;root.traverse(o=>{if(o.isMesh)triangles+=(o.geometry.index?.count||o.geometry.attributes.position.count)/3;});root.userData.features=['curved-independent-panels','open-wheel-arches','wheel-well-liners','curved-transparent-glazing','projector-headlamps','model-specific-grille','detailed-alloy-wheels','tyre-grooves','brake-rotors-calipers',s.id==='fox-d'?'seven-seat-cabin':'five-seat-cabin','steering-dashboard','door-seams-wipers','taiwan-plates'];root.userData.triangles=triangles;return{group:root,wheels,lamps,rider,type:'car',features:root.userData.features,spec:{...s,...face,...(shape.trim?{trim:shape.trim,tyreSpec:shape.tyreSpec}:{}),color,detail:'coachwork-v5',triangles,interpretation:true}};
   }
   function create(s,color){const key=[s.id,s.length,s.width,s.height,s.axle,color].join(':');let template=cache.get(key);if(!template){template=build(s,color);cache.set(key,template);}const group=template.group.clone(true),wheels=Array.from({length:4},(_,i)=>group.getObjectByName('sculpt-wheel-'+i));return{...template,group,wheels,lamps:cloneLights(group),rider:group.children.find(o=>o.isGroup&&!o.children.length)};}
   window.B1_VEHICLE_SCULPT={create,looks,shapes,batch,cloneLights};
