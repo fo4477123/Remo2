@@ -65,6 +65,9 @@
     // Continuous curved body skin, separately formed wheel shoulders, recessed sill and hood crown.
     const archBase=z=>Math.max(19,...[-A,A].map(a=>Math.abs(z-a)<R+4?R+Math.sqrt((R+4)**2-(z-a)**2):19));
     const fenderVents=shape.sectionedBody?[{z:A+R+10,w:s.id==='fox-b'?10:9,lo:.20,hi:.62},{z:-A-R-10,w:s.id==='fox-b'?9:8,lo:.20,hi:.58}]:[];
+    // Set opening height in centimetres relative to the tyre, not as an
+    // arbitrary fraction of the varying bumper / fender panel height.
+    for(const vent of fenderVents)vent.hi=Math.min(.92,(2*R+(vent.z>0?8:7)-19)/(edge(vent.z)-19));
     const zNodes=[...new Set([...Array.from({length:177},(_,i)=>-L/2+i/176*L),...fenderVents.flatMap(v=>[v.z-v.w/2,v.z+v.w/2])])].sort((a,b)=>a-b),vNodes=[...new Set([...Array.from({length:shape.sectionedBody?25:19},(_,i)=>i/(shape.sectionedBody?24:18)),...fenderVents.flatMap(v=>[v.lo,v.hi])])].sort((a,b)=>a-b);
     const nodeAt=(nodes,t)=>{const n=t*(nodes.length-1),i=Math.min(nodes.length-2,Math.floor(n));return nodes[i]+(nodes[i+1]-nodes[i])*(n-i);};
     const sideSurface=(z,v,side,depth=0)=>{const bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-depth);return[x,y,noseZ(x,z,y)];};
@@ -76,7 +79,7 @@
         // Open duct into the wheel-house volume: there is no dark end cap.
         // The inner aperture moves towards the tyre and below the arch crown.
         const through=(z,v,t)=>{const p=sideSurface(z,v,side),q=[side*(W/2-22),R+6+12*(v-vent.lo)/(vent.hi-vent.lo),z-Math.sign(vent.z)*10];return p.map((n,i)=>n+(q[i]-n)*t);};
-        (root.userData.fenderDucts??=[]).push({entry:through(vent.z,(vent.lo+vent.hi)/2,0),exit:through(vent.z,(vent.lo+vent.hi)/2,1)});
+        (root.userData.fenderDucts??=[]).push({entry:through(vent.z,(vent.lo+vent.hi)/2,0),exit:through(vent.z,(vent.lo+vent.hi)/2,1),upperRim:[through(z0,vent.hi,0),through(z1,vent.hi,0)]});
         for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];patch(16,12,(t,u)=>through(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,u),i===0?paint:darkMetal,'open-fender-duct-wall');}
       }
     }

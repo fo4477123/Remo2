@@ -117,3 +117,7 @@ User selected both Pioneer variants. See FOXTRON-PIONEER-BASELINE.md for primary
 Rechecked BRIA official brochure page 5 and CAVIRA OuterDetail4. Reduced the exaggerated centre badge-ramp recess and softened its return below the running-light bridge. Replaced the thick circular lower bumper tubes with formed flat lips and return surfaces. Refined BRIA honeycomb cell spacing and strut thickness. These are still photograph-estimated surfaces.
 
 Focused checks passed for the locked Pioneer tyre/track dimensions, finite geometry, rear emblem, wheel houses, LOD, rolling, S-duct clearance and four open fender ducts. Front close-up images inspected. Full OEM shape fidelity remains incomplete.
+
+## Fender opening height correction
+
+Per user feedback, the opening upper edges now reference the tyre crown in centimetres. Centre targets are 8 cm above the front tyre and 7 cm above the rear tyre; actual edge samples on the varying body surface clear the crown by approximately 6.9-7.6 cm. The four open duct walls follow the taller apertures. These are user-directed modelling controls, not factory-measured heights. Focused checks passed for upper-edge clearance, open ducts, Pioneer running gear, LOD and rolling; the charge-side preview was inspected.

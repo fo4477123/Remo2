@@ -20,6 +20,8 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
       assert(wells.every(d=>Number.isFinite(d)&&d<190),id+' wheel houses block the background above all four tyres');
       const channels=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)});let ports;c.high.traverse(o=>{if(o.userData.fenderDucts)ports=o.userData.fenderDucts;});return (ports||[]).map(p=>{const a=new T.Vector3(...p.entry),b=new T.Vector3(...p.exit),d=b.sub(a).normalize(),ray=new T.Raycaster(a.clone().addScaledVector(d,-10),d);return ray.intersectObject(c.high,true)[0]?.distance??null;});})()`);
       console.log(id,'open fender ducts',channels);assert.equal(channels.length,4);assert(channels.every(d=>d===null||d>18),id+' fender ducts have no shallow closing plate');
+      const clearance=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)}),r=B1_VEHICLE_SCULPT.shapes[c.spec.id].wheelRadius;let ports;c.high.traverse(o=>{if(o.userData.fenderDucts)ports=o.userData.fenderDucts;});return ports.map(p=>Math.min(...p.upperRim.map(q=>q[1]))-2*r);})()`);
+      console.log(id,'vent upper-edge clearance above tyre',clearance);assert(clearance.every(v=>v>5),id+' front and rear duct upper edges exceed tyre crown');
     }
     if(id==='model-3'){
       assert(report.features.includes('licensed-2018-model'),'Downloaded Model 3 is actually used');
