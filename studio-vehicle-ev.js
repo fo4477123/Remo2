@@ -137,8 +137,10 @@
     p[id].tailPocketShift=.022;p[id].tailOpticInset=3;
     p[id].tailHeightAnchor=id==='fox-b'?.7025:.711;
     p[id].tailHeightScale=id==='fox-b'?.78:1.10;
-    const outline=id==='fox-b'?[[.044,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.044,.67]]:[[.044,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[.044,.674]];
+    const outline=id==='fox-b'?[[.044,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.044,.67]]:[[0,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[0,.674]];
     p[id].tailPocket=outline.map(([x,y])=>[x,B1_VEHICLE_FACES.tailHeight(p[id],y)]);
+    if(id==='fox-b')p[id].tailPocketContours=[-1,1].map(side=>p[id].tailPocket.map(([x,y])=>[side*x,y]));
+    else p[id].tailPocketContours=[[...p[id].tailPocket.slice(0,-1),...p[id].tailPocket.slice(1).reverse().map(([x,y])=>[-x,y])]];
   }
   // Rounded lower trapezoids traced independently from the brochure / front
   // exterior photographs; the old six-sided mouths pinched back in at the base.
@@ -152,4 +154,11 @@
   }
   p['fox-b'].grille=lowerIntake(.64,.87,.355,.165);
   p['fox-c'].grille=lowerIntake(.60,.83,.337,.162);
+  // Keep the projector pockets inside the painted corners and separate from
+  // the centre S-duct mouth. The lens and the body use these same boundaries.
+  for(const id of ['fox-b','fox-c']){
+    p[id].head=p[id].head.map(([x,y],i)=>[i===0?.68:i===4?.69:x,y-(i===0?.012:i===1?.018:0)]);
+    p[id].projectors=p[id].projectors.map(([x,y])=>[x,y-(id==='fox-b'?.006:.004)]);
+    p[id].headPockets=[-1,1].map(side=>p[id].head.map(([x,y])=>[side*x,y]));
+  }
 })();

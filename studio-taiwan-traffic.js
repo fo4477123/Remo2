@@ -43,7 +43,22 @@
     const badge=mesh(new T.SphereGeometry(1,12,8),chrome,[0,belt*.78,frontZ+2]);badge.scale.set(s.nose==='ford'?7:5,s.nose==='ford'?3:4,1);box([0,27,frontZ+3],[32,10,2],white);box([0,39,-frontZ-2],[32,10,2],white);box([0,H+1,-L*.17],[3,5,7],black);const rider=new T.Group();rider.visible=false;root.add(rider);merge(root);return {group:root,wheels,rider,lamps:[],type:'car',spec:{...s,color,interpretation:true},features:['wheel-openings','separate-glazing',s.body,s.nose+'-grille','moving-wheels']};
   }
   function coarse(id,color='#cad0d0'){const s=specs.find(s=>s.id===id)||specs[0],key=s.id+color;let t=templates.get(key);if(!t){t=make(s,color);templates.set(key,t);}const group=t.group.clone(true);return {...t,group,wheels:group.children.filter(g=>g.isGroup&&g.children.some(c=>c.isMesh)),rider:group.children.find(g=>g.isGroup&&!g.children.length)};}
-  function create(id,color='#cad0d0'){const s=specs.find(x=>x.id===id)||specs[0];if(s.body==='bus'||s.body==='truck')return B1_VEHICLE_COMMERCIAL.create(s,color);const low=coarse(id,color),high=window.B1_VEHICLE_IMPORTS?.create(s,color)||B1_VEHICLE_SCULPT.create(s,color),group=new T.Group();group.name='taiwan-traffic-'+s.id;group.add(high.group,low.group);high.group.visible=true;low.group.visible=false;let detailed=true;return {...high,spec:{...high.spec,...s,color,interpretation:high.spec.interpretation},group,high:high.group,low:low.group,setDetail:value=>{detailed=Boolean(value);high.group.visible=detailed;low.group.visible=!detailed;},animateWheels:angle=>{for(const wheel of detailed?high.wheels:low.wheels)wheel.rotation.x+=angle;},detail:()=>detailed};}
+  function create(id,color='#cad0d0'){
+    const s=specs.find(x=>x.id===id)||specs[0];if(s.body==='bus'||s.body==='truck')return B1_VEHICLE_COMMERCIAL.create(s,color);
+    const low=coarse(id,color),group=new T.Group();let high=window.B1_VEHICLE_IMPORTS?.create(s,color)||B1_VEHICLE_SCULPT.create(s,color),detailed=true;
+    group.name='taiwan-traffic-'+s.id;group.add(high.group,low.group);high.group.visible=true;low.group.visible=false;
+    const vehicle={...high,spec:{...high.spec,...s,color,interpretation:high.spec.interpretation},group,high:high.group,low:low.group,setDetail:value=>{detailed=Boolean(value);high.group.visible=detailed;low.group.visible=!detailed;},animateWheels:angle=>{for(const wheel of detailed?high.wheels:low.wheels)wheel.rotation.x+=angle;},detail:()=>detailed};
+    if(s.id==='model-3'&&high.spec.interpretation&&window.B1_VEHICLE_IMPORTS?.loaded)B1_VEHICLE_IMPORTS.loaded.then(ok=>{
+      if(!ok)return;const imported=B1_VEHICLE_IMPORTS.create(s,color);if(!imported)return;
+      const old=high,activeWheels=detailed?old.wheels:low.wheels;
+      for(const wheel of imported.wheels){const previous=activeWheels.find(w=>Math.sign(w.position.x)===Math.sign(wheel.position.x)&&Math.sign(w.position.z)===Math.sign(wheel.position.z));if(previous)wheel.rotation.x=previous.rotation.x;}
+      imported.rider.visible=old.rider.visible;imported.rider.position.copy(old.rider.position);imported.rider.quaternion.copy(old.rider.quaternion);imported.rider.scale.copy(old.rider.scale);for(const child of [...old.rider.children])imported.rider.add(child);
+      for(let i=0;i<imported.lamps.length;i++)if(old.lamps[i])imported.lamps[i].material.emissiveIntensity=old.lamps[i].material.emissiveIntensity;
+      group.remove(old.group);high=imported;high.group.visible=detailed;group.add(high.group);
+      Object.assign(vehicle,imported,{group,high:high.group,low:low.group,spec:{...imported.spec,...s,color,interpretation:false}});
+    });
+    return vehicle;
+  }
   function traffic({data,world,toWorld,clear,water,pedestrians=[]}){
     const cars=[],paths=[],colors=['#d9deda','#5f7887','#ecebe3','#746c65','#37434b','#a75d4d'];let serial=0;
     const point=(path,s)=>{s=Math.max(0,Math.min(path.length-.001,s));let i=1;while(i<path.dist.length-1&&path.dist[i]<s)i++;const a=path.points[i-1],b=path.points[i],t=(s-path.dist[i-1])/(path.dist[i]-path.dist[i-1]),dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy);return{p:[a[0]+dx*t-dy/l*path.lane,a[1]+dy*t+dx/l*path.lane],u:[dx/l,dy/l]};};

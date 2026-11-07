@@ -2,7 +2,9 @@
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{spawn}=require('node:child_process');
 const assert=require('node:assert/strict');
 const root=__dirname,outputRoot=path.join(root,'qa-output');fs.mkdirSync(outputRoot,{recursive:true});const out=fs.mkdtempSync(path.join(outputRoot,'run-'));console.log('QA artifacts: '+out);
-const server=http.createServer((req,res)=>{const target=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!target.startsWith(root+path.sep)){res.writeHead(403).end();return;}fs.readFile(target,(err,data)=>{if(err){res.writeHead(404).end();return;}const ext=path.extname(target);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.jpg':'image/jpeg','.glb':'model/gltf-binary','.mp3':'audio/mpeg'})[ext]||'application/octet-stream');res.end(data);});});
+const originalModel3=fs.readFileSync(path.join(root,'assets/models/vehicles/model-3-2018.glb'));
+assert.equal(require('node:crypto').createHash('sha1').update('blob '+originalModel3.length+'\0').update(originalModel3).digest('hex'),'49b385eb2b431427e5970881868c906f4efca133','Model 3 GLB is byte-identical to its original imported asset');
+const server=http.createServer((req,res)=>{const target=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));if(!target.startsWith(root+path.sep)){res.writeHead(403).end();return;}const send=()=>fs.readFile(target,(err,data)=>{if(err){res.writeHead(404).end();return;}const ext=path.extname(target);res.setHeader('Content-Type',({'.js':'text/javascript','.css':'text/css','.html':'text/html','.png':'image/png','.jpg':'image/jpeg','.glb':'model/gltf-binary','.mp3':'audio/mpeg'})[ext]||'application/octet-stream');res.end(data);});if(process.argv.includes('--slow-model3')&&target.endsWith('model-3-2018.glb'))setTimeout(send,21000);else send();});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
 (async()=>{
  await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -20,7 +22,15 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));let browser,ws;
  await cdp('Page.addScriptToEvaluateOnNewDocument',{source:'localStorage.setItem("b1-gpu-quality-v1","low")'});
  const mode=process.env.B1_RENDERER||process.argv[2]||'webgl';await cdp('Page.navigate',{url:`http://127.0.0.1:${server.address().port}/vehicle-gallery.html`});
  const wait=async(ex,msg,limit=120000)=>{const end=Date.now()+limit;while(Date.now()<end){if(await ev(ex))return;await sleep(200);}throw Error(msg+' '+JSON.stringify(await ev('({load:document.querySelector("#status")?.textContent})')));};
+ if(process.argv.includes('--slow-model3')){
+   await wait('Boolean(window.B1_TAIWAN_TRAFFIC)&&B1_VEHICLE_IMPORTS.status.pending','Factories available before delayed GLB');
+   assert(await ev(`(()=>{const v=B1_TAIWAN_TRAFFIC.create('model-3','#a9b3bc');window.lateModel3={vehicle:v,original:v.high};v.group.position.set(7,8,9);v.setDetail(false);v.animateWheels(.4);const driver=new T.Group();driver.name='late-test-driver';v.rider.add(driver);v.rider.visible=true;return v.spec.interpretation===true;})()`),'Reproduce early substitute while download is pending');
+ }
  await wait('Boolean(window.B1_VEHICLE_GALLERY?.ready)','Ready');await cdp('Page.bringToFront');await cdp('Page.captureScreenshot',{format:'png'});
+ if(process.argv.includes('--slow-model3')){
+   const recovery=await ev(`(async()=>{const v=lateModel3.vehicle;return {grace:await B1_VEHICLE_IMPORTS.ready,loaded:B1_VEHICLE_IMPORTS.status.loaded,licensed:v.features.includes('licensed-2018-model'),interpretation:v.spec.interpretation,oldDetached:!lateModel3.original.parent,position:v.group.position.toArray(),far:!v.detail()&&!v.high.visible&&v.low.visible,wheels:v.wheels.every(w=>Math.abs(w.rotation.x-.4)<.001),driver:Boolean(v.rider.getObjectByName('late-test-driver'))&&v.rider.visible};})()`);
+   console.log('Delayed Model 3 recovery',recovery);assert(!recovery.grace&&recovery.loaded&&recovery.licensed&&!recovery.interpretation&&recovery.oldDetached&&recovery.far&&recovery.wheels&&recovery.driver);assert.deepEqual(recovery.position,[7,8,9]);
+ }
  if(mode==='webgpu')assert(await ev('B1_ENGINE.webgpu'),'Actual WebGPU');
  const shot=async name=>{await sleep(500);const p=await cdp('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(p.data,'base64'));};
  const key=async(k,down=true)=>cdp('Input.dispatchKeyEvent',{type:down?'keyDown':'keyUp',key:k});

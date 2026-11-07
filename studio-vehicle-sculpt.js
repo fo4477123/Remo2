@@ -103,7 +103,7 @@
       for(let i=1;i<=32;i++){const v=i/32,y=19+(topY(z,1)-19)*v;outline.push(new T.Vector2(sideX(z,v),y));}
       for(let i=1;i<=48;i++){const a=1-2*i/48;outline.push(new T.Vector2(a*sideX(z,1),topY(z,a)));}
       for(let i=31;i>0;i--){const v=i/32,y=19+(topY(z,-1)-19)*v;outline.push(new T.Vector2(-sideX(z,v),y));}
-      const holes=integratedTail?[-1,1].map(side=>profile.tailPocket.map(([x,y])=>new T.Vector2(side*x*W*.45,y*H))):[profile.grille,profile.ductInlet].map(points=>points.map(([x,y])=>new T.Vector2(x*W*.45,y*H)));
+      const holes=integratedTail?profile.tailPocketContours.map(points=>points.map(([x,y])=>new T.Vector2(x*W*.45,y*H))):[profile.grille,profile.ductInlet,...profile.headPockets].map(points=>points.map(([x,y])=>new T.Vector2(x*W*.45,y*H)));
       const all=[...outline,...holes.flat()],tri=T.ShapeUtils.triangulateShape(outline,holes),pos=[];
       // Bound edge lengths in centimetres rather than subdividing every
       // ear-clipped triangle equally: long narrow triangles caused creases.
@@ -120,13 +120,15 @@
       // inlet border meets the concave badge ramp.
       const gp=g.attributes.position,gn=g.attributes.normal;
       for(let i=0;i<gp.count;i++){const x=gp.getX(i),y=gp.getY(i),e=.04,n=new T.Vector3(-sign*(noseZ(x+e,z,y)-noseZ(x-e,z,y))/(2*e),-sign*(noseZ(x,z,y+e)-noseZ(x,z,y-e))/(2*e),sign).normalize();gn.setXYZ(i,n.x,n.y,n.z);}
-      const skin=mesh(g,paint,[0,0,0],integratedTail?'rear-skin-with-lamp-pockets':'perforated-front-bumper');if(integratedTail)skin.userData.keep=true;
-      for(const hole of integratedTail?holes:[holes[0]])for(let i=0;i<hole.length;i++){
+      const skin=mesh(g,paint,[0,0,0],integratedTail?'rear-skin-with-lamp-pockets':'perforated-front-bumper');skin.userData.keep=true;
+      for(const hole of integratedTail?holes:[holes[0],...holes.slice(2)])for(let i=0;i<hole.length;i++){
         const a=hole[i],b=hole[(i+1)%hole.length];
-        patch(6,24,(t,u)=>{const x=a.x+(b.x-a.x)*u,y=a.y+(b.y-a.y)*u;return[x,y,noseZ(x,z,y)-sign*(integratedTail?2.8:8)*t];},trim,integratedTail?'tail-pocket-return-wall':'recessed-intake-wall');
+        patch(6,24,(t,u)=>{const x=a.x+(b.x-a.x)*u,y=a.y+(b.y-a.y)*u;return[x,y,noseZ(x,z,y)-sign*(integratedTail?2.8:hole===holes[0]?8:4)*t];},trim,integratedTail?'tail-pocket-return-wall':hole===holes[0]?'recessed-intake-wall':'head-pocket-return-wall');
       }
       if(integratedTail)root.userData.tailPocketProbes=[-1,1].flatMap(side=>[.20,.40].map(a=>{const x=side*W*a,y=H*B1_VEHICLE_FACES.tailHeight(profile,.69);return[x,y,noseZ(x,z,y)];}));
       else root.userData.lowerGrilleProbes=[-1,1].map(side=>{const x=side*W*.14,y=H*.25;return[x,y,noseZ(x,z,y)];});
+      if(integratedTail&&s.id==='fox-c')root.userData.tailCentreProbes=[-1,0,1].map(x=>{const y=H*B1_VEHICLE_FACES.tailHeight(profile,.711);return[x,y,noseZ(x,z,y)];});
+      if(!integratedTail)root.userData.headPocketProbes=[-1,1].flatMap(side=>profile.projectors.map(([a,b])=>{const x=side*a*W*.45,y=b*H;return[x,y,noseZ(x,z,y)];}));
     }
 
     // The cabin must remain open above the floor; a waist-height cap hid the interior.

@@ -15,9 +15,9 @@
     const front=(points,m,depth=1)=>poly(points.map(scale),m,(x,y)=>frontZ(x,y)+depth),line=(points,r,m,depth=2)=>tube(points.flatMap((a,i)=>i?Array.from({length:8},(_,k)=>{const b=points[i-1],t=(k+1)/8;return to3([b[0]+(a[0]-b[0])*t,b[1]+(a[1]-b[1])*t],depth);}):[to3(a,depth)]),r,m,root,true);
     const tailPoint=([x,y])=>[x*W*.45,tailHeight(p,y)*H],tailSurface=(x,y,depth)=>rearZ(x,y)+(p.tailOpticInset||0)-depth;
     function splitTail(points){
-      const side=Math.sign(points.reduce((sum,p)=>sum+p[0],0))||1,split=side*W*(s.id==='fox-b'?.315:.335);
-      const clip=(limit,less)=>{const result=[];for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length],inside=q=>less?q[0]<=limit:q[0]>=limit,ia=inside(a),ib=inside(b);if(ia)result.push(a);if(ia!==ib){const t=(limit-a[0])/(b[0]-a[0]);result.push([limit,a[1]+(b[1]-a[1])*t]);}}return result;};
-      return [clip(split-.16,true),clip(split+.16,false)].filter(p=>p.length>2);
+      const split=W*(s.id==='fox-b'?.315:.335);
+      const clip=(polygon,limit,less)=>{const result=[];for(let i=0;i<polygon.length;i++){const a=polygon[i],b=polygon[(i+1)%polygon.length],inside=q=>less?q[0]<=limit:q[0]>=limit,ia=inside(a),ib=inside(b);if(ia)result.push(a);if(ia!==ib){const t=(limit-a[0])/(b[0]-a[0]);result.push([limit,a[1]+(b[1]-a[1])*t]);}}return result;};
+      return [clip(points,-split-.16,true),clip(clip(points,-split+.16,false),split-.16,true),clip(points,split+.16,false)].filter(p=>p.length>2);
     }
     const tailLayer=(points,m,depth,name='recessed-tail-optic')=>splitTail(points).map(part=>poly(part,m,(x,y)=>tailSurface(x,y,depth),name));
     const smallRearOptic=(points,m,depth)=>splitTail(points.map(tailPoint)).map(part=>{
@@ -31,6 +31,7 @@
     if(p.pattern!=='body-color-perforated'){const back=front(p.grille,trim,formedGrille?-8:1.2);if(formedGrille){back.name='formed-lower-grille-back';back.userData.keep=true;}}
     if(!['body-color-perforated','horizontal-shield'].includes(p.pattern)&&s.nose!=='ev')line([...p.grille,p.grille[0]],p.pattern==='v-motion'?2:1.1,p.pattern==='honeycomb'?darkMetal:metal);
     const grilleZ=(x,y)=>frontZ(x,y)-(formedGrille?6:0);
+    const frontOpticZ=(x,y,depth)=>frontZ(x,y)+depth-(formedGrille?4.4:0);
     const gs=p.grille.map(scale),xs=gs.map(p=>p[0]),ys=gs.map(p=>p[1]);
     if(formedGrille){
       // Intersect each continuous strand / louvre with the actual aperture.
@@ -51,30 +52,40 @@
     // A smoked optical bridge supports the light guide across the centre
     // inlet; the luminous ribbon must not appear suspended above the bonnet.
     if(s.id==='fox-b'||s.id==='fox-c')for(const sign of [-1,1]){
-      const top=p.drl.map(([x,y])=>[sign*x,y+.006]),bottom=[...p.drl].reverse().map(([x,y])=>[sign*x,y-.011]);front([...top,...bottom],trim,1.6);
+      const top=p.drl.map(([x,y])=>[sign*x,y+.006]),bottom=[...p.drl].reverse().map(([x,y])=>[sign*x,y-.011]),outline=[...top,...bottom];front(outline,trim,.1);
+      const returns=[];for(let i=0;i<outline.length;i++){const a=to3(outline[i],.1),b=to3(outline[(i+1)%outline.length],.1),back=q=>[q[0],q[1],q[2]-.75];returns.push(...a,...b,...back(a),...b,...back(b),...back(a));}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(returns,3));g.computeVertexNormals();mesh(g,trim,[0,0,0],'optical-bridge-body-return');
     }
     if(s.id==='fox-b'||s.id==='fox-c'){
       const cy=p.drl[0][1];
-      poly([[-5.6,cy*H+2.85],[5.6,cy*H+2.85],[4.8,cy*H-3.55],[-4.8,cy*H-3.55]],darkMetal,(x,y)=>frontZ(x,y)+2.6,'front-emblem-surround');
-      // Geometry sampled from the official favicon: https://www-assets.cloud.foxtronev.com/images/meta/favicon.ico
-      const emblemPixels=[[29,6],[30,6],[27,8],[26,9],[27,9],[32,9],[33,9],[23,11],[24,11],[23,12],[24,12],[29,12],[30,12],[20,14],[21,14],[26,14],[27,14],[20,15],[21,15],[22,15],[26,15],[27,15],[21,16],[17,17],[18,17],[19,17],[23,17],[24,17],[17,18],[18,18],[19,18],[23,18],[24,18],[15,19],[18,19],[14,20],[15,20],[16,20],[20,20],[21,20],[26,20],[27,20],[14,21],[15,21],[16,21],[20,21],[21,21],[22,21],[26,21],[27,21],[12,22],[15,22],[18,22],[11,23],[12,23],[13,23],[17,23],[18,23],[19,23],[23,23],[24,23],[29,23],[30,23],[11,24],[12,24],[13,24],[17,24],[18,24],[19,24],[23,24],[24,24],[29,24],[30,24],[12,25],[15,25],[18,25],[14,26],[15,26],[16,26],[20,26],[21,26],[22,26],[26,26],[27,26],[14,27],[15,27],[16,27],[20,27],[21,27],[26,27],[27,27],[15,28],[18,28],[17,29],[18,29],[19,29],[23,29],[24,29],[17,30],[18,30],[19,30],[23,30],[24,30],[21,31],[20,32],[21,32],[22,32],[26,32],[27,32],[20,33],[21,33],[26,33],[27,33],[23,35],[24,35],[29,35],[30,35],[23,36],[24,36],[26,38],[27,38],[32,38],[33,38],[27,39],[29,41],[30,41]],emblemPositions=[];
-      const dotSize=4.9/36;
-      for(const [px,py] of emblemPixels){const x=(px-22.5)*dotSize,y=cy*H+(24-py)*dotSize-.35,d=dotSize;for(const [dx,dy] of [[0,0],[d,0],[0,-d],[d,0],[d,-d],[0,-d]])emblemPositions.push(x+dx,y+dy,frontZ(x+dx,y+dy)+3.05);}
-      const emblemGeometry=new T.BufferGeometry();emblemGeometry.setAttribute('position',new T.Float32BufferAttribute(emblemPositions,3));emblemGeometry.computeVertexNormals();const frontBadge=mesh(emblemGeometry,metal,[0,0,0],'official-dot-chevron-emblem');frontBadge.userData.keep=true;
-      const rearEmblemPositions=[],rearCy=H*tailHeight(p,s.id==='fox-b'?.700:.705);
-      poly([[-3.5,rearCy+3.2],[3.5,rearCy+3.2],[3.1,rearCy-3.2],[-3.1,rearCy-3.2]],darkMetal,(x,y)=>rearZ(x,y)+.55,'tailgate-emblem-base');
-      for(const [px,py] of emblemPixels){const x=-(px-22.5)*dotSize,y=rearCy+(24-py)*dotSize,d=dotSize;for(const [dx,dy] of [[0,0],[-d,0],[0,-d],[-d,0],[-d,-d],[0,-d]])rearEmblemPositions.push(x+dx,y+dy,rearZ(x+dx,y+dy)+.43);}
-      const rearEmblemGeometry=new T.BufferGeometry();rearEmblemGeometry.setAttribute('position',new T.Float32BufferAttribute(rearEmblemPositions,3));rearEmblemGeometry.computeVertexNormals();const rearBadge=mesh(rearEmblemGeometry,metal,[0,0,0],'official-tailgate-emblem');rearBadge.userData.keep=true;
+      poly([[-5.6,cy*H+2.85],[5.6,cy*H+2.85],[4.8,cy*H-3.55],[-4.8,cy*H-3.55]],darkMetal,(x,y)=>frontZ(x,y)+.35,'front-emblem-surround');
+      // Separate diamond chips traced from the vehicle close-up, rather than
+      // enlarged pixels from the unrelated 48 px website favicon.
+      // Reference: https://image.u-car.com.tw/7619/photo_159534.jpg
+      const dots=[];for(let row=0;row<7;row++)for(let col=row<2?0:row<4?3:5;col<7;col++)dots.push([row-col,-row-col]);
+      function vehicleEmblem(centreY,sign,name){
+        const positions=[],at=(x,y,back=0)=>{x*=sign;const yy=centreY+y,surface=sign>0?frontZ(x,yy)+.6:rearZ(x,yy)+.43;return[x,yy,surface-sign*back];};
+        const tri=(a,b,c)=>positions.push(...a,...b,...c);
+        for(const [u,v]of dots){const x=((u+6)/7-.5)*3.94,y=((v+12)/12-.5)*4.74,corners=[[0,.23],[-.23,0],[0,-.23],[.23,0]],inner=corners.map(([dx,dy])=>at(x+dx*.82,y+dy*.82));tri(inner[0],inner[1],inner[2]);tri(inner[0],inner[2],inner[3]);
+          for(let i=0;i<4;i++){const j=(i+1)%4,a=at(x+corners[i][0],y+corners[i][1],.05),b=at(x+corners[j][0],y+corners[j][1],.05);tri(a,b,inner[i]);tri(b,inner[j],inner[i]);const c=at(x+corners[i][0],y+corners[i][1],.14),d=at(x+corners[j][0],y+corners[j][1],.14);tri(a,c,b);tri(b,c,d);}
+        }
+        const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(positions,3));g.computeVertexNormals();const badge=mesh(g,metal,[0,0,0],name);badge.userData.keep=true;badge.userData.source='vehicle-photo-diamond-grid';return badge;
+      }
+      vehicleEmblem(cy*H-.35,1,'official-dot-chevron-emblem');
+      if(s.id==='fox-b'){
+        const rearCy=H*tailHeight(p,.700);
+        poly([[-3.5,rearCy+3.2],[3.5,rearCy+3.2],[3.1,rearCy-3.2],[-3.1,rearCy-3.2]],darkMetal,(x,y)=>rearZ(x,y)+.55,'tailgate-emblem-base');
+        vehicleEmblem(rearCy,-1,'official-tailgate-emblem');
+      }
     }
     if(s.id==='fox-b')for(const sign of [-1,1])front([[.90,.508],[.97,.51],[.94,.18],[.85,.18],[.87,.36]].map(([x,y])=>[sign*x,y]),trim,.9);
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
-    for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);front(head,darkMetal,s.id==='model-3'?1.0:2);line([...head,head[0]],.38,s.nose==='ev'?trim:metal,2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'?.55:1.1,led,2.9));
+    for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);if(formedGrille)poly(head.map(scale),darkMetal,(x,y)=>frontOpticZ(x,y,2),'recessed-head-housing');else front(head,darkMetal,s.id==='model-3'?1.0:2);line([...head,head[0]],formedGrille?.12:.38,s.nose==='ev'?trim:metal,formedGrille?-2:2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'||formedGrille?.55:1.1,led,formedGrille?.45:2.9));
       const centre=p.head.reduce((a,v)=>[a[0]+v[0]/p.head.length,a[1]+v[1]/p.head.length],[0,0]),lensCount=p.projectors?p.projectors.length:s.id==='fox-d'?0:s.id==='focus'?2:s.id==='kuga'?2:1;for(let i=0;i<lensCount;i++){const x=side*(p.projectors?.[i]?.[0]??(centre[0]+(i?-.08:.04)))*W*.45,y=scale([0,p.projectors?.[i]?.[1]??(centre[1]-.005)])[1];if(p.lensStyle==='foxtron-projector'){
           const w=s.id==='fox-b'?7.8:7.2,h=s.id==='fox-b'?3.5:3.2;
-          const optic=(width,height,radius,m,depth)=>{const points=[];for(let corner=0;corner<4;corner++){const a0=corner*Math.PI/2,cx=x+(corner===0||corner===3?1:-1)*(width/2-radius),cy=y+(corner<2?1:-1)*(height/2-radius);for(let k=0;k<=5;k++){const a=a0+k/5*Math.PI/2;points.push([cx+radius*Math.cos(a),cy+radius*Math.sin(a)]);}}return poly(points,m,(px,py)=>frontZ(px,py)+depth,'surface-fitted-projector');};
+          const optic=(width,height,radius,m,depth)=>{const points=[];for(let corner=0;corner<4;corner++){const a0=corner*Math.PI/2,cx=x+(corner===0||corner===3?1:-1)*(width/2-radius),cy=y+(corner<2?1:-1)*(height/2-radius);for(let k=0;k<=5;k++){const a=a0+k/5*Math.PI/2;points.push([cx+radius*Math.cos(a),cy+radius*Math.sin(a)]);}}return poly(points,m,(px,py)=>frontOpticZ(px,py,depth),'surface-fitted-projector');};
           optic(w+1.4,h+1.2,.9,trim,2.3);optic(w,h,.8,metal,2.55);
           lamps.push(optic(w-1.2,h-.65,.7,led,2.8));
-          for(const dx of [-1.6,1.6])poly([[x+dx-.12,y-h*.3],[x+dx+.12,y-h*.3],[x+dx+.12,y+h*.3],[x+dx-.12,y+h*.3]],metal,(px,py)=>frontZ(px,py)+2.95,'projector-optical-divider');
+          for(const dx of [-1.6,1.6])poly([[x+dx-.12,y-h*.3],[x+dx+.12,y-h*.3],[x+dx+.12,y+h*.3],[x+dx-.12,y+h*.3]],metal,(px,py)=>frontOpticZ(px,py,2.95),'projector-optical-divider');
           continue;
         }if(p.lensStyle==='matrix'){const w=s.id==='model-3'?1.5:3.1,h=s.id==='model-3'?.45:1.9;poly([[x-w,y-h],[x+w,y-h],[x+w,y+h],[x-w,y+h]],led,(x,y)=>frontZ(x,y)+2.55,'recessed-led-module');continue;}const lens=mesh(new T.SphereGeometry(1,20,14),metal,[x,y,frontZ(x,y)+2.2],'lamp-reflector');lens.scale.set(s.id==='altis'?4.5:3.7,2.8,1.2);const bulb=mesh(new T.SphereGeometry(1,18,12),led,[x,y,frontZ(x,y)+3.3],'projector-lens');bulb.scale.set(s.id==='altis'?3:2.5,2.1,.7);lamps.push(bulb);}
       if(s.id==='altis'){front(mirror([[.71,.45],[.85,.44],[.88,.21],[.73,.19]]),trim,2);line(mirror([[.69,.47],[.83,.44],[.86,.20],[.73,.19]]),1.35,metal);const fog=mesh(new T.SphereGeometry(3,20,12),led,to3([side*.79,.24],4),'round-foglamp');fog.scale.z=.5;}
@@ -124,11 +135,11 @@
     // The name also acts as a testable vehicle identity when viewed from the front/rear.
     const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const plateY=side>0?H*(s.id==='fox-c'?.325:.25):H*(s.id==='fox-b'?.26:s.id==='fox-c'?.275:.36);if(side>0&&formedGrille)box([0,plateY,frontZ(0,plateY)-1.8],[7,13,4.4],trim,.5);const o=mesh(new T.PlaneGeometry(34,12),material,[0,plateY,side>0?frontZ(0,plateY)+(formedGrille?1.2:4.4):rearZ(0,plateY)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
     const rearBand=p.tailOutline||{focus:[[.24,.63],[.68,.63],[.94,.68],[.90,.59],[.69,.54]],altis:[[.24,.64],[.70,.63],[.94,.67],[.88,.57],[.58,.54]],sentra:[[.23,.64],[.73,.63],[.93,.67],[.88,.55],[.61,.53]],kicks:[[.30,.75],[.66,.76],[.94,.79],[.91,.66],[.60,.62]],kuga:[[.23,.68],[.69,.68],[.94,.72],[.91,.61],[.59,.60]],'corolla-cross':[[.22,.71],[.67,.71],[.94,.74],[.92,.64],[.60,.63]]}[s.id];
+    if(p.tailPocketContours)for(const contour of p.tailPocketContours)poly(contour.map(([x,y])=>[x*W*.45,y*H]),trim,(x,y)=>tailSurface(x,y,s.id==='fox-b'?1:.6),'tail-pocket-back');
     for(const side of [-1,1]){
-      if(p.tailPocket)poly(p.tailPocket.map(([x,y])=>[side*x*W*.45,y*H]),trim,(x,y)=>tailSurface(x,y,s.id==='fox-b'?1:.6),'tail-pocket-back');
       if(s.id==='fox-c'){
         const rp=(points,m,d)=>tailLayer(points.map(([x,y])=>tailPoint([side*x,y])),m,d,'cavira-optical-tail');
-        rp([[.054,.716],[.94,.716],[.95,.706],[.054,.706]],red,1.2);
+        rp([[0,.716],[.94,.716],[.95,.706],[0,.706]],red,1.2);
         rp([[.67,.701],[.73,.666],[.94,.666],[.94,.678],[.76,.678],[.71,.701]],red,1.4);
         for(const [x,w] of [[.22,.052],[.39,.045],[.79,.040],[.88,.035]]){
           const oval=Array.from({length:17},(_,i)=>{const a=i/16*Math.PI*2;return[x+Math.cos(a)*w,.689+Math.sin(a)*.007];});
@@ -153,8 +164,8 @@
       function cover(points,sign,depth,material){
         const world=points.map(([x,y])=>[x*W*.45,y*H]),surface=sign>0?frontZ:rearZ;
         for(const boundary of sign<0?splitTail(world):[world]){
-        const atSurface=(x,y)=>surface(x,y)+sign*depth+(sign<0?p.tailOpticInset:0);
-        const lens=poly(boundary,material,atSurface,sign<0?'integrated-tail-lens':'formed-optical-cover');if(sign<0)lens.userData.keep=true;
+        const atSurface=(x,y)=>surface(x,y)+sign*depth+(sign<0?p.tailOpticInset:-4.4);
+        const lens=poly(boundary,material,atSurface,sign<0?'integrated-tail-lens':'integrated-head-lens');lens.userData.keep=true;
         const pos=[];
         for(let i=0;i<boundary.length;i++){const a=boundary[i],b=boundary[(i+1)%boundary.length];for(let k=0;k<8;k++){const at=t=>{const x=a[0]+(b[0]-a[0])*t,y=a[1]+(b[1]-a[1])*t;return[x,y,atSurface(x,y)];},u=at(k/8),v=at((k+1)/8),inner=q=>[q[0],q[1],q[2]-sign*.65];pos.push(...u,...v,...inner(u),...v,...inner(v),...inner(u));}}
         const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();mesh(g,material,[0,0,0],'optical-cover-return');
@@ -162,8 +173,8 @@
       }
       for(const side of [-1,1]){
         cover(p.head.map(([x,y])=>[side*x,y]),1,3.35,lens);
-        cover(p.tailPocket.map(([x,y])=>[side*x,y]),-1,2.15,tailLens);
       }
+      for(const contour of p.tailPocketContours)cover(contour,-1,2.15,tailLens);
     }
     return {generation:p.generation,face:p.pattern,tail:p.tailStyle,source:p.source};
   }

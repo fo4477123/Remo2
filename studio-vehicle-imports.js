@@ -1,22 +1,21 @@
 /* Licensed street-car assets, prepared in centimetres with +Z forward. */
 (() => {
   let template=null;
-  const status={loaded:false,error:null};
-  const ready=(async()=>{
-    let timer;
+  const status={loaded:false,error:null,pending:true,timedOut:false};
+  // Keep the real download alive after the startup grace period. The old
+  // Promise.race discarded a successful late result and kept the substitute.
+  const loaded=(async()=>{
     try{
       const {GLTFLoader}=await import('./vendor/three/examples/jsm/loaders/GLTFLoader.js');
-      const gltf=await Promise.race([
-        new GLTFLoader().loadAsync('assets/models/vehicles/model-3-2018.glb'),
-        new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Model 3 loading timed out')),20000);})
-      ]);
+      const gltf=await new GLTFLoader().loadAsync('assets/models/vehicles/model-3-2018.glb');
       const source=gltf.scene;
       for(let i=0;i<4;i++)if(!source.getObjectByName('model-3-import-wheel-'+i))throw Error('Missing Model 3 wheel pivot '+i);
       source.traverse(o=>{if(!o.isMesh)return;o.castShadow=!o.material.transparent;o.receiveShadow=o.material.name!=='primary';if(o.material.transparent)o.material.depthWrite=false;});
-      template=source;status.loaded=true;return true;
+      template=source;status.loaded=true;status.error=null;status.timedOut=false;return true;
     }catch(error){status.error=error.message;console.warn('Model 3 asset unavailable; using procedural fallback:',error.message);return false;}
-    finally{clearTimeout(timer);}
+    finally{status.pending=false;}
   })();
+  const ready=new Promise(resolve=>{const timer=setTimeout(()=>{status.timedOut=true;resolve(false);},20000);loaded.then(value=>{clearTimeout(timer);resolve(value);});});
   function create(s,color){
     if(s.id!=='model-3'||!template)return null;
     const group=template.clone(true),wheels=Array.from({length:4},(_,i)=>group.getObjectByName('model-3-import-wheel-'+i)),lamps=[],materials=new Map();
@@ -40,5 +39,5 @@
     group.userData.features=features;
     return{group,wheels,lamps,rider,type:'car',features,spec:{...s,color,detail:'licensed-2018-model',interpretation:false,source:'https://sketchfab.com/3d-models/tesla-2018-model-3-5ef9b845aaf44203b6d04e2c677e444f'}};
   }
-  window.B1_VEHICLE_IMPORTS={ready,create,status};
+  window.B1_VEHICLE_IMPORTS={ready,loaded,create,status};
 })();
