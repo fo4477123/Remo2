@@ -85,3 +85,9 @@ Charge-flap geometry now uses a 16 by 14 cm rounded rectangle in physical side c
 Cavira wheel casting now has ten single machined faces instead of twenty apparent branches. Reduced hub-cap/rim-lip proportions, reduced brake-disc radius and expanded hidden wheel-house backing. Added broad painted A-pillar surfaces on the windscreen and side glazing, replacing the isolated thin front tube.
 
 Both front and rear fender slots were widened following the user correction and recessed to 7 cm. Their dimensions remain provisional pending exact reference matching. Added a charge-flap gallery camera. Focused geometry, duct, wheel-house, wheel animation and LOD checks passed; charge/wheel/side/front images inspected. This update does not claim factory CAD accuracy.
+
+## Wheel hardware and flush handles
+
+Wheel castings and machined faces now use closed bevelled extrusions with separate depths and a radial dish. Added centre-cap lettering and tyre valve stems. The brake calipers are attached to the stationary body group rather than the rolling wheel group. Bria flush handles use fine rounded panel outlines and surface-fitted faces instead of thick protruding boxes.
+
+Focused Bria/Cavira checks passed for finite geometry, duct clearance, wheel-house closure, LOD and wheel animation. Wheel and charge-side previews inspected. Shape fidelity is still incomplete and no factory CAD equivalence is claimed.

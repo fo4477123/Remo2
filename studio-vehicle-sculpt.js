@@ -186,7 +186,14 @@
       }else for(const seamZ of [-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
       for(const z of [-L*.175,L*.12]){
         const x=side*(sideX(z,.90)+.7),y=19+(edge(z)-19)*.90;
-        if(shape.bodyHandles){const recess=mesh(new T.SphereGeometry(1,24,12),trim,[x,y,z],'handle-recess');recess.scale.set(.7,2.4,8);const handle=mesh(new T.SphereGeometry(1,24,12),paint,[x+side*1.1,y+.3,z],'body-color-pull-handle');handle.scale.set(1.4,1.4,7.5);}
+        if(s.id==='fox-b'){
+          // Flush handle stays in physical side coordinates and follows the
+          // panel beneath it, rather than floating as a thick rectangular bar.
+          const points=[];
+          for(let corner=0;corner<4;corner++){const a0=corner*Math.PI/2,cz=z+(corner===0||corner===3?1:-1)*6.1,cy=y+(corner<2?.75:-.75);for(let k=0;k<=6;k++){const a=a0+k/6*Math.PI/2,zz=cz+.45*Math.cos(a),yy=cy+.45*Math.sin(a),v=(yy-19)/(edge(zz)-19),xx=side*(sideX(zz,v)+.12);points.push([xx,yy,noseZ(xx,zz,yy)]);}}
+          points.push(points[0]);tube(points,.075,trim);
+          patch(4,20,(t,u)=>{const zz=z-5.8+11.6*u,yy=y-.65+1.3*t,v=(yy-19)/(edge(zz)-19),xx=side*(sideX(zz,v)+.10);return[xx,yy,noseZ(xx,zz,yy)];},paint,'flush-door-handle');
+        }else if(shape.bodyHandles){const recess=mesh(new T.SphereGeometry(1,24,12),trim,[x,y,z],'handle-recess');recess.scale.set(.7,2.4,8);const handle=mesh(new T.SphereGeometry(1,24,12),paint,[x+side*1.1,y+.3,z],'body-color-pull-handle');handle.scale.set(1.4,1.4,7.5);}
         else box([x,y,z],[1.8,2.7,15],s.id==='model-3'?trim:s.id==='kicks'||s.id==='altis'?metal:paint,1);
       }
       for(const axle of [-A,A]){
@@ -350,9 +357,15 @@
       const rotorMaterial=mat('#686c70',.48,{metalness:.75});
       const rotor=mesh(new T.CylinderGeometry(rr*.67,rr*.67,.8,64),rotorMaterial,[side*5.5,0,0],'machined-brake-disc',wheel);rotor.rotation.z=Math.PI/2;
       for(const radius of [rr*.48,rr*.62]){const track=mesh(new T.TorusGeometry(radius,.18,4,64),darkMetal,[side*6,0,0],'rotor-wear-track',wheel);track.rotation.y=Math.PI/2;}
-      box([side*7.6,3,rr*.66],[5,14,8],darkMetal,2,wheel);
+      // The disc rolls with the rim; the brake caliper stays on the axle.
+      box([wheel.position.x+side*7.6,R+3,z+rr*.60],[5,14,8],darkMetal,2,root);
       function blade(points,material=darkMetal){
         const outline=points.map(([a,r])=>new T.Vector2(Math.sin(a)*r,Math.cos(a)*r));
+        if(shape.sectionedBody){
+          const machined=material===metal,g=new T.ExtrudeGeometry(new T.Shape(outline),{depth:machined?.22:2.3,bevelEnabled:true,bevelSize:machined?.08:.16,bevelThickness:machined?.07:.14,bevelSegments:2,steps:1,curveSegments:1}),p=g.attributes.position;
+          for(let i=0;i<p.count;i++){const yy=p.getX(i),zz=p.getY(i),r=Math.hypot(yy,zz),crown=9+1.65*Math.pow(r/rr,.7),xx=side*(crown+(machined?.10:-2.3)+p.getZ(i));p.setXYZ(i,xx,yy,zz);}
+          g.clearGroups();g.computeVertexNormals();material.side=T.DoubleSide;mesh(g,material,[0,0,0],'bevelled-production-wheel-blade',wheel);return;
+        }
         const tris=T.ShapeUtils.triangulateShape(outline,[]),pos=[],indices=[];
         // Machined faces sit above the black casting, never coplanar with it.
         // The spokes dish into the hub instead of forming a flat wheel disc.
@@ -382,6 +395,11 @@
       }
       const lip=mesh(new T.TorusGeometry(rr,shape.sectionedBody?.35:.60,8,80),style==='highland-photon'?darkMetal:metal,[side*10.4,0,0],'alloy-machined-lip',wheel);lip.rotation.y=Math.PI/2;
       const capR=shape.sectionedBody?3.3:4.5,cap=mesh(new T.CylinderGeometry(capR,capR,1,32),trim,[side*11.3,0,0],'recessed-centre-cap',wheel);cap.rotation.z=Math.PI/2;
+      if(shape.sectionedBody){
+        const canvas=document.createElement('canvas');canvas.width=256;canvas.height=64;const ctx=canvas.getContext('2d');ctx.font='28px sans-serif';ctx.fillStyle='#b7bcc0';ctx.textAlign='center';ctx.fillText('FOXTRON',128,43);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
+        const badge=mesh(new T.PlaneGeometry(5.6,1.4),new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,roughness:.4,metalness:.6}),[side*11.86,0,0],'wheel-centre-wordmark',wheel);badge.rotation.y=side*Math.PI/2;
+        const a=Math.PI*.34;rod([side*10.5,Math.sin(a)*rr*.90,Math.cos(a)*rr*.90],[side*10.5,Math.sin(a)*rr*.985,Math.cos(a)*rr*.985],.35,rubber,wheel);
+      }
       for(let i=0;i<5;i++){const a=i*Math.PI*.4,lug=mesh(new T.CylinderGeometry(.85,.85,1,8),metal,[side*11.2,Math.sin(a)*6,Math.cos(a)*6],'wheel-lug',wheel);lug.rotation.z=Math.PI/2;}
       wheel.userData.design=style;batch(wheel);wheels.push(wheel);
     }
