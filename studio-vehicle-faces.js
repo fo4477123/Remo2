@@ -12,10 +12,40 @@
   function build({s,root,mesh,box,tube,rod,poly,frontZ,rearZ,paint,trim,metal,darkMetal,red,led,lamps}){
     const p=profiles[s.id],W=s.width,H=s.height,L=s.length,scale=a=>[a[0]*W*.45,a[1]*H*(s.body==='sedan'||s.body==='hatch'?.90:1)],to3=(a,depth=1)=>{const [x,y]=scale(a);return[x,y,frontZ(x,y)+depth];},rect=(cx,cy,w,h)=>[[cx-w/2,cy+h/2],[cx+w/2,cy+h/2],[cx+w/2,cy-h/2],[cx-w/2,cy-h/2]];
     const front=(points,m,depth=1)=>poly(points.map(scale),m,(x,y)=>frontZ(x,y)+depth),line=(points,r,m,depth=2)=>tube(points.flatMap((a,i)=>i?Array.from({length:8},(_,k)=>{const b=points[i-1],t=(k+1)/8;return to3([b[0]+(a[0]-b[0])*t,b[1]+(a[1]-b[1])*t],depth);}):[to3(a,depth)]),r,m,root,true);
-    const smallRearOptic=(points,m,depth)=>{const shape=new T.Shape(points.map(([x,y])=>new T.Vector2(x*W*.45,y*H))),g=new T.ShapeGeometry(shape),p=g.attributes.position;for(let i=0;i<p.count;i++)p.setZ(i,rearZ(p.getX(i),p.getY(i))-depth);g.computeVertexNormals();m.side=T.DoubleSide;return mesh(g,m,[0,0,0],'small-rear-optic');};
-    if(p.pattern!=='body-color-perforated')front(p.grille,trim,s.id==='fox-b'||s.id==='fox-c'?-4.3:1.2);if(!['body-color-perforated','horizontal-shield'].includes(p.pattern)&&s.nose!=='ev')line([...p.grille,p.grille[0]],p.pattern==='v-motion'?2:1.1,p.pattern==='honeycomb'?darkMetal:metal);
-    const grilleZ=(x,y)=>frontZ(x,y)-(s.id==='fox-b'||s.id==='fox-c'?6:0);
-    const gs=p.grille.map(scale),xs=gs.map(p=>p[0]),ys=gs.map(p=>p[1]);for(let y=Math.min(...ys)+4,row=0;y<Math.max(...ys)-3;y+=(s.id==='fox-b'?4.2:5.5),row++)for(let x=Math.min(...xs)+3;x<Math.max(...xs)-2;x+=(s.id==='fox-b'?5.8:8)){const q=[x+(row%2?(s.id==='fox-b'?2.9:4):0),y];if(!inside(q,gs))continue;if(p.pattern==='body-color-perforated'){const w=s.id==='fox-d'?4.5:5.2,h=s.id==='fox-d'?1.8:2.5;poly([[q[0]-w/2,y-h/2],[q[0]+w/2,y-h/2],[q[0]+w/2,y+h/2],[q[0]-w/2,y+h/2]],trim,(x,y)=>grilleZ(x,y)+.85,'recessed-grille-perforation');}else if(p.pattern==='slats'||p.pattern==='horizontal-shield'){box([q[0],y,grilleZ(q[0],y)+2],[7.4,p.pattern==='slats'?1:2,1],darkMetal,.35);}else if(p.pattern==='vertical-mesh'){box([q[0],y,grilleZ(q[0],y)+2],[.7,5.2,1],metal,.25);box([q[0],y,grilleZ(q[0],y)+1.8],[7,.65,.8],darkMetal,.2);}else{const points=Array.from({length:7},(_,i)=>[q[0]+(s.id==='fox-b'?2.45:3.4)*Math.sin(i*Math.PI/3),y+(s.id==='fox-b'?1.5:2.15)*Math.cos(i*Math.PI/3),grilleZ(q[0],y)+2]);tube(points,p.pattern==='body-color-perforated'?1.1:s.id==='fox-b'?.26:.45,p.pattern==='body-color-perforated'?paint:darkMetal);}}
+    const tailPoint=([x,y])=>[x*W*.45,(y-(p.tailPocketShift||0))*H],tailSurface=(x,y,depth)=>rearZ(x,y)+(p.tailOpticInset||0)-depth;
+    function splitTail(points){
+      const side=Math.sign(points.reduce((sum,p)=>sum+p[0],0))||1,split=side*W*(s.id==='fox-b'?.315:.335);
+      const clip=(limit,less)=>{const result=[];for(let i=0;i<points.length;i++){const a=points[i],b=points[(i+1)%points.length],inside=q=>less?q[0]<=limit:q[0]>=limit,ia=inside(a),ib=inside(b);if(ia)result.push(a);if(ia!==ib){const t=(limit-a[0])/(b[0]-a[0]);result.push([limit,a[1]+(b[1]-a[1])*t]);}}return result;};
+      return [clip(split-.16,true),clip(split+.16,false)].filter(p=>p.length>2);
+    }
+    const tailLayer=(points,m,depth,name='recessed-tail-optic')=>splitTail(points).map(part=>poly(part,m,(x,y)=>tailSurface(x,y,depth),name));
+    const smallRearOptic=(points,m,depth)=>splitTail(points.map(tailPoint)).map(part=>{
+      const xs=part.map(p=>p[0]),ys=part.map(p=>p[1]),cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2,rx=(Math.max(...xs)-Math.min(...xs))/2||1,ry=(Math.max(...ys)-Math.min(...ys))/2||1;
+      const formed=(x,y)=>tailSurface(x,y,depth)+(m===red?-.06:.12)*Math.max(0,1-((x-cx)/rx)**2-((y-cy)/ry)**2);
+      const optic=poly(part,m,formed,'formed-tail-optic'),walls=[];
+      for(let i=0;i<part.length;i++){const a=part[i],b=part[(i+1)%part.length],at=q=>[q[0],q[1],formed(...q)],u=at(a),v=at(b),back=q=>[q[0],q[1],q[2]+.28];walls.push(...u,...v,...back(u),...v,...back(v),...back(u));}
+      const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(walls,3));g.computeVertexNormals();mesh(g,darkMetal,[0,0,0],'tail-optic-return');return optic;
+    });
+    const formedGrille=s.id==='fox-b'||s.id==='fox-c';
+    if(p.pattern!=='body-color-perforated'){const back=front(p.grille,trim,formedGrille?-8:1.2);if(formedGrille){back.name='formed-lower-grille-back';back.userData.keep=true;}}
+    if(!['body-color-perforated','horizontal-shield'].includes(p.pattern)&&s.nose!=='ev')line([...p.grille,p.grille[0]],p.pattern==='v-motion'?2:1.1,p.pattern==='honeycomb'?darkMetal:metal);
+    const grilleZ=(x,y)=>frontZ(x,y)-(formedGrille?6:0);
+    const gs=p.grille.map(scale),xs=gs.map(p=>p[0]),ys=gs.map(p=>p[1]);
+    if(formedGrille){
+      // Intersect each continuous strand / louvre with the actual aperture.
+      const cross=(a,b)=>a[0]*b[1]-a[1]*b[0];
+      const grilleLine=(origin,d)=>{const hits=[];for(let i=0;i<gs.length;i++){const a=gs[i],b=gs[(i+1)%gs.length],edge=[b[0]-a[0],b[1]-a[1]],q=[a[0]-origin[0],a[1]-origin[1]],den=cross(d,edge);if(Math.abs(den)<1e-8)continue;const t=cross(q,edge)/den,u=cross(q,d)/den;if(u>=0&&u<=1)hits.push(t);}return hits.length>1?[Math.min(...hits),Math.max(...hits)]:null;};
+      const low=Math.min(...ys),high=Math.max(...ys);
+      if(s.id==='fox-b'){
+        for(const sign of [-1,1])for(let k=Math.min(...xs)-(high-low)/1.45;k<Math.max(...xs)+(high-low)/1.45;k+=4.4){const origin=[k,low],d=[1,sign*1.45],span=grilleLine(origin,d);if(!span||span[1]-span[0]<1)continue;const n=Math.max(2,Math.ceil((span[1]-span[0])/2)),points=Array.from({length:n+1},(_,i)=>{const t=span[0]+.25+(span[1]-span[0]-.5)*i/n,x=origin[0]+d[0]*t,y=origin[1]+d[1]*t;return[x,y,grilleZ(x,y)+2];});tube(points,.25,darkMetal,root,true);}
+      }else{
+        for(let y=low+2.5;y<high-1.5;y+=4.6){const a=grilleLine([0,y-.65],[1,0]),b=grilleLine([0,y+.65],[1,0]);if(!a||!b)continue;const left=Math.max(a[0],b[0])+.6,right=Math.min(a[1],b[1])-.6;
+          poly([[left,y-.65],[right,y-.65],[right,y+.65],[left,y+.65]],trim,(x,y)=>grilleZ(x,y)+2,'continuous-grille-louvre');
+          const top=[];for(let i=0;i<24;i++){const u=left+(right-left)*i/24,v=left+(right-left)*(i+1)/24,at=x=>[x,y+.65,grilleZ(x,y+.65)+2],back=q=>[q[0],q[1]+.25,q[2]-1.3],a=at(u),b=at(v);top.push(...a,...b,...back(a),...b,...back(b),...back(a));}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(top,3));g.computeVertexNormals();mesh(g,darkMetal,[0,0,0],'louvre-top-return');
+        }
+        line([[-.98,.160],[-.86,.154],[0,.154],[.86,.154],[.98,.160]],.35,metal,.7);
+      }
+    }else for(let y=Math.min(...ys)+4,row=0;y<Math.max(...ys)-3;y+=5.5,row++)for(let x=Math.min(...xs)+3;x<Math.max(...xs)-2;x+=8){const q=[x+(row%2?4:0),y];if(!inside(q,gs))continue;if(p.pattern==='body-color-perforated'){const w=s.id==='fox-d'?4.5:5.2,h=s.id==='fox-d'?1.8:2.5;poly([[q[0]-w/2,y-h/2],[q[0]+w/2,y-h/2],[q[0]+w/2,y+h/2],[q[0]-w/2,y+h/2]],trim,(x,y)=>grilleZ(x,y)+.85,'recessed-grille-perforation');}else if(p.pattern==='slats'||p.pattern==='horizontal-shield'){box([q[0],y,grilleZ(q[0],y)+2],[7.4,p.pattern==='slats'?1:2,1],darkMetal,.35);}else if(p.pattern==='vertical-mesh'){box([q[0],y,grilleZ(q[0],y)+2],[.7,5.2,1],metal,.25);box([q[0],y,grilleZ(q[0],y)+1.8],[7,.65,.8],darkMetal,.2);}else{const points=Array.from({length:7},(_,i)=>[q[0]+3.4*Math.sin(i*Math.PI/3),y+2.15*Math.cos(i*Math.PI/3),grilleZ(q[0],y)+2]);tube(points,.45,darkMetal);}}
     if(p.pattern==='v-motion')line([[-.55,.59],[-.43,.41],[-.28,.32],[.28,.32],[.43,.41],[.55,.59]],2.5,metal);
     // A smoked optical bridge supports the light guide across the centre
     // inlet; the luminous ribbon must not appear suspended above the bonnet.
@@ -29,9 +59,9 @@
       const emblemPixels=[[29,6],[30,6],[27,8],[26,9],[27,9],[32,9],[33,9],[23,11],[24,11],[23,12],[24,12],[29,12],[30,12],[20,14],[21,14],[26,14],[27,14],[20,15],[21,15],[22,15],[26,15],[27,15],[21,16],[17,17],[18,17],[19,17],[23,17],[24,17],[17,18],[18,18],[19,18],[23,18],[24,18],[15,19],[18,19],[14,20],[15,20],[16,20],[20,20],[21,20],[26,20],[27,20],[14,21],[15,21],[16,21],[20,21],[21,21],[22,21],[26,21],[27,21],[12,22],[15,22],[18,22],[11,23],[12,23],[13,23],[17,23],[18,23],[19,23],[23,23],[24,23],[29,23],[30,23],[11,24],[12,24],[13,24],[17,24],[18,24],[19,24],[23,24],[24,24],[29,24],[30,24],[12,25],[15,25],[18,25],[14,26],[15,26],[16,26],[20,26],[21,26],[22,26],[26,26],[27,26],[14,27],[15,27],[16,27],[20,27],[21,27],[26,27],[27,27],[15,28],[18,28],[17,29],[18,29],[19,29],[23,29],[24,29],[17,30],[18,30],[19,30],[23,30],[24,30],[21,31],[20,32],[21,32],[22,32],[26,32],[27,32],[20,33],[21,33],[26,33],[27,33],[23,35],[24,35],[29,35],[30,35],[23,36],[24,36],[26,38],[27,38],[32,38],[33,38],[27,39],[29,41],[30,41]],emblemPositions=[];
       for(const [px,py] of emblemPixels){const x=(px-22.5)*0.08333333333333333,y=cy*H-(24-py)*-0.08333333333333333-0.4,d=0.08333333333333333;for(const [dx,dy] of [[0,0],[d,0],[0,-d],[d,0],[d,-d],[0,-d]])emblemPositions.push(x+dx,y+dy,frontZ(x+dx,y+dy)+3.05);}
       const emblemGeometry=new T.BufferGeometry();emblemGeometry.setAttribute('position',new T.Float32BufferAttribute(emblemPositions,3));emblemGeometry.computeVertexNormals();mesh(emblemGeometry,metal,[0,0,0],'official-dot-chevron-emblem');
-      const rearEmblemPositions=[],rearCy=H*(s.id==='fox-b'?.700:.705);
-      poly([[-2.4,rearCy+2.1],[2.4,rearCy+2.1],[2.1,rearCy-2.1],[-2.1,rearCy-2.1]],darkMetal,(x,y)=>rearZ(x,y)-2.35,'tailgate-emblem-base');
-      for(const [px,py] of emblemPixels){const x=-(px-22.5)/12,y=rearCy+(24-py)/12,d=1/12;for(const [dx,dy] of [[0,0],[-d,0],[0,-d],[-d,0],[-d,-d],[0,-d]])rearEmblemPositions.push(x+dx,y+dy,rearZ(x+dx,y+dy)-2.6);}
+      const rearEmblemPositions=[],rearCy=H*((s.id==='fox-b'?.700:.705)-(p.tailPocketShift||0));
+      poly([[-2.4,rearCy+2.1],[2.4,rearCy+2.1],[2.1,rearCy-2.1],[-2.1,rearCy-2.1]],darkMetal,(x,y)=>rearZ(x,y)+.55,'tailgate-emblem-base');
+      for(const [px,py] of emblemPixels){const x=-(px-22.5)/12,y=rearCy+(24-py)/12,d=1/12;for(const [dx,dy] of [[0,0],[-d,0],[0,-d],[-d,0],[-d,-d],[0,-d]])rearEmblemPositions.push(x+dx,y+dy,rearZ(x+dx,y+dy)+.43);}
       const rearEmblemGeometry=new T.BufferGeometry();rearEmblemGeometry.setAttribute('position',new T.Float32BufferAttribute(rearEmblemPositions,3));rearEmblemGeometry.computeVertexNormals();const rearBadge=mesh(rearEmblemGeometry,metal,[0,0,0],'official-tailgate-emblem');rearBadge.userData.keep=true;
     }
     if(s.id==='fox-b')for(const sign of [-1,1])front([[.90,.508],[.97,.51],[.94,.18],[.85,.18],[.87,.36]].map(([x,y])=>[sign*x,y]),trim,.9);
@@ -90,13 +120,13 @@
       for(const side of [-1,1])tube([[side*W*.31,H*.245,rearZ(side*W*.31,H*.245)-2],[side*W*.40,H*.245,rearZ(side*W*.40,H*.245)-2]],.9,red);
     }
     // The name also acts as a testable vehicle identity when viewed from the front/rear.
-    const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const plateY=side>0?H*.25:H*(s.id==='fox-b'?.26:s.id==='fox-c'?.275:.36);const o=mesh(new T.PlaneGeometry(34,12),material,[0,plateY,side>0?frontZ(0,plateY)+4.4:rearZ(0,plateY)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
+    const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const plateY=side>0?H*(s.id==='fox-c'?.325:.25):H*(s.id==='fox-b'?.26:s.id==='fox-c'?.275:.36);if(side>0&&formedGrille)box([0,plateY,frontZ(0,plateY)-1.8],[7,13,4.4],trim,.5);const o=mesh(new T.PlaneGeometry(34,12),material,[0,plateY,side>0?frontZ(0,plateY)+(formedGrille?1.2:4.4):rearZ(0,plateY)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
     const rearBand=p.tailOutline||{focus:[[.24,.63],[.68,.63],[.94,.68],[.90,.59],[.69,.54]],altis:[[.24,.64],[.70,.63],[.94,.67],[.88,.57],[.58,.54]],sentra:[[.23,.64],[.73,.63],[.93,.67],[.88,.55],[.61,.53]],kicks:[[.30,.75],[.66,.76],[.94,.79],[.91,.66],[.60,.62]],kuga:[[.23,.68],[.69,.68],[.94,.72],[.91,.61],[.59,.60]],'corolla-cross':[[.22,.71],[.67,.71],[.94,.74],[.92,.64],[.60,.63]]}[s.id];
     for(const side of [-1,1]){
+      if(p.tailPocket)poly(p.tailPocket.map(([x,y])=>[side*x*W*.45,y*H]),trim,(x,y)=>tailSurface(x,y,s.id==='fox-b'?1:.6),'tail-pocket-back');
       if(s.id==='fox-c'){
-        const rp=(points,m,d)=>poly(points.map(([x,y])=>[side*x*W*.45,y*H]),m,(x,y)=>rearZ(x,y)-d,'cavira-optical-tail');
-        rp([[.015,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[.015,.674]],trim,.6);
-        rp([[.025,.716],[.94,.716],[.95,.706],[.025,.706]],red,1.2);
+        const rp=(points,m,d)=>tailLayer(points.map(([x,y])=>tailPoint([side*x,y])),m,d,'cavira-optical-tail');
+        rp([[.045,.716],[.94,.716],[.95,.706],[.045,.706]],red,1.2);
         rp([[.67,.701],[.73,.666],[.94,.666],[.94,.678],[.76,.678],[.71,.701]],red,1.4);
         for(const [x,w] of [[.22,.052],[.39,.045],[.79,.040],[.88,.035]]){
           const oval=Array.from({length:17},(_,i)=>{const a=i/16*Math.PI*2;return[x+Math.cos(a)*w,.689+Math.sin(a)*.007];});
@@ -105,8 +135,7 @@
         continue;
       }
       if(s.id==='fox-b'){
-        const rearPoly=(points,m,depth)=>poly(points.map(([x,y])=>[side*x*W*.45,y*H]),m,(x,y)=>rearZ(x,y)-depth,'bria-matrix-tail');
-        rearPoly([[.03,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.03,.67]],trim,1);
+        const rearPoly=(points,m,depth)=>tailLayer(points.map(([x,y])=>tailPoint([side*x,y])),m,depth,'bria-matrix-tail');
         rearPoly([[.05,.710],[.92,.710],[.92,.695],[.05,.695]],red,1.6);
         for(let row=0;row<4;row++)for(let col=0;col<5-row;col++){
           const x=.75+col*.044+row*.018,y=.657-row*.017;
@@ -121,15 +150,17 @@
       const tailLens=lens.clone();tailLens.color.set('#742d35');tailLens.opacity=.18;
       function cover(points,sign,depth,material){
         const world=points.map(([x,y])=>[x*W*.45,y*H]),surface=sign>0?frontZ:rearZ;
-        poly(world,material,(x,y)=>surface(x,y)+sign*depth,'formed-optical-cover');
+        for(const boundary of sign<0?splitTail(world):[world]){
+        const atSurface=(x,y)=>surface(x,y)+sign*depth+(sign<0?p.tailOpticInset:0);
+        const lens=poly(boundary,material,atSurface,sign<0?'integrated-tail-lens':'formed-optical-cover');if(sign<0)lens.userData.keep=true;
         const pos=[];
-        for(let i=0;i<world.length;i++){const a=world[i],b=world[(i+1)%world.length];for(let k=0;k<8;k++){const at=t=>{const x=a[0]+(b[0]-a[0])*t,y=a[1]+(b[1]-a[1])*t;return[x,y,surface(x,y)+sign*depth];},u=at(k/8),v=at((k+1)/8),inner=q=>[q[0],q[1],q[2]-sign*.65];pos.push(...u,...v,...inner(u),...v,...inner(v),...inner(u));}}
+        for(let i=0;i<boundary.length;i++){const a=boundary[i],b=boundary[(i+1)%boundary.length];for(let k=0;k<8;k++){const at=t=>{const x=a[0]+(b[0]-a[0])*t,y=a[1]+(b[1]-a[1])*t;return[x,y,atSurface(x,y)];},u=at(k/8),v=at((k+1)/8),inner=q=>[q[0],q[1],q[2]-sign*.65];pos.push(...u,...v,...inner(u),...v,...inner(v),...inner(u));}}
         const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();mesh(g,material,[0,0,0],'optical-cover-return');
+        }
       }
       for(const side of [-1,1]){
         cover(p.head.map(([x,y])=>[side*x,y]),1,3.35,lens);
-        const outline=s.id==='fox-b'?[[.03,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.03,.67]]:[[.015,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[.015,.674]];
-        cover(outline.map(([x,y])=>[side*x,y]),-1,2.15,tailLens);
+        cover(p.tailPocket.map(([x,y])=>[side*x,y]),-1,2.15,tailLens);
       }
     }
     return {generation:p.generation,face:p.pattern,tail:p.tailStyle,source:p.source};

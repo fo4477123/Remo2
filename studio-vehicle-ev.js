@@ -131,4 +131,23 @@
   // Shallower badge ramp with a softer return beneath the optical bridge.
   shapes['fox-b'].noseSection=[[0,6],[.18,1],[.36,3],[.57,3],[.70,6],[.84,12],[.94,7],[1,5]];
   shapes['fox-c'].noseSection=[[0,5],[.18,1],[.34,3],[.58,3],[.73,6],[.86,11],[.95,6],[1,5]];
+  // One boundary drives both the perforated rear skin and the recessed lamp
+  // assembly. Keep a painted lip below the deck instead of crossing its edge.
+  for(const id of ['fox-b','fox-c']){
+    p[id].tailPocketShift=.022;p[id].tailOpticInset=3;
+    const outline=id==='fox-b'?[[.03,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.03,.67]]:[[.035,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[.035,.674]];
+    p[id].tailPocket=outline.map(([x,y])=>[x,y-p[id].tailPocketShift]);
+  }
+  // Rounded lower trapezoids traced independently from the brochure / front
+  // exterior photographs; the old six-sided mouths pinched back in at the base.
+  function lowerIntake(top,bottom,high,low){
+    const q=new T.Shape();q.moveTo(-top+.045,high);q.lineTo(top-.045,high);
+    q.quadraticCurveTo(top+.01,high,top+.045,high-.025);
+    q.lineTo(bottom-.018,low+.025);q.quadraticCurveTo(bottom+.025,low,bottom-.04,low);
+    q.lineTo(-bottom+.04,low);q.quadraticCurveTo(-bottom-.025,low,-bottom+.018,low+.025);
+    q.lineTo(-top-.045,high-.025);q.quadraticCurveTo(-top-.01,high,-top+.045,high);
+    return q.getPoints(12).slice(0,-1).map(p=>[p.x,p.y]);
+  }
+  p['fox-b'].grille=lowerIntake(.64,.87,.355,.165);
+  p['fox-c'].grille=lowerIntake(.60,.83,.337,.162);
 })();
