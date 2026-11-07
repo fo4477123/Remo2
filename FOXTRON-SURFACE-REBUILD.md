@@ -130,3 +130,10 @@ Rechecked the BRIA brochure exterior views and CAVIRA official side/rear photogr
 The spoiler top, underside, edge caps and third brake lamp now share one surface function. The lamp follows the actual trailing edge instead of being partly buried or hanging below the foil. Added a gallery mirror close-up and ray checks that both mirror faces and three points across the stop lamp are exposed.
 
 Validation: node syntax checks, git diff --check and node qa-vehicle-rebuild.cjs --foxtron passed. Mirror and tailgate renders inspected in qa-output/run-oDBdAu. Pioneer running gear, finite geometry, four wheels, open ducts, wheel-house closure, rolling and LOD checks remain passing. Full OEM shape likeness remains incomplete.
+
+
+## Rear door / sail continuity and rear glazing blades
+
+Compared both cars with the BRIA official brochure exterior views and CAVIRA official side image. BRIA's previous rear body shut-line ended at -0.280 of body length while its sail/window boundary ended at -0.322, leaving an approximately 18 cm longitudinal mismatch. The body seam now follows each car's own sail boundary, with an explicit bridge over the painted window sill. Added the rear window jamb and aligned the lower shut-line with the front and rear door endpoints. These are geometric continuity repairs, not newly measured factory surface dimensions.
+
+CAVIRA quarter-light seals are sampled on the curved glazing instead of straight 3D chords. Replaced the floating rectangular aero patches on the side glass with narrow blades following the actual rear-glazing perimeter. Side and C-pillar renders inspected in qa-output/run-SdEfb5. Focused checks now measure the actual retained body/window seam endpoint geometry: both cars have approximately 3 cm joints across the sill, rather than the former BRIA longitudinal mismatch. Existing wheel, duct, mirror, stop lamp and LOD checks passed. Overall photographic likeness remains incomplete.

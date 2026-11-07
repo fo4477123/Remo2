@@ -163,7 +163,14 @@
         // with the curved roof and waist, including the quarter-light aperture.
         for(const ids of tri){const [a,b,c]=ids.map(i=>vertices[i]),at=(i,j)=>{const z=(a.x+(b.x-a.x)*i/16+(c.x-a.x)*j/16)*L,v=a.y+(b.y-a.y)*i/16+(c.y-a.y)*j/16,q=glassSide(z,v,side);q[0]+=side*.45;return q;};for(let i=0;i<16;i++)for(let j=0;j<16-i;j++){pos.push(...at(i,j),...at(i+1,j),...at(i,j+1));if(i+j<15)pos.push(...at(i+1,j),...at(i+1,j+1),...at(i,j+1));}}
         const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();smoothNormals(g);mesh(g,roofPaint,[0,0,0],'formed-sail-panel');
-        if(hole.length)tube([...sail.quarter,sail.quarter[0]].map(([z,v])=>{const q=glassSide(z*L,v,side);q[0]+=side*.55;return q;}),.6,trim,root,true);
+        if(hole.length){
+          const rim=[];for(let i=0;i<sail.quarter.length;i++){const a=sail.quarter[i],b=sail.quarter[(i+1)%sail.quarter.length];for(let j=0;j<16;j++){const t=j/16,q=glassSide((a[0]+(b[0]-a[0])*t)*L,a[1]+(b[1]-a[1])*t,side);q[0]+=side*.55;rim.push(q);}}rim.push(rim[0]);tube(rim,.38,trim,root,true);
+        }
+        // The rear door's window frame shares the sail boundary. Its lower
+        // end will continue through the painted sill into the door shut-line.
+        const jambZ=v=>L*(sail.top+(sail.bottom-sail.top)*v);
+        patch(40,6,(v,u)=>{const q=glassSide(jambZ(v)+u*3.2,v,side);q[0]+=side*.52;return q;},roofPaint,'rear-door-window-jamb');
+        const jamb=tube(Array.from({length:41},(_,i)=>{const v=i/40,q=glassSide(jambZ(v),v,side);q[0]+=side*.68;return q;}),.10,darkMetal,root,true);jamb.name='rear-door-window-seam-'+side;jamb.userData.keep=true;
       }else patch(12,10,(t,v)=>{const q=glassSide(rear+(roofRear-rear)*t*(s.id==='model-3'?.30:s.id==='fox-d'?.32:.55),v,side);q[0]+=side*.35;return q;},roofPaint,'rear-pillar-'+s.id);
       const bZ=s.id==='kicks'?-L*.075:-L*.055;
       if(shape.productionPillars){
@@ -182,14 +189,17 @@
       if(shape.sectionedBody){
         // Door trailing edge rises around the rear arch, with a straight
         // centre shut-line and a sill edge shared by both doors.
-        const rearEdge=[[.10,-.215],[.28,-.225],[.48,-.245],[.70,-.265],[.90,-.275],[1,-.280]];
+        const lowerZ=(-A+R+6)/L,upperZ=shape.sail.bottom,frontDoorZ=v=>.216-.010*Math.pow(1-v,2);
+        const rearEdge=[[.10,lowerZ],[.28,lowerZ-.006],[.48,lowerZ+(upperZ-lowerZ)*.43],[.70,upperZ+.018],[.90,upperZ+.004],[1,upperZ]];
         for(const kind of ['rear','centre','front']){
           const pts=[];
-          for(let i=0;i<=64;i++){const v=.10+.90*i/64,z=L*(kind==='rear'?sample(rearEdge,v):kind==='centre'?-.055:.216-.010*Math.pow(1-v,2)),y=19+(edge(z)-19)*v;
+          for(let i=0;i<=64;i++){const v=.10+.90*i/64,z=L*(kind==='rear'?sample(rearEdge,v):kind==='centre'?-.055:frontDoorZ(v)),y=19+(edge(z)-19)*v;
             if(y<archBase(z)+.6)continue;const x=side*(sideX(z,v)+.12);pts.push([x,y,noseZ(x,z,y)]);}
-          if(pts.length>1)tube(pts,.12,trim);
+          if(pts.length>1){const seam=tube(pts,.12,trim);if(kind==='rear'){seam.name='rear-door-body-seam-'+side;seam.userData.keep=true;}}
         }
-        tube(Array.from({length:65},(_,i)=>{const z=L*(-.215+i/64*.42),v=.10,x=side*(sideX(z,v)+.12),y=19+(edge(z)-19)*v;return[x,y,noseZ(x,z,y)];}),.12,trim);
+        const z=upperZ*L,x=side*(sideX(z,1)+.12),body=[x,edge(z),noseZ(x,z,edge(z))],window=glassSide(z,1,side);window[0]+=side*.68;
+        tube(Array.from({length:9},(_,i)=>body.map((n,k)=>n+(window[k]-n)*i/8)),.12,trim,root,true);
+        tube(Array.from({length:65},(_,i)=>{const z=L*(lowerZ+i/64*(frontDoorZ(.10)-lowerZ)),v=.10,x=side*(sideX(z,v)+.12),y=19+(edge(z)-19)*v;return[x,y,noseZ(x,z,y)];}),.12,trim);
       }else for(const seamZ of [-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
       for(const z of [-L*.175,L*.12]){
         const x=side*(sideX(z,.90)+.7),y=19+(edge(z)-19)*.90;
@@ -246,7 +256,9 @@
         patch(12,48,(t,u)=>foilAt(t,u*2-1,2),trim,'spoiler-underside');
         for(const t of [0,1])patch(2,48,(v,u)=>foilAt(t,u*2-1,2*v),foilPaint,'spoiler-edge');
         for(const side of [-1,1])patch(12,2,(t,v)=>foilAt(t,side,2*v),foilPaint,'spoiler-end-cap');
-        for(const side of [-1,1])patch(12,6,(t,v)=>{const z=roofRear-18+(s.id==='fox-c'?18:40)*t,q=glassSide(z,v*.42,side);q[0]+=side*.7;return q;},trim,'rear-aero-blade');
+        // Rear blades follow the actual rear glazing perimeter, rather than
+        // leaving separate rectangular patches floating over the side glass.
+        for(const side of [-1,1])patch(48,8,(t,v)=>{const q=roofAt(roofRear+(rear-roofRear)*t,side*(.94+.06*v));q[0]+=side*.18;q[1]+=.22;q[2]-=.18;return q;},roofPaint,'rear-glazing-aero-blade');
         const stopLamp=tube(Array.from({length:41},(_,i)=>{const a=(i/40*2-1)*.55,q=foilAt(1,a,1);q[2]-=.45;return q;}),.35,red);stopLamp.name='spoiler-third-brake-lamp';stopLamp.userData.keep=true;
       }else{const z=roofRear-4,h=cabin(z).h;box([0,h-.2,z],[W*.73,3.5,16],roofPaint,2);box([0,h-1,z-8],[W*.40,1.5,1.3],red,.4);}
     }
