@@ -28,7 +28,7 @@
     function patch(rows,cols,fn,m,name,cut=null){const p=[],idx=[],uv=[];for(let i=0;i<=rows;i++)for(let j=0;j<=cols;j++){p.push(...fn(i/rows,j/cols));uv.push(j/cols,i/rows);}for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){if(cut?.((i+.5)/rows,(j+.5)/cols))continue;const a=i*(cols+1)+j;idx.push(a,a+cols+1,a+1,a+1,a+cols+1,a+cols+2);}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
       // Match the tangent at bonnet/shoulder and bumper joins. Separate patch
       // boundaries must not make a continuous painted surface look folded.
-      if((!shape.sectionedBody&&name.startsWith('continuous-wheel'))||(name.startsWith('formed-hood')&&!shape.sectionedBody)||name.startsWith('formed-front')||name.startsWith('formed-rear')){
+      if((!shape.sectionedBody&&name.startsWith('continuous-wheel'))||(name.startsWith('formed-hood')&&!shape.sectionedBody)||name.startsWith('formed-front')||(name.startsWith('formed-rear')&&!shape.sectionedBody)){
         const normals=g.attributes.normal,positions=g.attributes.position;
         for(let i=0;i<=rows;i++)for(let j=0;j<=cols;j++){
           const k=i*(cols+1)+j,x=positions.getX(k),z=positions.getZ(k),n=new T.Vector3(normals.getX(k),normals.getY(k),normals.getZ(k));
@@ -290,7 +290,12 @@
     for(const sign of [-1,1]){
       const at=sign*L/2;
       tube(Array.from({length:35},(_,i)=>{const x=(i/34*2-1)*W*.438;return[x,23+(suv?2:0),noseZ(x,at,23)-sign*.2];}),suv?4:2.3,trim);
-      if(sign<0){const contour=(s.id==='fox-c'?[[-.32,.65],[-.31,.43],[-.27,.38],[.27,.38],[.31,.43],[.32,.65]]:s.id==='fox-b'?[[-.37,.63],[-.32,.46],[.32,.46],[.37,.63]]:[[-.42,.58],[-.37,.37],[.37,.37],[.42,.58]]).map(([x,y])=>[x*W,y*H,rearZ(x*W,y*H)]);tube(contour,.32,trim,root,true);if(s.id!=='fox-c')box([0,H*.36,rearZ(0,H*.36)+1],[38,14,1],trim,2);if(!shape.sectionedBody)box([0,H*.54,rearZ(0,H*.54)-.6],[s.nose==='ford'?11:8,4,.8],metal,1);for(const side of [-1,1])tube(Array.from({length:9},(_,i)=>{const x=side*(W*.27+i*2);return[x,29,rearZ(x,29)-.6];}),.9,red);}
+      if(sign<0){if(shape.sectionedBody){
+        const outline=s.id==='fox-b'?[[-.315,.725],[-.32,.68],[-.315,.60],[-.30,.49],[-.27,.455],[0,.447],[.27,.455],[.30,.49],[.315,.60],[.32,.68],[.315,.725]]:[[-.335,.722],[-.34,.68],[-.33,.56],[-.31,.44],[-.275,.399],[0,.390],[.275,.399],[.31,.44],[.33,.56],[.34,.68],[.335,.722]];
+        const curve=new T.CatmullRomCurve3(outline.map(([x,y])=>new T.Vector3(x*W,y*H,0)),false,'centripetal');
+        tube(Array.from({length:121},(_,i)=>{const q=curve.getPoint(i/120);return[q.x,q.y,rearZ(q.x,q.y)-.10];}),.12,trim,root,true);
+      }
+      const contour=(s.id==='fox-c'?[[-.32,.65],[-.31,.43],[-.27,.38],[.27,.38],[.31,.43],[.32,.65]]:s.id==='fox-b'?[[-.37,.63],[-.32,.46],[.32,.46],[.37,.63]]:[[-.42,.58],[-.37,.37],[.37,.37],[.42,.58]]).map(([x,y])=>[x*W,y*H,rearZ(x*W,y*H)]);if(!shape.sectionedBody)tube(contour,.32,trim,root,true);if(s.id!=='fox-c')box([0,H*.36,rearZ(0,H*.36)+1],[38,14,1],trim,2);if(!shape.sectionedBody)box([0,H*.54,rearZ(0,H*.54)-.6],[s.nose==='ford'?11:8,4,.8],metal,1);for(const side of [-1,1])tube(Array.from({length:9},(_,i)=>{const x=side*(W*.27+i*2);return[x,29,rearZ(x,29)-.6];}),.9,red);}
     }
     if(suv&&!s.id.startsWith('fox-'))for(const sign of [-1,1])tube(Array.from({length:25},(_,i)=>{const x=(i/24-.5)*W*.60;return[x,22,noseZ(x,sign*L/2,22)+sign];}),1.4,metal);
     // Seats, dashboard, console, instrument cluster, steering and door cards are actual geometry.

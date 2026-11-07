@@ -101,3 +101,9 @@ Added formed transparent headlamp and tail-lamp covers with narrow return walls.
 Removed the 7 cm fender-slot backing plates. Four-wall ducts now terminate in open apertures towards the wheel houses. New oblique ray checks along the duct axes find the first internal surface at 25-35 cm from an origin 10 cm outside the inlet, rather than at a shallow closing plate. These channels are modelling approximations and are not a CFD or factory-geometry claim.
 
 The tailgate wordmark has a separate texture and panel: 64 pixel letter-centre spacing and an 86 cm fitted panel, independent of the front wordmark. Replaced generic central strokes with geometry sampled from the official 48 px favicon: https://www-assets.cloud.foxtronev.com/images/meta/favicon.ico . This small emblem is limited by the source resolution. Focused vehicle checks passed and nose/rear/charge-side previews inspected.
+
+## Rear emblem and continuous tailgate shut-line
+
+The previous official emblem geometry was front-only. Added a separate rear-facing emblem in the central optical-band insert on both Bria and Cavira, following the rear surface. It is retained as an independently named mesh and checked by gallery QA so omission cannot be hidden by front-badge validation.
+
+Replaced the partial floating rear-panel lines with independent smooth three-sided tailgate boundaries that terminate at the optical-band joints. Reduced oscillation of the rear depth sections and removed the forced upper normal bias on the sectioned rear skin. Added the tailgate/emblem close-up camera. Final focused checks passed and rear close-ups inspected. These repairs do not establish exact factory shape fidelity.
