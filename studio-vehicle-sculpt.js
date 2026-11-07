@@ -217,7 +217,21 @@
         // Wheel-well backing closes the cut edge without an opaque cylinder through the tyre.
         patch(24,5,(t,v)=>{const a=t*Math.PI,z=axle+Math.cos(a)*(R+4.3),y=R+Math.sin(a)*(R+4.3);const sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-v*14);return[x,y,noseZ(x,z,y)];},trim,'inner-arch');
       }
+      if(shape.sectionedBody){
+        const mz=front-12,mh=belt(mz)+2,xc=side*(W/2+4),yc=mh+6,zc=mz-2,baseX=side*(sideX(mz,.97)+.4);
+        const mount=mesh(new T.SphereGeometry(1,20,12),trim,[baseX,mh,mz],'mirror-door-mount');mount.scale.set(1.5,2.4,4.2);
+        rod([baseX,mh,mz],[xc-side*5,yc-3,zc+2],1.4,trim);
+        // Rounded trapezoid perimeter, tapered nose and an open, yawed rear
+        // face. All layers share the same rim instead of intersecting spheres.
+        const mirrorAt=(a,r=1)=>{const cx=Math.cos(a),sy=Math.sin(a),x=9.4*Math.sign(cx)*Math.abs(cx)**.78*r*(1-.09*sy),y=5.6*Math.sign(sy)*Math.abs(sy)**.86*r;return[x,y,-.16*x];};
+        patch(24,64,(t,u)=>{const a=u*2*Math.PI,p=mirrorAt(a,Math.cos(t*Math.PI/2));return[xc+side*p[0],yc+p[1]-.7*Math.sin(t*Math.PI/2),zc+p[2]+10*Math.sin(t*Math.PI/2)];},roofPaint,'formed-mirror-housing');
+        const mirrorGlass=new T.MeshPhysicalMaterial({color:'#9facb5',metalness:1,roughness:.075,clearcoat:1});
+        const face=patch(12,64,(r,u)=>{const p=mirrorAt(u*Math.PI*2,.86*r);return[xc+side*p[0],yc+p[1],zc+p[2]-.22-.12*(1-r*r)];},mirrorGlass,'mirror-reflective-face');face.userData.keep=true;
+        patch(4,64,(t,u)=>{const p=mirrorAt(u*Math.PI*2,.86+.14*t);return[xc+side*p[0],yc+p[1],zc+p[2]-.22*(1-t)];},trim,'mirror-glass-bezel');
+        tube(Array.from({length:41},(_,i)=>{const p=mirrorAt((1.04+i/40*.92)*Math.PI,Math.cos(.24*Math.PI/2));return[xc+side*p[0],yc+p[1]-.7*Math.sin(.24*Math.PI/2),zc+p[2]+10*Math.sin(.24*Math.PI/2)+.12];}),.18,led);
+      }else{
       const mz=front-12,mh=belt(mz)+9;rod([side*W*.435,mh,mz],[side*(W/2+7),mh+1,mz],1.8,trim);const mirror=mesh(new T.SphereGeometry(1,32,20),shape.blackMirrors?trim:paint,[side*(W/2+7),mh+3,mz],'mirror');mirror.scale.set(8,4.8,9);box([side*(W/2+7),mh+3,mz-6],[11,6,.6],darkMetal,1);box([side*(W/2+7),mh+2,mz+8],[10,1,1],led,.3);
+      }
       if(s.id==='fox-c'){
         const tailPoints=Array.from({length:20},(_,i)=>{const z=-L*.49+i/19*L*.085,v=.96,x=side*(sideX(z,v)+.8),y=19+(edge(z)-19)*v;return[x,y,noseZ(x,z,y)];});
         tube(tailPoints,2.1,trim);tube(tailPoints.map(p=>[p[0]+side*.7,p[1]+.3,p[2]]),.8,red);
@@ -227,12 +241,13 @@
     if(s.body!=='sedan'){
       if(shape.sectionedBody){
         const foilPaint=roofPaint.clone();foilPaint.userData.noSelfShadow=true;
-        patch(12,48,(t,u)=>{const a=u*2-1,z=roofRear+5-23*t,p=cabin(roofRear+5);return[a*W*.395,p.h-6*a*a+1.4+.6*Math.sin(t*Math.PI)-4*t,z+3*a*a];},foilPaint,'contoured-roof-spoiler');
-        patch(12,48,(t,u)=>{const a=u*2-1,z=roofRear+5-23*t,p=cabin(roofRear+5);return[a*W*.395,p.h-6*a*a-.6+.6*Math.sin(t*Math.PI)-4*t,z+3*a*a];},trim,'spoiler-underside');
-        for(const t of [0,1])patch(2,48,(v,u)=>{const a=u*2-1,z=roofRear+5-23*t,p=cabin(roofRear+5);return[a*W*.395,p.h-6*a*a+1.4+.6*Math.sin(t*Math.PI)-4*t-2*v,z+3*a*a];},foilPaint,'spoiler-edge');
-        for(const side of [-1,1])patch(12,2,(t,v)=>{const a=side,z=roofRear+5-23*t,p=cabin(roofRear+5);return[a*W*.395,p.h-6+1.4+.6*Math.sin(t*Math.PI)-4*t-2*v,z+3];},foilPaint,'spoiler-end-cap');
+        const foilAt=(t,a,drop=0)=>{const p=cabin(roofRear+5);return[a*W*.395,p.h-6*a*a+1.4+.6*Math.sin(t*Math.PI)-4*t-drop,roofRear+5-23*t+3*a*a];};
+        patch(12,48,(t,u)=>foilAt(t,u*2-1),foilPaint,'contoured-roof-spoiler');
+        patch(12,48,(t,u)=>foilAt(t,u*2-1,2),trim,'spoiler-underside');
+        for(const t of [0,1])patch(2,48,(v,u)=>foilAt(t,u*2-1,2*v),foilPaint,'spoiler-edge');
+        for(const side of [-1,1])patch(12,2,(t,v)=>foilAt(t,side,2*v),foilPaint,'spoiler-end-cap');
         for(const side of [-1,1])patch(12,6,(t,v)=>{const z=roofRear-18+(s.id==='fox-c'?18:40)*t,q=glassSide(z,v*.42,side);q[0]+=side*.7;return q;},trim,'rear-aero-blade');
-        tube(Array.from({length:30},(_,i)=>{const a=i/29*2-1;return[a*W*.22,cabin(roofRear+5).h-6*a*a-2.5,roofRear-17+3*a*a];}),.65,red);
+        const stopLamp=tube(Array.from({length:41},(_,i)=>{const a=(i/40*2-1)*.55,q=foilAt(1,a,1);q[2]-=.45;return q;}),.35,red);stopLamp.name='spoiler-third-brake-lamp';stopLamp.userData.keep=true;
       }else{const z=roofRear-4,h=cabin(z).h;box([0,h-.2,z],[W*.73,3.5,16],roofPaint,2);box([0,h-1,z-8],[W*.40,1.5,1.3],red,.4);}
     }
     if(shape.sectionedBody){

@@ -121,3 +121,12 @@ Focused checks passed for the locked Pioneer tyre/track dimensions, finite geome
 ## Fender opening height correction
 
 Per user feedback, the opening upper edges now reference the tyre crown in centimetres. Centre targets are 8 cm above the front tyre and 7 cm above the rear tyre; actual edge samples on the varying body surface clear the crown by approximately 6.9-7.6 cm. The four open duct walls follow the taller apertures. These are user-directed modelling controls, not factory-measured heights. Focused checks passed for upper-edge clearance, open ducts, Pioneer running gear, LOD and rolling; the charge-side preview was inspected.
+
+
+## Mirror housing and spoiler stop lamp
+
+Rechecked the BRIA brochure exterior views and CAVIRA official side/rear photographs from the Pioneer baseline. Replaced the complete mirror ellipsoid with an open tapered housing, rounded trapezoid rim, separate recessed reflective face, bezel and curved indicator. Shortened the exposed mounting stalk. Mirror proportions remain photo-estimated; the reflective material uses the existing studio environment rather than a live scene reflection.
+
+The spoiler top, underside, edge caps and third brake lamp now share one surface function. The lamp follows the actual trailing edge instead of being partly buried or hanging below the foil. Added a gallery mirror close-up and ray checks that both mirror faces and three points across the stop lamp are exposed.
+
+Validation: node syntax checks, git diff --check and node qa-vehicle-rebuild.cjs --foxtron passed. Mirror and tailgate renders inspected in qa-output/run-oDBdAu. Pioneer running gear, finite geometry, four wheels, open ducts, wheel-house closure, rolling and LOD checks remain passing. Full OEM shape likeness remains incomplete.
