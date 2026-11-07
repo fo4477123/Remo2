@@ -399,18 +399,22 @@
     function productionWheel(side,z){
       const wheel=new T.Group();wheel.name='sculpt-wheel-'+wheels.length;wheel.position.set(side*(shape.frontTrack?(z>0?shape.frontTrack:shape.rearTrack)/2:W/2-10.5),R,z);root.add(wheel);
       const style=shape.wheelStyle,rr=shape.rimRadius||R*(style==='highland-photon'?.715:.735),tyreScale=(shape.tyreWidth||22.8)/22.8;
-      const cutFinish=shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#afb3b7',metalness:.92,roughness:.26,clearcoat:.35,clearcoatRoughness:.14}):metal;
+      const cutFinish=shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#d2d5d8',metalness:.9,roughness:.21,clearcoat:.35,clearcoatRoughness:.14}):metal;
       const castFinish=shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#15191c',metalness:.55,roughness:.27,clearcoat:.7,clearcoatRoughness:.12}):darkMetal;
+      const finFinish=shape.sectionedBody?mat('#34383c',.48,{metalness:.4,side:T.DoubleSide}):trim;if(shape.sectionedBody)finFinish.userData.noSelfShadow=true;
+      if(shape.sectionedBody){cutFinish.userData.noSelfShadow=true;castFinish.userData.noSelfShadow=true;}
       const section=[[rr,-10],[R-4,-11.4],[R-1.4,-9.3],[R,-6.7],[R,6.7],[R-1.4,9.3],[R-4,11.4],[rr,10],[rr,-10]].map(([r,x])=>new T.Vector2(r,x*tyreScale));
       const tyre=mesh(new T.LatheGeometry(section,96),rubber,[0,0,0],'production-tyre',wheel);tyre.rotation.z=Math.PI/2;
       for(const x of [-4.8,-1.6,1.6,4.8]){const groove=mesh(new T.TorusGeometry(R+.025,.19,4,96),trim,[x*tyreScale,0,0],'recessed-tread-channel',wheel);groove.rotation.y=Math.PI/2;}
       for(let i=0;i<72;i++)for(const flank of [-1,1]){const a=i*Math.PI/36;const pts=[0,1,2].map(k=>{const x=flank*(6.2+k*2.2)*tyreScale,radius=R-.2-k*.7,theta=a+k*.013;return[x,Math.sin(theta)*radius,Math.cos(theta)*radius];});tube(pts,.16,trim,wheel);}
       const barrel=mesh(new T.CylinderGeometry(rr,rr,20,72,1,true),darkMetal,[0,0,0],'open-alloy-barrel',wheel);barrel.rotation.z=Math.PI/2;
+      if(shape.sectionedBody){barrel.receiveShadow=false;const cavity=mesh(new T.CylinderGeometry(rr*.985,rr*.985,.3,80),new T.MeshBasicMaterial({color:'#0c1013'}),[-side*8.7,0,0],'shadowed-inner-wheel-house',wheel);cavity.rotation.z=Math.PI/2;cavity.castShadow=false;cavity.receiveShadow=false;}
       const rotorMaterial=mat('#686c70',.48,{metalness:.75});
       const rotor=mesh(new T.CylinderGeometry(rr*.67,rr*.67,.8,64),rotorMaterial,[side*5.5,0,0],'machined-brake-disc',wheel);rotor.rotation.z=Math.PI/2;
+      if(shape.sectionedBody)rotor.receiveShadow=false;
       for(const radius of [rr*.48,rr*.62]){const track=mesh(new T.TorusGeometry(radius,.18,4,64),darkMetal,[side*6,0,0],'rotor-wear-track',wheel);track.rotation.y=Math.PI/2;}
       // The disc rolls with the rim; the brake caliper stays on the axle.
-      box([wheel.position.x+side*7.6,R+3,z+rr*.60],[5,14,8],darkMetal,2,root);
+      box([wheel.position.x+side*(shape.sectionedBody?4.4:7.6),R+3,z+rr*.60],[5,14,8],darkMetal,2,root);
       function blade(points,material=darkMetal){
         const outline=points.map(([a,r])=>new T.Vector2(Math.sin(a)*r,Math.cos(a)*r));
         if(shape.sectionedBody){
@@ -427,6 +431,45 @@
         for(let i=0;i<n;i++){const j=(i+1)%n;indices.push(i,j,j+n,i,j+n,i+n);}
         const geo=new T.BufferGeometry();geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setIndex(indices);geo.computeVertexNormals();material.side=T.DoubleSide;mesh(geo,material,[0,0,0],'production-wheel-blade',wheel);
       }
+      if(shape.sectionedBody){
+        // The photographed rims are continuous cast / machined faces with
+        // real openings, rather than independent thin triangular outlines.
+        const polar=(a,r)=>new T.Vector2(Math.sin(a)*r,Math.cos(a)*r),faceDepth=r=>8.4+2.1*Math.pow(Math.min(1,r/rr),1.45),face=new T.Shape(Array.from({length:128},(_,i)=>polar(i*Math.PI/64,rr*.993)));
+        const pockets=[],addHole=(points,round=0)=>{const path=new T.Path();if(!round)path.setFromPoints(points);else for(let i=0;i<points.length;i++){const b=points[i],a=points[(i+points.length-1)%points.length],c=points[(i+1)%points.length],u=b.clone().lerp(a,round),v=b.clone().lerp(c,round);if(i===0)path.moveTo(u.x,u.y);else path.lineTo(u.x,u.y);path.quadraticCurveTo(b.x,b.y,v.x,v.y);}path.closePath();face.holes.push(path);},circle=(x,y,r)=>{const path=new T.Path(Array.from({length:32},(_,i)=>new T.Vector2(x+Math.cos(-i*Math.PI/16)*r,y+Math.sin(-i*Math.PI/16)*r)));path.closePath();face.holes.push(path);};
+        circle(0,0,3.6);
+        const sectors=[];
+        for(let i=0;i<5;i++){
+          const a=i*Math.PI*2/5,points=spec=>spec.map(([angle,r])=>polar(a+angle,rr*r));
+          circle(...polar(a+.14,6).toArray(),1.15);
+          if(style==='bria-geometric-five'){
+            const panel=points([[.04,.34],[.19,.30],[.73,.90],[.65,.965],[.02,.965],[-.055,.86]]);addHole(panel,.06);pockets.push({points:panel,angle:a+.22});
+            addHole(points([[.86,.64],[.85,.935],[1.15,.935]]),.08);
+            addHole(points([[.77,.47],[.795,.48],[.795,.925],[.77,.925]]));
+            addHole(points([[.817,.54],[.84,.55],[.84,.92],[.817,.92]]));
+          }else{
+            addHole(points([[.12,.34],[.20,.30],[.62,.79],[.62,.96],[.12,.96],[.06,.82]]),.20);
+            addHole(points([[.37,.30],[.47,.34],[1.10,.93],[1.05,.97],[.78,.97],[.68,.81]]),.20);
+          }
+          sectors.push(a);
+        }
+        function formedFace(shape,material,depth,offset,name){
+          const g=new T.ExtrudeGeometry(shape,{depth,bevelEnabled:true,bevelSize:.075,bevelThickness:.055,bevelSegments:2,steps:1,curveSegments:6}),p=g.attributes.position,n=g.attributes.normal;
+          for(let i=0;i<p.count;i++){const y=p.getX(i),z=p.getY(i),r=Math.hypot(y,z),slope=r>1e-6&&r<rr?2.1*1.45/rr*Math.pow(r/rr,.45):0,nx=n.getX(i),ny=n.getY(i),nz=n.getZ(i),normal=new T.Vector3(side*nz,nx-(r?slope*y/r:0)*nz,ny-(r?slope*z/r:0)*nz).normalize(),x=side*(faceDepth(r)+offset+p.getZ(i));p.setXYZ(i,x,y,z);n.setXYZ(i,normal.x,normal.y,normal.z);}if(side<0){const indices=[];for(let i=0;i<p.count;i+=3)indices.push(i,i+2,i+1);g.setIndex(indices);}g.clearGroups();material.side=T.DoubleSide;return mesh(g,material,[0,0,0],name,wheel);
+        }
+        const main=formedFace(face,cutFinish,.48,0,'continuous-pioneer-wheel-face');main.userData.keep=true;
+        for(const pocket of pockets){
+          const panel=new T.Shape(pocket.points);formedFace(panel,castFinish,.16,-.12,'bria-aero-insert');
+          const d=new T.Vector2(Math.sin(pocket.angle),Math.cos(pocket.angle)),normal=new T.Vector2(-d.y,d.x),cross=(a,b)=>a.x*b.y-a.y*b.x;
+          const fins=[];
+          for(let offset=-rr;offset<=rr;offset+=rr*.044){const origin=normal.clone().multiplyScalar(offset),hits=[];for(let i=0;i<pocket.points.length;i++){const a=pocket.points[i],b=pocket.points[(i+1)%pocket.points.length],edge=b.clone().sub(a),q=a.clone().sub(origin),den=cross(d,edge);if(Math.abs(den)<1e-8)continue;const t=cross(q,edge)/den,u=cross(q,d)/den;if(u>=0&&u<=1)hits.push(t);}if(hits.length<2)continue;const lo=Math.min(...hits)+.3,hi=Math.max(...hits)-.3;if(hi<=lo)continue;
+            const at=(t,w)=>{const p=origin.clone().addScaledVector(d,t).addScaledVector(normal,w);return[side*(faceDepth(p.length())+.34),p.x,p.y];};for(let j=0;j<8;j++){const u=lo+(hi-lo)*j/8,v=lo+(hi-lo)*(j+1)/8;fins.push(...at(u,-.055),...at(v,-.055),...at(u,.055),...at(v,-.055),...at(v,.055),...at(u,.055));}
+          }
+          const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(fins,3));g.computeVertexNormals();const fin=mesh(g,finFinish,[0,0,0],'formed-aero-insert-ribs',wheel);fin.castShadow=false;
+        }
+        // Recessed bolt seats remain distinct from the outward rim lip.
+        for(const a of sectors){const p=polar(a+.14,6),well=mesh(new T.CylinderGeometry(1.13,1.13,1.2,24,1,true),castFinish,[side*8.8,p.x,p.y],'recessed-bolt-seat',wheel);well.rotation.z=Math.PI/2;}
+        wheel.userData.faceConstruction=style==='bria-geometric-five'?'five-aero-panels-triangular-vents':'five-paired-curved-apertures';
+      }else{
       const count=style==='bria-geometric-five'?5:style==='cavira-machined-ten'?10:7;
       for(let i=0;i<count;i++){
         const a=i*Math.PI*2/count;
@@ -446,14 +489,15 @@
           blade([[a+.12,rr*.30],[a+.16,rr*.31],[a+.46,rr*.92],[a+.41,rr*.93]],darkMetal);
         }
       }
-      const lip=mesh(new T.TorusGeometry(rr,shape.sectionedBody?.35:.60,8,80),style==='highland-photon'?darkMetal:metal,[side*10.4,0,0],'alloy-machined-lip',wheel);lip.rotation.y=Math.PI/2;
-      const capR=shape.sectionedBody?3.3:4.5,cap=mesh(new T.CylinderGeometry(capR,capR,1,32),trim,[side*11.3,0,0],'recessed-centre-cap',wheel);cap.rotation.z=Math.PI/2;
+      }
+      const lip=mesh(new T.TorusGeometry(rr,shape.sectionedBody?.28:.60,8,80),style==='highland-photon'?darkMetal:metal,[side*(shape.sectionedBody?11.03:10.4),0,0],'alloy-machined-lip',wheel);lip.rotation.y=Math.PI/2;
+      const capR=shape.sectionedBody?3.3:4.5,cap=mesh(new T.CylinderGeometry(capR,capR,shape.sectionedBody?.7:1,32),trim,[side*(shape.sectionedBody?8.8:11.3),0,0],'recessed-centre-cap',wheel);cap.rotation.z=Math.PI/2;
       if(shape.sectionedBody){
         const canvas=document.createElement('canvas');canvas.width=256;canvas.height=64;const ctx=canvas.getContext('2d');ctx.font='28px sans-serif';ctx.fillStyle='#b7bcc0';ctx.textAlign='center';ctx.fillText('FOXTRON',128,43);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
-        const badge=mesh(new T.PlaneGeometry(5.6,1.4),new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,roughness:.4,metalness:.6}),[side*11.86,0,0],'wheel-centre-wordmark',wheel);badge.rotation.y=side*Math.PI/2;
+        const badge=mesh(new T.PlaneGeometry(5.6,1.4),new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,roughness:.4,metalness:.6}),[side*9.17,0,0],'wheel-centre-wordmark',wheel);badge.rotation.y=side*Math.PI/2;
         const a=Math.PI*.34;rod([side*10.5,Math.sin(a)*rr*.90,Math.cos(a)*rr*.90],[side*10.5,Math.sin(a)*rr*.985,Math.cos(a)*rr*.985],.35,rubber,wheel);
       }
-      for(let i=0;i<5;i++){const a=i*Math.PI*.4,lug=mesh(new T.CylinderGeometry(.85,.85,1,8),metal,[side*11.2,Math.sin(a)*6,Math.cos(a)*6],'wheel-lug',wheel);lug.rotation.z=Math.PI/2;}
+      for(let i=0;i<5;i++){const a=i*Math.PI*.4+(shape.sectionedBody?.14:0),lug=mesh(new T.CylinderGeometry(shape.sectionedBody?.78:.85,shape.sectionedBody?.78:.85,shape.sectionedBody?.65:1,shape.sectionedBody?6:8),metal,[side*(shape.sectionedBody?9:11.2),Math.sin(a)*6,Math.cos(a)*6],'wheel-lug',wheel);lug.rotation.z=Math.PI/2;}
       wheel.userData.design=style;batch(wheel);wheels.push(wheel);
     }
     // Four articulated wheels with rounded tyre shoulders, grooves, split spokes, rotors and calipers.

@@ -33,3 +33,8 @@ Implemented nominal tyre radius, rim radius, tyre width, track and wheelbase. Ad
 Gallery QA measures the wheel-pivot tracks and tyre diameter rather than merely checking the configuration constants. It also checks rolling, LOD, apertures and finite geometry.
 
 The bonnet, bumper, door, pillar, optical and vent surfaces still use estimated controls. The precise wheel-spoke contours also remain approximations. Promotional photographs differ in perspective and optional equipment; neither they nor the specification table establish hidden geometry. A claim of exact reproduction requires additional factory CAD, measured scans or sufficiently complete calibrated references and a verified surface comparison.
+
+
+## User-requested rear identity override
+
+Latest user instruction explicitly requests restoring the CAVIRA tailgate dot emblem. Keep it beneath the continuous light guide, above the FOXTRON wordmark. This is the requested visual configuration even though the reference production rear photographs show the wordmark without this additional emblem. Do not remove it again while refining factory details.

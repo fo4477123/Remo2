@@ -62,8 +62,8 @@
       // enlarged pixels from the unrelated 48 px website favicon.
       // Reference: https://image.u-car.com.tw/7619/photo_159534.jpg
       const dots=[];for(let row=0;row<7;row++)for(let col=row<2?0:row<4?3:5;col<7;col++)dots.push([row-col,-row-col]);
-      function vehicleEmblem(centreY,sign,name){
-        const positions=[],at=(x,y,back=0)=>{x*=sign;const yy=centreY+y,surface=sign>0?frontZ(x,yy)+.6:rearZ(x,yy)+.43;return[x,yy,surface-sign*back];};
+      function vehicleEmblem(centreY,sign,name,rearOffset=.43){
+        const positions=[],at=(x,y,back=0)=>{x*=sign;const yy=centreY+y,surface=sign>0?frontZ(x,yy)+.6:rearZ(x,yy)+rearOffset;return[x,yy,surface-sign*back];};
         const tri=(a,b,c)=>positions.push(...a,...b,...c);
         for(const [u,v]of dots){const x=((u+6)/7-.5)*3.94,y=((v+12)/12-.5)*4.74,corners=[[0,.23],[-.23,0],[0,-.23],[.23,0]],inner=corners.map(([dx,dy])=>at(x+dx*.82,y+dy*.82));tri(inner[0],inner[1],inner[2]);tri(inner[0],inner[2],inner[3]);
           for(let i=0;i<4;i++){const j=(i+1)%4,a=at(x+corners[i][0],y+corners[i][1],.05),b=at(x+corners[j][0],y+corners[j][1],.05);tri(a,b,inner[i]);tri(b,inner[j],inner[i]);const c=at(x+corners[i][0],y+corners[i][1],.14),d=at(x+corners[j][0],y+corners[j][1],.14);tri(a,c,b);tri(b,c,d);}
@@ -75,7 +75,7 @@
         const rearCy=H*tailHeight(p,.700);
         poly([[-3.5,rearCy+3.2],[3.5,rearCy+3.2],[3.1,rearCy-3.2],[-3.1,rearCy-3.2]],darkMetal,(x,y)=>rearZ(x,y)+.55,'tailgate-emblem-base');
         vehicleEmblem(rearCy,-1,'official-tailgate-emblem');
-      }
+      }else vehicleEmblem(H*(tailHeight(p,.674)+tailHeight(p,.706))/2,-1,'official-tailgate-emblem',.73);
     }
     if(s.id==='fox-b')for(const sign of [-1,1])front([[.90,.508],[.97,.51],[.94,.18],[.85,.18],[.87,.36]].map(([x,y])=>[sign*x,y]),trim,.9);
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
