@@ -25,7 +25,10 @@
     if(s.id==='fox-b'||s.id==='fox-c'){
       const cy=p.drl[0][1];
       front([[-.048,cy+.008],[.048,cy+.008],[.038,cy-.015],[-.038,cy-.015]],darkMetal,2.6);
-      for(const sign of [-1,1])for(let i=0;i<3;i++)line([[sign*(.006+i*.009),cy+.004-i*.004],[sign*(.015+i*.009),cy-.006-i*.002]],.18,metal,2.9);
+      // Geometry sampled from the official favicon: https://www-assets.cloud.foxtronev.com/images/meta/favicon.ico
+      const emblemPixels=[[29,6],[30,6],[27,8],[26,9],[27,9],[32,9],[33,9],[23,11],[24,11],[23,12],[24,12],[29,12],[30,12],[20,14],[21,14],[26,14],[27,14],[20,15],[21,15],[22,15],[26,15],[27,15],[21,16],[17,17],[18,17],[19,17],[23,17],[24,17],[17,18],[18,18],[19,18],[23,18],[24,18],[15,19],[18,19],[14,20],[15,20],[16,20],[20,20],[21,20],[26,20],[27,20],[14,21],[15,21],[16,21],[20,21],[21,21],[22,21],[26,21],[27,21],[12,22],[15,22],[18,22],[11,23],[12,23],[13,23],[17,23],[18,23],[19,23],[23,23],[24,23],[29,23],[30,23],[11,24],[12,24],[13,24],[17,24],[18,24],[19,24],[23,24],[24,24],[29,24],[30,24],[12,25],[15,25],[18,25],[14,26],[15,26],[16,26],[20,26],[21,26],[22,26],[26,26],[27,26],[14,27],[15,27],[16,27],[20,27],[21,27],[26,27],[27,27],[15,28],[18,28],[17,29],[18,29],[19,29],[23,29],[24,29],[17,30],[18,30],[19,30],[23,30],[24,30],[21,31],[20,32],[21,32],[22,32],[26,32],[27,32],[20,33],[21,33],[26,33],[27,33],[23,35],[24,35],[29,35],[30,35],[23,36],[24,36],[26,38],[27,38],[32,38],[33,38],[27,39],[29,41],[30,41]],emblemPositions=[];
+      for(const [px,py] of emblemPixels){const x=(px-22.5)*0.08333333333333333,y=cy*H-(24-py)*-0.08333333333333333-0.4,d=0.08333333333333333;for(const [dx,dy] of [[0,0],[d,0],[0,-d],[d,0],[d,-d],[0,-d]])emblemPositions.push(x+dx,y+dy,frontZ(x+dx,y+dy)+3.05);}
+      const emblemGeometry=new T.BufferGeometry();emblemGeometry.setAttribute('position',new T.Float32BufferAttribute(emblemPositions,3));emblemGeometry.computeVertexNormals();mesh(emblemGeometry,metal,[0,0,0],'official-dot-chevron-emblem');
     }
     if(s.id==='fox-b')for(const sign of [-1,1])front([[.90,.508],[.97,.51],[.94,.18],[.85,.18],[.87,.36]].map(([x,y])=>[sign*x,y]),trim,.9);
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
@@ -64,9 +67,10 @@
         g.computeVertexNormals();const badge=mesh(g,m,[0,0,0],'ramp-conforming-foxtron-wordmark');badge.userData.keep=true;
       }
       if(s.id==='fox-b'||s.id==='fox-c'){
-        const g=new T.PlaneGeometry(55,6.8,32,6),v=g.attributes.position;
+        const rearCanvas=document.createElement('canvas');rearCanvas.width=512;rearCanvas.height=64;const rc=rearCanvas.getContext('2d');rc.fillStyle='#b5bec4';rc.font='38px sans-serif';rc.textAlign='center';[...'FOXTRON'].forEach((letter,i)=>rc.fillText(letter,256+(i-3)*64,46));const rearTexture=new T.CanvasTexture(rearCanvas);rearTexture.colorSpace=T.SRGBColorSpace;const rearMaterial=m.clone();rearMaterial.map=rearTexture;
+        const g=new T.PlaneGeometry(86,6.8,40,6),v=g.attributes.position;
         for(let i=0;i<v.count;i++){const x=-v.getX(i),y=v.getY(i)+H*.61;v.setXYZ(i,x,y,rearZ(x,y)-.25);}
-        g.computeVertexNormals();mesh(g,m,[0,0,0],'surface-fitted-tailgate-wordmark');
+        g.computeVertexNormals();mesh(g,rearMaterial,[0,0,0],'surface-fitted-tailgate-wordmark');
       }
     }
     if(s.id==='fox-c'){

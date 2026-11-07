@@ -72,9 +72,12 @@
       patch(zNodes.length-1,vNodes.length-1,(t,u)=>sideSurface(nodeAt(zNodes,t),nodeAt(vNodes,u),side),paint,'continuous-wheel-opening-'+s.id,(t,u)=>{const z=nodeAt(zNodes,t),v=nodeAt(vNodes,u);return fenderVents.some(p=>Math.abs(z-p.z)<p.w/2&&v>p.lo&&v<p.hi);});
       for(const vent of fenderVents){
         const z0=vent.z-vent.w/2,z1=vent.z+vent.w/2;
-        patch(12,8,(t,u)=>sideSurface(z0+(z1-z0)*t,vent.lo+(vent.hi-vent.lo)*u,side,7),trim,'recessed-fender-vent');
         const corners=[[z0,vent.lo],[z1,vent.lo],[z1,vent.hi],[z0,vent.hi]];
-        for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];patch(12,4,(t,u)=>sideSurface(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,side,7*u),i===0?paint:darkMetal,'fender-vent-return');}
+        // Open duct into the wheel-house volume: there is no dark end cap.
+        // The inner aperture moves towards the tyre and below the arch crown.
+        const through=(z,v,t)=>{const p=sideSurface(z,v,side),q=[side*(W/2-22),R+6+12*(v-vent.lo)/(vent.hi-vent.lo),z-Math.sign(vent.z)*10];return p.map((n,i)=>n+(q[i]-n)*t);};
+        (root.userData.fenderDucts??=[]).push({entry:through(vent.z,(vent.lo+vent.hi)/2,0),exit:through(vent.z,(vent.lo+vent.hi)/2,1)});
+        for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];patch(16,12,(t,u)=>through(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,u),i===0?paint:darkMetal,'open-fender-duct-wall');}
       }
     }
     const c=shape.cabin.map(p=>[...p]),rear=c[0][0]*L,roofRear=c[1][0]*L,roofFront=c[3][0]*L,front=c[4][0]*L;c[0][1]=(belt(rear)+5)/H;c[4][1]=(belt(front)+5)/H;

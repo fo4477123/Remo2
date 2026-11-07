@@ -13,6 +13,8 @@ module.exports=async({ev,shot,assert,cdp,sleep})=>{
       assert(ramp&&ramp.depth>1&&ramp.vertices>100,id+' wordmark follows inclined surface instead of a flat plane');
       const wells=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)}),s=c.spec,r=B1_VEHICLE_SCULPT.shapes[s.id].wheelRadius;c.group.updateMatrixWorld(true);return [-1,1].flatMap(side=>[-1,1].map(axle=>{const ray=new T.Raycaster(new T.Vector3(side*(s.width+20),2*r+2,axle*s.axle/2),new T.Vector3(-side,0,0));return ray.intersectObject(c.high,true)[0]?.distance??Infinity;}));})()`);
       assert(wells.every(d=>Number.isFinite(d)&&d<190),id+' wheel houses block the background above all four tyres');
+      const channels=await ev(`(()=>{const c=B1_VEHICLE_GALLERY.models.get(${JSON.stringify(id)});let ports;c.high.traverse(o=>{if(o.userData.fenderDucts)ports=o.userData.fenderDucts;});return (ports||[]).map(p=>{const a=new T.Vector3(...p.entry),b=new T.Vector3(...p.exit),d=b.sub(a).normalize(),ray=new T.Raycaster(a.clone().addScaledVector(d,-10),d);return ray.intersectObject(c.high,true)[0]?.distance??null;});})()`);
+      console.log(id,'open fender ducts',channels);assert.equal(channels.length,4);assert(channels.every(d=>d===null||d>18),id+' fender ducts have no shallow closing plate');
     }
     if(id==='model-3'){
       assert(report.features.includes('licensed-2018-model'),'Downloaded Model 3 is actually used');
