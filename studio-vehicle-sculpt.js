@@ -125,7 +125,7 @@
         const a=hole[i],b=hole[(i+1)%hole.length];
         patch(6,24,(t,u)=>{const x=a.x+(b.x-a.x)*u,y=a.y+(b.y-a.y)*u;return[x,y,noseZ(x,z,y)-sign*(integratedTail?2.8:8)*t];},trim,integratedTail?'tail-pocket-return-wall':'recessed-intake-wall');
       }
-      if(integratedTail)root.userData.tailPocketProbes=[-1,1].flatMap(side=>[.20,.40].map(a=>{const x=side*W*a,y=H*(.69-profile.tailPocketShift);return[x,y,noseZ(x,z,y)];}));
+      if(integratedTail)root.userData.tailPocketProbes=[-1,1].flatMap(side=>[.20,.40].map(a=>{const x=side*W*a,y=H*B1_VEHICLE_FACES.tailHeight(profile,.69);return[x,y,noseZ(x,z,y)];}));
       else root.userData.lowerGrilleProbes=[-1,1].map(side=>{const x=side*W*.14,y=H*.25;return[x,y,noseZ(x,z,y)];});
     }
 

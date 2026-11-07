@@ -122,7 +122,7 @@
   for(const id of ['fox-b','fox-c'])shapes[id].sideSection=[[0,.94],[.12,.96],[.28,.955],[.50,.975],[.73,1],[.88,.995],[.95,.982],[.985,.960],[1,.935]];
   shapes['fox-b'].hoodSection=[[0,3.6],[.30,3],[.56,-.8],[.76,2],[.90,1],[1,-1.5]];
   shapes['fox-c'].hoodSection=[[0,3],[.40,2.7],[.62,.4],[.80,1.3],[1,-1.3]];
-  for(const id of ['fox-b','fox-c'])p[id].drl[0][0]=.052;
+  for(const id of ['fox-b','fox-c'])p[id].drl[0][0]=.073;
   shapes['fox-b'].tailSection=[[0,7],[.18,2],[.36,3],[.51,5],[.65,7],[.82,3],[1,7]];
   shapes['fox-c'].tailSection=[[0,6],[.18,1],[.37,2],[.53,5],[.68,8],[.83,4],[1,7]];
   // Pioneer standard specification: brochure BRIA p12 / CAVIRA p1.
@@ -135,8 +135,10 @@
   // assembly. Keep a painted lip below the deck instead of crossing its edge.
   for(const id of ['fox-b','fox-c']){
     p[id].tailPocketShift=.022;p[id].tailOpticInset=3;
-    const outline=id==='fox-b'?[[.03,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.03,.67]]:[[.035,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[.035,.674]];
-    p[id].tailPocket=outline.map(([x,y])=>[x,y-p[id].tailPocketShift]);
+    p[id].tailHeightAnchor=id==='fox-b'?.7025:.711;
+    p[id].tailHeightScale=id==='fox-b'?.78:1.10;
+    const outline=id==='fox-b'?[[.044,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.044,.67]]:[[.044,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[.044,.674]];
+    p[id].tailPocket=outline.map(([x,y])=>[x,B1_VEHICLE_FACES.tailHeight(p[id],y)]);
   }
   // Rounded lower trapezoids traced independently from the brochure / front
   // exterior photographs; the old six-sided mouths pinched back in at the base.
