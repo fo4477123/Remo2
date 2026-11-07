@@ -61,3 +61,11 @@ The models remain procedural approximations. In particular, the exact bumper cur
 Follow-up to the reported body-line and rear-glass mismatch: the shell used longitudinal end contraction while the glazing remained in uncontracted coordinates. Rear glazing and sail-panel coordinates now use the same end contraction, blended out towards the roof. Their lower edge follows the deck height with a small seal offset. The window sill interpolates full 3D edge coordinates instead of leaving its longitudinal component fixed.
 
 Sectioned side panels now use one moderate door hollow and wheel flare, rather than compounding generic sine displacement, deep panel offsets and shoulder ridges. Rounded upper section stations replace the flat ledge, and the side panels use their own geometric normals. Focused geometry, wheel-house, duct, lettering, LOD and wheel animation checks passed; rear/side screenshots inspected. This repairs the structural mismatch but is not a claim of exact OEM body fidelity.
+
+## Rear optics, glazing detail, fender openings and bonnet sections
+
+Added surface-aligned rear ceramic borders, defroster wires, rubber lower seal and wiper. Rear FOXTRON lettering now conforms to the tailgate. Bria matrix elements have rounded corners; Cavira includes separate oval reflector elements within an extended optical housing. Small elements use direct triangulation instead of full bumper subdivision.
+
+Each side shell now has exact grid boundaries around two fender slots, with return walls and a recessed backing. Slot positions and dimensions are provisional photo-derived controls, not confirmed factory measurements. They need further source comparison for exact fidelity. Independent transverse bonnet sections form a broad crown and shallow side valleys, flattening at the leading bridge; these replace the common Gaussian fender hump. The existing through S-duct is retained.
+
+Focused gallery QA passed for finite geometry, four wheels, duct clearance, lettering, wheel-house closure, LOD and rolling. Side, hood and rear renders inspected. Shape similarity remains incomplete.

@@ -120,4 +120,6 @@
   // Gentle continuous shoulder sections. The old layered sine / crease /
   // hollow offsets compounded into an exaggerated inward bow of the doors.
   for(const id of ['fox-b','fox-c'])shapes[id].sideSection=[[0,.94],[.12,.96],[.28,.955],[.50,.975],[.73,1],[.88,.995],[.95,.982],[.985,.960],[1,.935]];
+  shapes['fox-b'].hoodSection=[[0,3.6],[.30,3],[.56,-.8],[.76,2],[.90,1],[1,-1.5]];
+  shapes['fox-c'].hoodSection=[[0,3],[.40,2.7],[.62,.4],[.80,1.3],[1,-1.3]];
 })();

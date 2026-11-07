@@ -60,10 +60,23 @@
       width(z)*(.91+.09*Math.sin(v*Math.PI*.79))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
       -(shape.panelDepth||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.29+.13*Math.exp(-Math.pow((z+A*.7)/60,2)):.34))/.20,2))*Math.exp(-Math.pow(z/(A*.83),6))
       +(shape.shoulder||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.76-.12*z/L:.80))/.105,2))*Math.exp(-Math.pow(z/(L*.46),6));
-    const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?(z<0?1.5*(1-u*u)-1.5*Math.pow(u,4):2.5*(1-u*u)+4.5*Math.exp(-Math.pow((Math.abs(u)-.78)/.19,2))-3*Math.pow(Math.abs(u),8)):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
+    const hoodCrown=(z,u)=>{const a=Math.min(1,Math.abs(u)),t=Math.max(0,Math.min(1,(z/L-.39)/.11)),section=sample(shape.hoodSection||[[0,2.5],[.78,4],[1,-1.5]],a);return section*(1-t)+(1.3*(1-u*u)-1.5*Math.pow(u,4))*t;};
+    const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?(z<0?1.5*(1-u*u)-1.5*Math.pow(u,4):hoodCrown(z,u)):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
     // Continuous curved body skin, separately formed wheel shoulders, recessed sill and hood crown.
     const archBase=z=>Math.max(19,...[-A,A].map(a=>Math.abs(z-a)<R+4?R+Math.sqrt((R+4)**2-(z-a)**2):19));
-    for(const side of [-1,1])patch(176,18,(t,v)=>{const z=-L/2+t*L,bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*sideX(z,sv);return[x,y,noseZ(x,z,y)];},paint,'continuous-wheel-opening-'+s.id);
+    const fenderVents=shape.sectionedBody?[{z:A+R+9,w:s.id==='fox-b'?5.5:4.5,lo:.23,hi:.57},{z:-A-R-9,w:s.id==='fox-b'?4.5:4,lo:.23,hi:.52}]:[];
+    const zNodes=[...new Set([...Array.from({length:177},(_,i)=>-L/2+i/176*L),...fenderVents.flatMap(v=>[v.z-v.w/2,v.z+v.w/2])])].sort((a,b)=>a-b),vNodes=[...new Set([...Array.from({length:shape.sectionedBody?25:19},(_,i)=>i/(shape.sectionedBody?24:18)),...fenderVents.flatMap(v=>[v.lo,v.hi])])].sort((a,b)=>a-b);
+    const nodeAt=(nodes,t)=>{const n=t*(nodes.length-1),i=Math.min(nodes.length-2,Math.floor(n));return nodes[i]+(nodes[i+1]-nodes[i])*(n-i);};
+    const sideSurface=(z,v,side,depth=0)=>{const bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-depth);return[x,y,noseZ(x,z,y)];};
+    for(const side of [-1,1]){
+      patch(zNodes.length-1,vNodes.length-1,(t,u)=>sideSurface(nodeAt(zNodes,t),nodeAt(vNodes,u),side),paint,'continuous-wheel-opening-'+s.id,(t,u)=>{const z=nodeAt(zNodes,t),v=nodeAt(vNodes,u);return fenderVents.some(p=>Math.abs(z-p.z)<p.w/2&&v>p.lo&&v<p.hi);});
+      for(const vent of fenderVents){
+        const z0=vent.z-vent.w/2,z1=vent.z+vent.w/2;
+        patch(12,8,(t,u)=>sideSurface(z0+(z1-z0)*t,vent.lo+(vent.hi-vent.lo)*u,side,4.5),trim,'recessed-fender-vent');
+        const corners=[[z0,vent.lo],[z1,vent.lo],[z1,vent.hi],[z0,vent.hi]];
+        for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];patch(12,4,(t,u)=>sideSurface(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,side,4.5*u),trim,'fender-vent-return');}
+      }
+    }
     const c=shape.cabin.map(p=>[...p]),rear=c[0][0]*L,roofRear=c[1][0]*L,roofFront=c[3][0]*L,front=c[4][0]*L;c[0][1]=(belt(rear)+5)/H;c[4][1]=(belt(front)+5)/H;
     const duct=shape.duct;
     const ductBounds=a=>{const q=Math.min(1,Math.abs(a)/(duct?.half||1)),mid=(duct.rear+duct.front)/2,span=(duct.front-duct.rear)/2*Math.sqrt(Math.max(0,1-q*q));return [L*(mid-span),L*(mid+span)];};
@@ -114,6 +127,15 @@
     function glassSide(z,v,side){const p=cabin(z),x=side*(p.w+(width(z)*.916-p.w)*v+2.4*Math.sin(v*Math.PI)),b=rearBlend(z),base=(belt(z)+1)*(1-b)+(topY(z,x/sideX(z,1))+.25)*b,top=roofAt(z,side),y=top[1]+(base-top[1])*v;return[x,y,z+b*(noseZ(x,z,y)-z)];}
     for(const z of [rear,front])patch(3,32,(t,u)=>{const a=u*2-1,top=roofAt(z,a),x=sideX(z,1)*a,y=topY(z,a),end=[x,y,noseZ(x,z,y)];return top.map((v,i)=>v*(1-t)+end[i]*t);},shape.sectionedBody&&z===rear?trim:paint,'sealed-glazing-cowl');
     patch(18,32,(t,u)=>roofAt(rear+(roofRear-rear)*t,u*2-1),shape.sectionedBody?privacyGlass:glass,'rear-glass-'+s.id);
+    if(shape.sectionedBody){
+      const rearWindow=(t,a)=>{const q=roofAt(rear+(roofRear-rear)*t,a);q[1]+=.08;q[2]-=.12;return q;};
+      // Ceramic perimeter and rubber edge share the exact glazing surface.
+      for(const side of [-1,1])patch(40,4,(t,u)=>rearWindow(t,side*(.958+.042*u)),trim,'rear-window-ceramic-edge');
+      for(const end of [0,1])patch(4,48,(t,u)=>rearWindow(end?1-t*.045:t*.045,u*2-1),trim,'rear-window-ceramic-band');
+      const heater=mat('#56483a',.75,{transparent:true,opacity:.42,depthWrite:false});
+      for(let row=0;row<7;row++)tube(Array.from({length:33},(_,i)=>rearWindow(.13+row*.105,(i/32*2-1)*.91)),.055,heater);
+      tube(Array.from({length:49},(_,i)=>rearWindow(0,i/48*2-1)),.32,trim);
+    }
     patch(32,32,(t,u)=>roofAt(roofRear+(roofFront-roofRear)*t,u*2-1),s.id==='model-3'?roofGlass:roofPaint,'roof-crown-'+s.id);
     patch(22,32,(t,u)=>roofAt(roofFront+(front-roofFront)*t,u*2-1),glass,'windscreen-'+s.id);
     for(const side of [-1,1]){
@@ -184,7 +206,12 @@
         tube(Array.from({length:30},(_,i)=>{const a=i/29*2-1;return[a*W*.22,cabin(roofRear+5).h-6*a*a-2.5,roofRear-17+3*a*a];}),.65,red);
       }else{const z=roofRear-4,h=cabin(z).h;box([0,h-.2,z],[W*.73,3.5,16],roofPaint,2);box([0,h-1,z-8],[W*.40,1.5,1.3],red,.4);}
     }
-    if(shape.sectionedBody){const z=rear+(roofRear-rear)*.22,p=roofAt(z,0);tube([[0,p[1]+1,z-1],[W*.21,p[1]+1.4,z+2]],1.1,trim);}
+    if(shape.sectionedBody){
+      const z=rear+(roofRear-rear)*.18,at=a=>{const q=roofAt(z,a);q[1]+=.6;q[2]-=.9;return q;};
+      const pivot=at(0);box(pivot,[3.2,2.2,4],trim,.6);
+      tube(Array.from({length:13},(_,i)=>at(.04+i/12*.42)),.65,trim);
+      tube(Array.from({length:17},(_,i)=>{const q=roofAt(z+1,(i/16)*.57-.02);q[1]+=.8;q[2]-=1;return q;}),.38,rubber);
+    }
     if(suv&&!s.id.startsWith('fox-'))for(const side of [-1,1])tube(Array.from({length:15},(_,i)=>{const z=roofRear+8+(roofFront-roofRear-18)*i/14;return[side*W*.30,cabin(z).h+1,z];}),1.4,s.id==='kicks'?trim:metal);
     // Two shallow hood pressings and realistic wipers lie on the bonnet, not above the lights.
     for(const side of [-1,1]){tube(Array.from({length:16},(_,i)=>{const z=front+9+(L/2-front-25)*i/15,a=side*(.52+.18*i/15),x=sideX(z,1)*a;return[x,topY(z,a)+.1,noseZ(x,z,topY(z,a))];}),.22,paint);tube([[side*W*.05,belt(front)+3,front+2],[side*W*.29,belt(front)+3,front-3]],.65,trim);}
