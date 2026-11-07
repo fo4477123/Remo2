@@ -140,7 +140,7 @@
     patch(22,32,(t,u)=>roofAt(roofFront+(front-roofFront)*t,u*2-1),glass,'windscreen-'+s.id);
     if(shape.sectionedBody)for(const side of [-1,1]){
       patch(40,8,(t,v)=>{const z=roofFront+(front-roofFront)*t,q=roofAt(z,side*(.91+.09*v));q[1]+=.15;return q;},paint,'formed-a-pillar-windscreen');
-      patch(40,8,(t,v)=>{const z=roofFront+(front-roofFront)*t,q=glassSide(z,v*.16,side);q[0]+=side*.22;return q;},paint,'formed-a-pillar-side');
+      patch(40,8,(t,v)=>{const z=roofFront+(front-roofFront)*t,q=glassSide(z,v*.16,side);q[0]+=side*.22;return q;},roofPaint,'formed-a-pillar-side');
     }
     for(const side of [-1,1]){
       if(shape.sectionedBody){
