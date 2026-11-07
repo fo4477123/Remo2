@@ -64,7 +64,7 @@
     const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?(z<0?1.5*(1-u*u)-1.5*Math.pow(u,4):hoodCrown(z,u)):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
     // Continuous curved body skin, separately formed wheel shoulders, recessed sill and hood crown.
     const archBase=z=>Math.max(19,...[-A,A].map(a=>Math.abs(z-a)<R+4?R+Math.sqrt((R+4)**2-(z-a)**2):19));
-    const fenderVents=shape.sectionedBody?[{z:A+R+9,w:s.id==='fox-b'?5.5:4.5,lo:.23,hi:.57},{z:-A-R-9,w:s.id==='fox-b'?4.5:4,lo:.23,hi:.52}]:[];
+    const fenderVents=shape.sectionedBody?[{z:A+R+10,w:s.id==='fox-b'?10:9,lo:.20,hi:.62},{z:-A-R-10,w:s.id==='fox-b'?9:8,lo:.20,hi:.58}]:[];
     const zNodes=[...new Set([...Array.from({length:177},(_,i)=>-L/2+i/176*L),...fenderVents.flatMap(v=>[v.z-v.w/2,v.z+v.w/2])])].sort((a,b)=>a-b),vNodes=[...new Set([...Array.from({length:shape.sectionedBody?25:19},(_,i)=>i/(shape.sectionedBody?24:18)),...fenderVents.flatMap(v=>[v.lo,v.hi])])].sort((a,b)=>a-b);
     const nodeAt=(nodes,t)=>{const n=t*(nodes.length-1),i=Math.min(nodes.length-2,Math.floor(n));return nodes[i]+(nodes[i+1]-nodes[i])*(n-i);};
     const sideSurface=(z,v,side,depth=0)=>{const bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-depth);return[x,y,noseZ(x,z,y)];};
@@ -72,9 +72,9 @@
       patch(zNodes.length-1,vNodes.length-1,(t,u)=>sideSurface(nodeAt(zNodes,t),nodeAt(vNodes,u),side),paint,'continuous-wheel-opening-'+s.id,(t,u)=>{const z=nodeAt(zNodes,t),v=nodeAt(vNodes,u);return fenderVents.some(p=>Math.abs(z-p.z)<p.w/2&&v>p.lo&&v<p.hi);});
       for(const vent of fenderVents){
         const z0=vent.z-vent.w/2,z1=vent.z+vent.w/2;
-        patch(12,8,(t,u)=>sideSurface(z0+(z1-z0)*t,vent.lo+(vent.hi-vent.lo)*u,side,4.5),trim,'recessed-fender-vent');
+        patch(12,8,(t,u)=>sideSurface(z0+(z1-z0)*t,vent.lo+(vent.hi-vent.lo)*u,side,7),trim,'recessed-fender-vent');
         const corners=[[z0,vent.lo],[z1,vent.lo],[z1,vent.hi],[z0,vent.hi]];
-        for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];patch(12,4,(t,u)=>sideSurface(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,side,4.5*u),trim,'fender-vent-return');}
+        for(let i=0;i<4;i++){const a=corners[i],b=corners[(i+1)%4];patch(12,4,(t,u)=>sideSurface(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,side,7*u),i===0?paint:darkMetal,'fender-vent-return');}
       }
     }
     const c=shape.cabin.map(p=>[...p]),rear=c[0][0]*L,roofRear=c[1][0]*L,roofFront=c[3][0]*L,front=c[4][0]*L;c[0][1]=(belt(rear)+5)/H;c[4][1]=(belt(front)+5)/H;
@@ -138,6 +138,10 @@
     }
     patch(32,32,(t,u)=>roofAt(roofRear+(roofFront-roofRear)*t,u*2-1),s.id==='model-3'?roofGlass:roofPaint,'roof-crown-'+s.id);
     patch(22,32,(t,u)=>roofAt(roofFront+(front-roofFront)*t,u*2-1),glass,'windscreen-'+s.id);
+    if(shape.sectionedBody)for(const side of [-1,1]){
+      patch(40,8,(t,v)=>{const z=roofFront+(front-roofFront)*t,q=roofAt(z,side*(.91+.09*v));q[1]+=.15;return q;},paint,'formed-a-pillar-windscreen');
+      patch(40,8,(t,v)=>{const z=roofFront+(front-roofFront)*t,q=glassSide(z,v*.16,side);q[0]+=side*.22;return q;},paint,'formed-a-pillar-side');
+    }
     for(const side of [-1,1]){
       if(shape.sectionedBody){
         const split=-L*.055;
@@ -158,7 +162,7 @@
       if(shape.productionPillars){
         for(const [centre,span]of (shape.sail?[[bZ,9]]:[[bZ,9],[rear+(roofRear-rear)*.76,12]]))patch(8,8,(t,v)=>{const q=glassSide(centre+(t-.5)*span,v,side);q[0]+=side*.65;return q;},trim,'production-window-pillar');
       }
-      for(const [z,r,m]of (shape.sail?[[front-3,1.5,paint]]:[[bZ,2.4,trim],[rear+(roofRear-rear)*.79,1.5,roofPaint],[front-3,1.5,paint]]))tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
+      for(const [z,r,m]of (shape.sail?[]:[[bZ,2.4,trim],[rear+(roofRear-rear)*.79,1.5,roofPaint],[front-3,1.5,paint]]))tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,0,side)),1.05,roofPaint);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,1,side)),.7,['altis','kuga'].includes(s.id)?metal:trim);
       // Body creases follow the real rising belt line, with long lower-door concavity.
@@ -168,7 +172,18 @@
       }else{
         patch(48,6,(t,u)=>{const z=-A+R+4+t*(2*A-2*R-8),v=u*.095;return[side*(sideX(z,v)+.45),19+(edge(z)-19)*v,z];},trim,'formed-rocker-cladding');
       }
-      for(const seamZ of [-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
+      if(shape.sectionedBody){
+        // Door trailing edge rises around the rear arch, with a straight
+        // centre shut-line and a sill edge shared by both doors.
+        const rearEdge=[[.10,-.215],[.28,-.225],[.48,-.245],[.70,-.265],[.90,-.275],[1,-.280]];
+        for(const kind of ['rear','centre','front']){
+          const pts=[];
+          for(let i=0;i<=64;i++){const v=.10+.90*i/64,z=L*(kind==='rear'?sample(rearEdge,v):kind==='centre'?-.055:.216-.010*Math.pow(1-v,2)),y=19+(edge(z)-19)*v;
+            if(y<archBase(z)+.6)continue;const x=side*(sideX(z,v)+.12);pts.push([x,y,noseZ(x,z,y)]);}
+          if(pts.length>1)tube(pts,.12,trim);
+        }
+        tube(Array.from({length:65},(_,i)=>{const z=L*(-.215+i/64*.42),v=.10,x=side*(sideX(z,v)+.12),y=19+(edge(z)-19)*v;return[x,y,noseZ(x,z,y)];}),.12,trim);
+      }else for(const seamZ of [-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
       for(const z of [-L*.175,L*.12]){
         const x=side*(sideX(z,.90)+.7),y=19+(edge(z)-19)*.90;
         if(shape.bodyHandles){const recess=mesh(new T.SphereGeometry(1,24,12),trim,[x,y,z],'handle-recess');recess.scale.set(.7,2.4,8);const handle=mesh(new T.SphereGeometry(1,24,12),paint,[x+side*1.1,y+.3,z],'body-color-pull-handle');handle.scale.set(1.4,1.4,7.5);}
@@ -178,7 +193,7 @@
         if(shape.sectionedBody){
           // Close the inside of the wheel house behind the articulated wheel.
           // The old upper strip left the opposite sky visible around the tyre.
-          const radius=R+8,angle=Math.asin((R-19)/radius),pos=[],x=side*(W/2-27);
+          const radius=R+14,angle=Math.asin((R-19)/radius),pos=[],x=side*(W/2-27);
           for(let i=0;i<72;i++){const a=-angle+(Math.PI+2*angle)*i/72,b=-angle+(Math.PI+2*angle)*(i+1)/72;pos.push(x,R,axle,x,R+radius*Math.sin(a),axle+radius*Math.cos(a),x,R+radius*Math.sin(b),axle+radius*Math.cos(b));}
           const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();mesh(g,trim,[0,0,0],'closed-wheel-house');
         }
@@ -242,7 +257,12 @@
     if(shape.wheelStyle){
       // Charge flap, repeater/camera and fine glass seals lie on the body surfaces.
       const flapZ=s.id==='model-3'?-L*.42:L*.24;
-      const side=-1,flap=Array.from({length:33},(_,i)=>{const a=i/32*Math.PI*2,z=flapZ+8*Math.sign(Math.cos(a))*Math.pow(Math.abs(Math.cos(a)),.4),v=.77+.075*Math.sign(Math.sin(a))*Math.pow(Math.abs(Math.sin(a)),.4);return[side*(sideX(z,v)+.17),19+(edge(z)-19)*v,z];});tube(flap,.13,trim);
+      const side=-1;
+      if(shape.sectionedBody){
+        const centreY=19+(edge(flapZ)-19)*.77,halfZ=8,halfY=7,r=1.4,pts=[];
+        for(let corner=0;corner<4;corner++){const a0=corner*Math.PI/2,cz=flapZ+(corner===0||corner===3?1:-1)*(halfZ-r),cy=centreY+(corner<2?1:-1)*(halfY-r);for(let k=0;k<=8;k++){const a=a0+k/8*Math.PI/2,z=cz+r*Math.cos(a),y=cy+r*Math.sin(a),v=(y-19)/(edge(z)-19),x=side*(sideX(z,v)+.16);pts.push([x,y,noseZ(x,z,y)]);}}
+        pts.push(pts[0]);tube(pts,.11,trim);
+      }else{const flap=Array.from({length:33},(_,i)=>{const a=i/32*Math.PI*2,z=flapZ+8*Math.sign(Math.cos(a))*Math.pow(Math.abs(Math.cos(a)),.4),v=.77+.075*Math.sign(Math.sin(a))*Math.pow(Math.abs(Math.sin(a)),.4);return[side*(sideX(z,v)+.17),19+(edge(z)-19)*v,z];});tube(flap,.13,trim);}
       for(const sign of [-1,1]){
         const z=front-8,v=.89,y=19+(edge(z)-19)*v,x=sign*(sideX(z,v)+.5);
         const camera=mesh(new T.SphereGeometry(1,14,10),trim,[x,y,z],'fender-camera');camera.scale.set(.65,1.6,3.9);
@@ -328,8 +348,8 @@
       for(let i=0;i<72;i++)for(const flank of [-1,1]){const a=i*Math.PI/36;const pts=[0,1,2].map(k=>{const x=flank*(6.2+k*2.2),radius=R-.2-k*.7,theta=a+k*.013;return[x,Math.sin(theta)*radius,Math.cos(theta)*radius];});tube(pts,.16,trim,wheel);}
       const barrel=mesh(new T.CylinderGeometry(rr,rr,20,72,1,true),darkMetal,[0,0,0],'open-alloy-barrel',wheel);barrel.rotation.z=Math.PI/2;
       const rotorMaterial=mat('#686c70',.48,{metalness:.75});
-      const rotor=mesh(new T.CylinderGeometry(rr*.79,rr*.79,.8,64),rotorMaterial,[side*5.5,0,0],'machined-brake-disc',wheel);rotor.rotation.z=Math.PI/2;
-      for(const radius of [rr*.54,rr*.72]){const track=mesh(new T.TorusGeometry(radius,.18,4,64),darkMetal,[side*6,0,0],'rotor-wear-track',wheel);track.rotation.y=Math.PI/2;}
+      const rotor=mesh(new T.CylinderGeometry(rr*.67,rr*.67,.8,64),rotorMaterial,[side*5.5,0,0],'machined-brake-disc',wheel);rotor.rotation.z=Math.PI/2;
+      for(const radius of [rr*.48,rr*.62]){const track=mesh(new T.TorusGeometry(radius,.18,4,64),darkMetal,[side*6,0,0],'rotor-wear-track',wheel);track.rotation.y=Math.PI/2;}
       box([side*7.6,3,rr*.66],[5,14,8],darkMetal,2,wheel);
       function blade(points,material=darkMetal){
         const outline=points.map(([a,r])=>new T.Vector2(Math.sin(a)*r,Math.cos(a)*r));
@@ -352,15 +372,16 @@
           for(let line=0;line<4;line++){const r=rr*(.50+line*.08);rod([side*10.9,Math.sin(a+.03)*r,Math.cos(a+.03)*r],[side*10.9,Math.sin(a+.26)*r,Math.cos(a+.26)*r],.22,trim,wheel);}
         }else if(style==='cavira-machined-ten'){
           blade([[a-.11,5],[a+.11,5],[a+.20,rr*.95],[a-.055,rr*.95]]);
-          blade([[a-.045,6],[a+.01,6],[a+.14,rr*.94],[a+.07,rr*.94]],metal);
-          blade([[a+.09,rr*.48],[a+.12,rr*.48],[a+.30,rr*.94],[a+.26,rr*.94]],metal);
+          // Ten single machined faces, alternating broad/narrow shoulders;
+          // the old second fork doubled the apparent spoke count to twenty.
+          blade([[a-.035,6],[a+.015,6],[a+(i%2?.15:.20),rr*.94],[a+(i%2?.09:.07),rr*.94]],metal);
         }else{
           blade([[a-.17,4],[a+.17,4],[a+.48,rr*.93],[a+.09,rr*.97],[a-.10,rr*.78]],trim);
           blade([[a+.12,rr*.30],[a+.16,rr*.31],[a+.46,rr*.92],[a+.41,rr*.93]],darkMetal);
         }
       }
-      const lip=mesh(new T.TorusGeometry(rr,.60,8,80),style==='highland-photon'?darkMetal:metal,[side*10.4,0,0],'alloy-machined-lip',wheel);lip.rotation.y=Math.PI/2;
-      const cap=mesh(new T.CylinderGeometry(4.5,4.5,1,32),trim,[side*11.3,0,0],'recessed-centre-cap',wheel);cap.rotation.z=Math.PI/2;
+      const lip=mesh(new T.TorusGeometry(rr,shape.sectionedBody?.35:.60,8,80),style==='highland-photon'?darkMetal:metal,[side*10.4,0,0],'alloy-machined-lip',wheel);lip.rotation.y=Math.PI/2;
+      const capR=shape.sectionedBody?3.3:4.5,cap=mesh(new T.CylinderGeometry(capR,capR,1,32),trim,[side*11.3,0,0],'recessed-centre-cap',wheel);cap.rotation.z=Math.PI/2;
       for(let i=0;i<5;i++){const a=i*Math.PI*.4,lug=mesh(new T.CylinderGeometry(.85,.85,1,8),metal,[side*11.2,Math.sin(a)*6,Math.cos(a)*6],'wheel-lug',wheel);lug.rotation.z=Math.PI/2;}
       wheel.userData.design=style;batch(wheel);wheels.push(wheel);
     }

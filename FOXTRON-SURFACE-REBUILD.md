@@ -77,3 +77,11 @@ Rechecked Bria brochure page 5 close-up. Removed the generic raised painted hood
 ## FOXTRON letter spacing
 
 Replaced font-dependent space characters with seven independently positioned glyphs on the existing wordmark texture. Letter centres are evenly spaced at 58 pixels; the front and rear surface-fitted panels therefore display a wider wordmark without changing the glyph height. Focused gallery checks passed and nose preview inspected.
+
+## Charge flap, rear door, wheel and A-pillar correction
+
+Charge-flap geometry now uses a 16 by 14 cm rounded rectangle in physical side coordinates before fitting to the body. This prevents changing panel height from stretching its outline. Rear door trailing edges now rise around the rear arch using independent stations; the centre seam and lower door seam meet the sill.
+
+Cavira wheel casting now has ten single machined faces instead of twenty apparent branches. Reduced hub-cap/rim-lip proportions, reduced brake-disc radius and expanded hidden wheel-house backing. Added broad painted A-pillar surfaces on the windscreen and side glazing, replacing the isolated thin front tube.
+
+Both front and rear fender slots were widened following the user correction and recessed to 7 cm. Their dimensions remain provisional pending exact reference matching. Added a charge-flap gallery camera. Focused geometry, duct, wheel-house, wheel animation and LOD checks passed; charge/wheel/side/front images inspected. This update does not claim factory CAD accuracy.
