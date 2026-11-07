@@ -128,4 +128,7 @@
   // Pioneer standard specification: brochure BRIA p12 / CAVIRA p1.
   Object.assign(shapes['fox-b'],{trim:'Pioneer',wheelRadius:34.8,rimRadius:25.4,tyreWidth:23.5,frontTrack:163.9,rearTrack:163.8,panoramicRoof:true,tyreSpec:'235/40 R20'});
   Object.assign(shapes['fox-c'],{trim:'Pioneer',wheelRadius:35.155,rimRadius:24.13,tyreWidth:24.5,frontTrack:163.9,rearTrack:163.5,panoramicRoof:true,tyreSpec:'245/45 R19'});
+  // Shallower badge ramp with a softer return beneath the optical bridge.
+  shapes['fox-b'].noseSection=[[0,6],[.18,1],[.36,3],[.57,3],[.70,6],[.84,12],[.94,7],[1,5]];
+  shapes['fox-c'].noseSection=[[0,5],[.18,1],[.34,3],[.58,3],[.73,6],[.86,11],[.95,6],[1,5]];
 })();

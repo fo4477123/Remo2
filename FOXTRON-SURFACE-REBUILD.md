@@ -111,3 +111,9 @@ Replaced the partial floating rear-panel lines with independent smooth three-sid
 ## Pioneer baseline locked
 
 User selected both Pioneer variants. See FOXTRON-PIONEER-BASELINE.md for primary sources, exact nominal running-gear values, standard equipment and remaining uncertainty. Updated actual tyre/rim sizes, wheel-pivot tracks, glass roof, black upholstery and variant labels. Reduced the oversized Bria lower black bumper and corrected rear plate height; removed duplicate generic reflectors. Focused checks now measure official track and tyre-diameter targets, and passed. Full shape fidelity is not complete.
+
+## Front fascia proportion pass
+
+Rechecked BRIA official brochure page 5 and CAVIRA OuterDetail4. Reduced the exaggerated centre badge-ramp recess and softened its return below the running-light bridge. Replaced the thick circular lower bumper tubes with formed flat lips and return surfaces. Refined BRIA honeycomb cell spacing and strut thickness. These are still photograph-estimated surfaces.
+
+Focused checks passed for the locked Pioneer tyre/track dimensions, finite geometry, rear emblem, wheel houses, LOD, rolling, S-duct clearance and four open fender ducts. Front close-up images inspected. Full OEM shape fidelity remains incomplete.

@@ -290,7 +290,11 @@
     // Sculpted bumper volumes, lower intakes and tailgate shut-lines anchor the fascia in the body.
     for(const sign of [-1,1]){
       const at=sign*L/2;
-      tube(Array.from({length:35},(_,i)=>{const x=(i/34*2-1)*W*.438;return[x,23+(suv?2:0),noseZ(x,at,23)-sign*.2];}),suv?4:2.3,trim);
+      if(shape.sectionedBody){
+        // A formed flat lip, rather than a thick round bumper tube.
+        patch(6,64,(v,u)=>{const x=(u*2-1)*W*.438,y=22+3*v;return[x,y,noseZ(x,at,y)+sign*(.5+.8*Math.sin(v*Math.PI))];},trim,'formed-lower-bumper-lip');
+        patch(4,64,(v,u)=>{const x=(u*2-1)*W*.438,y=25;return[x,y,noseZ(x,at,y)+sign*(.5-5*v)];},trim,'lower-bumper-lip-return');
+      }else tube(Array.from({length:35},(_,i)=>{const x=(i/34*2-1)*W*.438;return[x,23+(suv?2:0),noseZ(x,at,23)-sign*.2];}),suv?4:2.3,trim);
       if(sign<0){if(shape.sectionedBody){
         const outline=s.id==='fox-b'?[[-.315,.725],[-.32,.68],[-.315,.60],[-.30,.49],[-.27,.455],[0,.447],[.27,.455],[.30,.49],[.315,.60],[.32,.68],[.315,.725]]:[[-.335,.722],[-.34,.68],[-.33,.56],[-.31,.44],[-.275,.399],[0,.390],[.275,.399],[.31,.44],[.33,.56],[.34,.68],[.335,.722]];
         const curve=new T.CatmullRomCurve3(outline.map(([x,y])=>new T.Vector3(x*W,y*H,0)),false,'centripetal');
