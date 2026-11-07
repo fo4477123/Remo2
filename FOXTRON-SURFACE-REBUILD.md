@@ -73,3 +73,7 @@ Focused gallery QA passed for finite geometry, four wheels, duct clearance, lett
 ## Bonnet seams and front identity insert
 
 Rechecked Bria brochure page 5 close-up. Removed the generic raised painted hood tubes and used fine panel shut-lines outside the S-duct outlet. Added the bonnet leading shut-line and a small dark central identity insert with metallic graphic strokes; the DRL halves stop at the insert. Focused gallery checks passed and the front close-up was inspected. These are photo-derived interpretations and remain visually short of the factory vehicle.
+
+## FOXTRON letter spacing
+
+Replaced font-dependent space characters with seven independently positioned glyphs on the existing wordmark texture. Letter centres are evenly spaced at 58 pixels; the front and rear surface-fitted panels therefore display a wider wordmark without changing the glyph height. Focused gallery checks passed and nose preview inspected.

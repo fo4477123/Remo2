@@ -54,7 +54,7 @@
     }
     if(s.id==='fox-d'){for(const side of [-1,1]){front([[side*.77,.48],[side*.90,.48],[side*.90,.25],[side*.79,.25]],trim,1.5);for(const y of [.30,.40])line([[side*.85,y],[side*.85,y+.055]],1.5,led,2.3);}}
     if(['model-3','fox-b','fox-c'].includes(s.id)){
-      const canvas=document.createElement('canvas');canvas.width=512;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='#b5bec4';ctx.font='38px sans-serif';ctx.textAlign='center';ctx.fillText(s.id==='model-3'?'T E S L A':'F O X T R O N',256,46);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const m=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.65,roughness:.32,side:T.DoubleSide}),back=s.id==='model-3';
+      const canvas=document.createElement('canvas');canvas.width=512;canvas.height=64;const ctx=canvas.getContext('2d');ctx.fillStyle='#b5bec4';ctx.font='38px sans-serif';ctx.textAlign='center';if(s.id==='model-3')ctx.fillText('T E S L A',256,46);else [...'FOXTRON'].forEach((letter,i)=>ctx.fillText(letter,256+(i-3)*58,46));const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;const m=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.65,roughness:.32,side:T.DoubleSide}),back=s.id==='model-3';
       if(back){const badge=mesh(new T.PlaneGeometry(48,7.25),m,[0,H*.53,rearZ(0,H*.53)-1.5],'rear-wordmark');badge.rotation.y=Math.PI;}
       else{
         // Project every vertex onto the actual inclined bumper ramp. A flat
