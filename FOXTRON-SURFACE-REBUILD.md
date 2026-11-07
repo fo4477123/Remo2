@@ -91,3 +91,7 @@ Both front and rear fender slots were widened following the user correction and 
 Wheel castings and machined faces now use closed bevelled extrusions with separate depths and a radial dish. Added centre-cap lettering and tyre valve stems. The brake calipers are attached to the stationary body group rather than the rolling wheel group. Bria flush handles use fine rounded panel outlines and surface-fitted faces instead of thick protruding boxes.
 
 Focused Bria/Cavira checks passed for finite geometry, duct clearance, wheel-house closure, LOD and wheel animation. Wheel and charge-side previews inspected. Shape fidelity is still incomplete and no factory CAD equivalence is claimed.
+
+## Optical covers and wheel finishes
+
+Added formed transparent headlamp and tail-lamp covers with narrow return walls. The covers follow the existing optical outlines and remain distinct from the opaque housings and emissive internals. Wheel machined faces and castings now have separate clear-coated metal and dark paint finishes. Focused Bria/Cavira geometry, duct, wheel-house, LOD and rolling checks passed; nose, rear and wheel previews inspected. This is a material/detail improvement rather than proof of accurate overall vehicle reproduction.

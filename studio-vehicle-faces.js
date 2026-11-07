@@ -108,6 +108,22 @@
         continue;
       }
       const contour=rearBand.map(([x,y])=>[side*x*W*.45,y*H]),tailZ=(x,y)=>rearZ(x,y)-.45;poly(contour,darkMetal,tailZ,'tail-smoke-housing');poly(contour.map(([x,y])=>[x,y-(s.id==='model-3'?.35:1)]),red,(x,y)=>tailZ(x,y)-.45,'tail-'+p.tailStyle);tube(contour.slice(0,3).map(([x,y])=>[x,y,tailZ(x,y)-1]),.75,red,root,true);}
+    if(s.id==='fox-b'||s.id==='fox-c'){
+      const lens=new T.MeshPhysicalMaterial({color:'#c7d5dd',roughness:.075,metalness:0,clearcoat:1,clearcoatRoughness:.04,transparent:true,opacity:.15,depthWrite:false,side:T.DoubleSide});
+      const tailLens=lens.clone();tailLens.color.set('#742d35');tailLens.opacity=.18;
+      function cover(points,sign,depth,material){
+        const world=points.map(([x,y])=>[x*W*.45,y*H]),surface=sign>0?frontZ:rearZ;
+        poly(world,material,(x,y)=>surface(x,y)+sign*depth,'formed-optical-cover');
+        const pos=[];
+        for(let i=0;i<world.length;i++){const a=world[i],b=world[(i+1)%world.length];for(let k=0;k<8;k++){const at=t=>{const x=a[0]+(b[0]-a[0])*t,y=a[1]+(b[1]-a[1])*t;return[x,y,surface(x,y)+sign*depth];},u=at(k/8),v=at((k+1)/8),inner=q=>[q[0],q[1],q[2]-sign*.65];pos.push(...u,...v,...inner(u),...v,...inner(v),...inner(u));}}
+        const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.computeVertexNormals();mesh(g,material,[0,0,0],'optical-cover-return');
+      }
+      for(const side of [-1,1]){
+        cover(p.head.map(([x,y])=>[side*x,y]),1,3.35,lens);
+        const outline=s.id==='fox-b'?[[.03,.725],[.96,.725],[.96,.585],[.72,.60],[.61,.67],[.03,.67]]:[[.015,.726],[.96,.726],[.97,.662],[.75,.658],[.60,.680],[.015,.674]];
+        cover(outline.map(([x,y])=>[side*x,y]),-1,2.15,tailLens);
+      }
+    }
     return {generation:p.generation,face:p.pattern,tail:p.tailStyle,source:p.source};
   }
   window.B1_VEHICLE_FACES={profiles,build};

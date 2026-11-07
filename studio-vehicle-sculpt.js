@@ -349,6 +349,8 @@
     function productionWheel(side,z){
       const wheel=new T.Group();wheel.name='sculpt-wheel-'+wheels.length;wheel.position.set(side*(W/2-10.5),R,z);root.add(wheel);
       const style=shape.wheelStyle,rr=R*(style==='highland-photon'?.715:.735);
+      const cutFinish=shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#afb3b7',metalness:.92,roughness:.26,clearcoat:.35,clearcoatRoughness:.14}):metal;
+      const castFinish=shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#15191c',metalness:.55,roughness:.27,clearcoat:.7,clearcoatRoughness:.12}):darkMetal;
       const section=[[rr,-10],[R-4,-11.4],[R-1.4,-9.3],[R,-6.7],[R,6.7],[R-1.4,9.3],[R-4,11.4],[rr,10],[rr,-10]].map(p=>new T.Vector2(...p));
       const tyre=mesh(new T.LatheGeometry(section,96),rubber,[0,0,0],'production-tyre',wheel);tyre.rotation.z=Math.PI/2;
       for(const x of [-4.8,-1.6,1.6,4.8]){const groove=mesh(new T.TorusGeometry(R+.025,.19,4,96),trim,[x,0,0],'recessed-tread-channel',wheel);groove.rotation.y=Math.PI/2;}
@@ -364,7 +366,8 @@
         if(shape.sectionedBody){
           const machined=material===metal,g=new T.ExtrudeGeometry(new T.Shape(outline),{depth:machined?.22:2.3,bevelEnabled:true,bevelSize:machined?.08:.16,bevelThickness:machined?.07:.14,bevelSegments:2,steps:1,curveSegments:1}),p=g.attributes.position;
           for(let i=0;i<p.count;i++){const yy=p.getX(i),zz=p.getY(i),r=Math.hypot(yy,zz),crown=9+1.65*Math.pow(r/rr,.7),xx=side*(crown+(machined?.10:-2.3)+p.getZ(i));p.setXYZ(i,xx,yy,zz);}
-          g.clearGroups();g.computeVertexNormals();material.side=T.DoubleSide;mesh(g,material,[0,0,0],'bevelled-production-wheel-blade',wheel);return;
+          const finish=machined?cutFinish:material===darkMetal?castFinish:material;
+          g.clearGroups();g.computeVertexNormals();finish.side=T.DoubleSide;mesh(g,finish,[0,0,0],'bevelled-production-wheel-blade',wheel);return;
         }
         const tris=T.ShapeUtils.triangulateShape(outline,[]),pos=[],indices=[];
         // Machined faces sit above the black casting, never coplanar with it.
