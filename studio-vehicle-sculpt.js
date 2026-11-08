@@ -5,11 +5,11 @@
   led.userData.vehicleHeadlight=true;
   function cloneLights(group){const lamps=[],materials=new Map();group.traverse(o=>{if(o.isMesh&&o.material.userData.vehicleHeadlight){if(!materials.has(o.material))materials.set(o.material,o.material.clone());o.material=materials.get(o.material);lamps.push(o);}});return lamps;}
   const shapes={
-    focus:{cabin:[[-.465,.685,.435],[-.344,.963,.354],[-.13,1,.351],[.047,.982,.36],[.245,.652,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],crease:1.7,spokes:5},
-    altis:{cabin:[[-.332,.656,.425],[-.179,.957,.355],[-.068,1,.35],[.039,.978,.354],[.248,.653,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],crease:.75,spokes:10},
+    focus:{cabin:[[-.465,.685,.435],[-.344,.92,.354],[-.13,1,.351],[.047,.95,.36],[.245,.652,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],crease:3.8,panelDepth:4.2,spokes:5,wheelRadius:38,bodyHandles:true,productionPillars:true},
+    altis:{cabin:[[-.332,.656,.425],[-.179,.918,.355],[-.068,.98,.35],[.039,.945,.354],[.248,.653,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],crease:2.4,panelDepth:3.0,spokes:10,wheelRadius:35,bodyHandles:true,productionPillars:true},
     sentra:{cabin:[[-.341,.654,.423],[-.185,.949,.361],[-.067,1,.354],[.030,.981,.355],[.258,.656,.439]],belt:[[-.5,.632],[-.35,.685],[-.18,.668],[.14,.646],[.32,.626],[.5,.612]],width:[[-.5,.94],[-.42,.994],[-.29,1],[-.04,.973],[.24,1],[.37,.987],[.5,.947]],crease:1.9,spokes:5},
     kicks:{cabin:[[-.479,.763,.430],[-.349,.975,.356],[-.12,1,.348],[.027,.978,.354],[.233,.662,.430]],belt:[[-.5,.72],[-.36,.755],[-.22,.717],[0,.687],[.23,.661],[.38,.646],[.5,.628]],width:[[-.5,.925],[-.40,.984],[-.30,1],[-.08,.968],[.21,1],[.38,.975],[.5,.932]],crease:2.4,spokes:10},
-    kuga:{cabin:[[-.474,.716,.427],[-.335,.958,.365],[-.1,1,.362],[.045,.981,.363],[.262,.651,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],crease:1.35,spokes:10},
+    kuga:{cabin:[[-.474,.716,.427],[-.335,.94,.365],[-.1,1,.362],[.045,.95,.363],[.262,.651,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],crease:3.2,panelDepth:4.0,spokes:10,wheelRadius:39,bodyHandles:true,productionPillars:true},
     'corolla-cross':{cabin:[[-.482,.755,.435],[-.364,.968,.371],[-.12,1,.363],[.045,.982,.366],[.252,.684,.443]],belt:[[-.5,.716],[-.35,.743],[-.15,.725],[.14,.704],[.31,.688],[.5,.655]],width:[[-.5,.939],[-.42,.989],[-.295,1],[-.05,.977],[.22,1],[.38,.986],[.5,.947]],crease:2.0,spokes:5}
   };
   // Shape-preserving Hermite interpolation keeps each photographed silhouette independent.
@@ -19,7 +19,7 @@
   function smoothNormals(g){const p=g.attributes.position,n=g.attributes.normal,buckets=new Map();for(let i=0;i<p.count;i++){const key=[p.getX(i),p.getY(i),p.getZ(i)].map(v=>Math.round(v*1000)).join(',');if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(i);}for(const ids of buckets.values()){if(ids.length<2)continue;const normal=new T.Vector3();for(const i of ids)normal.add(new T.Vector3(n.getX(i),n.getY(i),n.getZ(i)));normal.normalize();for(const i of ids)n.setXYZ(i,normal.x,normal.y,normal.z);}n.needsUpdate=true;}
   function build(s,color){
     const leather=mat(['fox-b','fox-c'].includes(s.id)?'#252b30':'#313a40',.82);
-    const root=new T.Group(),wheels=[],lamps=[],cfg={...looks[s.id],...B1_VEHICLE_FACES.profiles[s.id]},shape=shapes[s.id],L=s.length,W=s.width,H=s.height,A=s.axle/2,suv=['suv','crossover'].includes(s.body),R=shape.wheelRadius||(s.id==='fox-d'?39:suv?35:33),paint=new T.MeshPhysicalMaterial({color,roughness:shape.sectionedBody?.27:.21,metalness:shape.sectionedBody?.48:.72,clearcoat:1,clearcoatRoughness:.08,envMapIntensity:1.25}),roofPaint=['sentra','kicks','fox-a','fox-b','fox-c','fox-d'].includes(s.id)?(shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#151b20',roughness:.26,metalness:.25,clearcoat:1}):trim):paint;
+    const root=new T.Group(),wheels=[],lamps=[],cfg={...looks[s.id],...B1_VEHICLE_FACES.profiles[s.id]},shape=shapes[s.id],L=s.length,W=s.width,H=s.height,A=s.axle/2,suv=['suv','crossover'].includes(s.body),R=shape.wheelRadius||(s.id==='fox-d'?39:suv?35:33),premiumPaint=['focus','altis','kuga'].includes(s.id),paint=new T.MeshPhysicalMaterial({color,roughness:shape.sectionedBody?.27:premiumPaint?.21:.24,metalness:shape.sectionedBody?.48:premiumPaint?.52:.34,clearcoat:1,clearcoatRoughness:.075,envMapIntensity:premiumPaint?1.8:1.35}),roofPaint=['sentra','kicks','fox-a','fox-b','fox-c','fox-d'].includes(s.id)?(shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#151b20',roughness:.26,metalness:.25,clearcoat:1}):trim):paint;
     paint.userData.noSelfShadow=true;root.name='sculpted-'+s.id;const parts={body:0,lamps:0,cabin:0,wheel:0};
     function mesh(g,m,p=[0,0,0],name='',parent=root){const o=new T.Mesh(g,m);o.position.set(...p);o.name=name;o.castShadow=!m.transparent;o.receiveShadow=!m.userData.noSelfShadow;parent.add(o);return o;}
     const box=(p,sz,m=paint,r=1,parent=root)=>{const g=new T.BoxGeometry(sz[0],sz[1],sz[2],r<.2?1:3,r<.2?1:3,r<.2?1:3),v=g.attributes.position,q=new T.Vector3(),c=new T.Vector3(),radius=Math.min(r,...sz.map(n=>n*.32));for(let i=0;i<v.count;i++){q.fromBufferAttribute(v,i);c.set(...sz.map((n,k)=>Math.max(-n/2+radius,Math.min(n/2-radius,q.getComponent(k)))));q.sub(c).normalize().multiplyScalar(radius).add(c);v.setXYZ(i,q.x,q.y,q.z);}g.computeVertexNormals();smoothNormals(g);return mesh(g,m,p,'bevelled-detail',parent);};
@@ -59,7 +59,7 @@
       -(s.id==='fox-b'?4:3.5)*Math.exp(-Math.pow((v-(.29+.10*Math.exp(-Math.pow((z+A*.7)/70,2))))/.24,2))*Math.exp(-Math.pow(z/(A*.92),4)):
       width(z)*(.91+.09*Math.sin(v*Math.PI*.79))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
       -(shape.panelDepth||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.29+.13*Math.exp(-Math.pow((z+A*.7)/60,2)):.34))/.20,2))*Math.exp(-Math.pow(z/(A*.83),6))
-      +(shape.shoulder||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.76-.12*z/L:.80))/.105,2))*Math.exp(-Math.pow(z/(L*.46),6));
+      +(shape.shoulder||cfg.shoulder||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.76-.12*z/L:.80))/.105,2))*Math.exp(-Math.pow(z/(L*.46),6));
     const hoodCrown=(z,u)=>{const a=Math.min(1,Math.abs(u)),t=Math.max(0,Math.min(1,(z/L-.39)/.11)),section=sample(shape.hoodSection||[[0,2.5],[.78,4],[1,-1.5]],a);return section*(1-t)+(1.3*(1-u*u)-1.5*Math.pow(u,4))*t;};
     const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?(z<0?1.5*(1-u*u)-1.5*Math.pow(u,4):hoodCrown(z,u)):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
     // Continuous curved body skin, separately formed wheel shoulders, recessed sill and hood crown.
@@ -219,7 +219,11 @@
           for(let corner=0;corner<4;corner++){const a0=corner*Math.PI/2,cz=z+(corner===0||corner===3?1:-1)*6.1,cy=y+(corner<2?.75:-.75);for(let k=0;k<=6;k++){const a=a0+k/6*Math.PI/2,zz=cz+.45*Math.cos(a),yy=cy+.45*Math.sin(a),v=(yy-19)/(edge(zz)-19),xx=side*(sideX(zz,v)+.12);points.push([xx,yy,noseZ(xx,zz,yy)]);}}
           points.push(points[0]);tube(points,.075,trim);
           patch(4,20,(t,u)=>{const zz=z-5.8+11.6*u,yy=y-.65+1.3*t,v=(yy-19)/(edge(zz)-19),xx=side*(sideX(zz,v)+.10);return[xx,yy,noseZ(xx,zz,yy)];},paint,'flush-door-handle');
-        }else if(shape.bodyHandles){const recess=mesh(new T.SphereGeometry(1,24,12),trim,[x,y,z],'handle-recess');recess.scale.set(.7,2.4,8);const handle=mesh(new T.SphereGeometry(1,24,12),paint,[x+side*1.1,y+.3,z],'body-color-pull-handle');handle.scale.set(1.4,1.4,7.5);}
+        }else if(shape.bodyHandles){
+          box([x+side*.55,y,z],[.7,2.6,11.5],darkMetal,.55);
+          box([x+side*1.25,y+.18,z],[.85,1.65,8.3],metal,.55);
+          box([x+side*1.62,y+.18,z],[.75,1.35,7.2],paint,.5);
+        }
         else box([x,y,z],[1.8,2.7,15],s.id==='model-3'?trim:s.id==='kicks'||s.id==='altis'?metal:paint,1);
       }
       for(const axle of [-A,A]){
@@ -237,19 +241,26 @@
         patch(24,5,(t,v)=>{const a=t*Math.PI,z=axle+Math.cos(a)*(R+4.3),y=R+Math.sin(a)*(R+4.3);const sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-v*14);return[x,y,noseZ(x,z,y)];},trim,'inner-arch');
       }
       if(shape.sectionedBody){
-        const mz=front-12,mh=belt(mz)+2,xc=side*(W/2+4),yc=mh+6,zc=mz-2,baseX=side*(sideX(mz,.97)+.4);
+        const mirrorSet={focus:{back:28,out:3.2},altis:{back:31,out:2.6},kuga:{back:30,out:3.8}}[s.id]||{back:20,out:4};
+        const mz=front-mirrorSet.back,mh=belt(mz)+3,xc=side*(W/2+mirrorSet.out),yc=mh+4.8,zc=mz-1,baseX=side*(sideX(mz,.94)+.15);
         const mount=mesh(new T.SphereGeometry(1,20,12),trim,[baseX,mh,mz],'mirror-door-mount');mount.scale.set(1.5,2.4,4.2);
-        rod([baseX,mh,mz],[xc-side*5,yc-3,zc+2],1.4,trim);
+        rod([baseX,mh,mz],[xc-side*5.2,yc-2.5,zc+1],.95,trim);
         // Rounded trapezoid perimeter, tapered nose and an open, yawed rear
         // face. All layers share the same rim instead of intersecting spheres.
-        const mirrorAt=(a,r=1)=>{const cx=Math.cos(a),sy=Math.sin(a),x=9.4*Math.sign(cx)*Math.abs(cx)**.78*r*(1-.09*sy),y=5.6*Math.sign(sy)*Math.abs(sy)**.86*r;return[x,y,-.16*x];};
+        const mirrorAt=(a,r=1)=>{const cx=Math.cos(a),sy=Math.sin(a),x=8.1*Math.sign(cx)*Math.abs(cx)**.78*r*(1-.09*sy),y=4.8*Math.sign(sy)*Math.abs(sy)**.86*r;return[x,y,-.16*x];};
         patch(24,64,(t,u)=>{const a=u*2*Math.PI,p=mirrorAt(a,Math.cos(t*Math.PI/2));return[xc+side*p[0],yc+p[1]-.7*Math.sin(t*Math.PI/2),zc+p[2]+10*Math.sin(t*Math.PI/2)];},roofPaint,'formed-mirror-housing');
         const mirrorGlass=new T.MeshPhysicalMaterial({color:'#9facb5',metalness:1,roughness:.075,clearcoat:1});
         const face=patch(12,64,(r,u)=>{const p=mirrorAt(u*Math.PI*2,.86*r);return[xc+side*p[0],yc+p[1],zc+p[2]-.22-.12*(1-r*r)];},mirrorGlass,'mirror-reflective-face');face.userData.keep=true;
         patch(4,64,(t,u)=>{const p=mirrorAt(u*Math.PI*2,.86+.14*t);return[xc+side*p[0],yc+p[1],zc+p[2]-.22*(1-t)];},trim,'mirror-glass-bezel');
-        tube(Array.from({length:41},(_,i)=>{const p=mirrorAt((1.04+i/40*.92)*Math.PI,Math.cos(.24*Math.PI/2));return[xc+side*p[0],yc+p[1]-.7*Math.sin(.24*Math.PI/2),zc+p[2]+10*Math.sin(.24*Math.PI/2)+.12];}),.18,led);
+        tube(Array.from({length:41},(_,i)=>{const p=mirrorAt((1.04+i/40*.92)*Math.PI,Math.cos(.24*Math.PI/2));return[xc+side*p[0],yc+p[1]-.55*Math.sin(.24*Math.PI/2),zc+p[2]+7*Math.sin(.24*Math.PI/2)+.12];}),.14,led);
       }else{
-      const mz=front-12,mh=belt(mz)+9;rod([side*W*.435,mh,mz],[side*(W/2+7),mh+1,mz],1.8,trim);const mirror=mesh(new T.SphereGeometry(1,32,20),shape.blackMirrors?trim:paint,[side*(W/2+7),mh+3,mz],'mirror');mirror.scale.set(8,4.8,9);box([side*(W/2+7),mh+3,mz-6],[11,6,.6],darkMetal,1);box([side*(W/2+7),mh+2,mz+8],[10,1,1],led,.3);
+      const mirrorSet={focus:{back:28,out:3.2},altis:{back:31,out:2.6},kuga:{back:30,out:3.8}}[s.id]||{back:18,out:6};
+      const mz=front-mirrorSet.back,mh=belt(mz)+2.5,xc=side*(W/2+mirrorSet.out),baseX=side*(sideX(mz,.94)+.1),yc=mh+4.2;
+      const mount=mesh(new T.SphereGeometry(1,16,10),trim,[baseX,mh,mz],'mirror-door-mount');mount.scale.set(1.2,1.7,3.1);
+      rod([baseX,mh,mz],[xc-side*4.0,yc-2.2,mz-.8],.85,trim);
+      const mirror=mesh(new T.SphereGeometry(1,28,18),shape.blackMirrors?trim:paint,[xc,yc,mz-.8],'aero-mirror-shell');mirror.scale.set(7.1,4.3,7.8);
+      const mirrorCap=mesh(new T.SphereGeometry(1,24,16),metal,[xc+side*.10,yc-.22,mz-1.0],'mirror-glass');mirrorCap.scale.set(6.1,3.25,5.65);
+      const signal=mesh(new T.SphereGeometry(1,16,10),led,[xc+side*1.8,yc-1.2,mz+5.0],'mirror-turn-signal');signal.scale.set(3.8,.42,.55);
       }
       if(s.id==='fox-c'){
         tube(Array.from({length:24},(_,i)=>{const z=-A+R+6+i/23*(2*A-2*R-12);return[side*(sideX(z,.12)+.6),24,z];}),.6,metal);
@@ -324,22 +335,21 @@
       }
     }
     const face=B1_VEHICLE_FACES.build({s,root,mesh,box,tube,rod,poly:frontPolygon,frontZ,rearZ,paint,trim,metal,darkMetal,red,led,lamps});
-    // Small, surface-fitted factory model lettering replaces generic placeholder
-    // badges on the three Taiwan-market models refined in this pass.
+    // Rear emblems are separate surface-mounted pieces on the tailgate.
     if(['focus','altis','kuga'].includes(s.id)){
-      const label=s.id==='focus'?'FOCUS':s.id==='altis'?'ALTIS  HEV':'KUGA';
-      const canvas=document.createElement('canvas');canvas.width=512;canvas.height=96;
-      const ctx=canvas.getContext('2d');ctx.clearRect(0,0,512,96);ctx.fillStyle='#667078';
-      ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=s.id==='altis'?'600 54px Arial':'600 60px Arial';ctx.fillText(label,256,48);
-      const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
-      const lettering=new T.MeshStandardMaterial({map:texture,transparent:true,depthWrite:false,metalness:.72,roughness:.3,side:T.DoubleSide});
-      const width=s.id==='altis'?42:38, y=H*(s.body==='hatch'?.45:.44), z=rearZ(0,y)-.95;
-      const badgeGeometry=new T.PlaneGeometry(width,7.2,32,4),positions=badgeGeometry.attributes.position;
-      for(let i=0;i<positions.count;i++){
-        const x=positions.getX(i),yy=positions.getY(i)+y;
-        positions.setZ(i,rearZ(x,yy)-.95-z);
+      const logoY=H*.525,logoZ=rearZ(0,logoY)-1.25;
+      if(s.nose==='ford'){
+        const oval=mesh(new T.SphereGeometry(1,32,20),mat('#244b73',.26,{metalness:.35}),[0,logoY,logoZ],'rear-ford-oval');oval.scale.set(7.5,3.5,1.35);
+        const canvas=document.createElement('canvas');canvas.width=256;canvas.height=96;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,256,96);ctx.fillStyle='#f5f5ef';ctx.font='italic bold 66px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Ford',128,52);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
+        const word=mesh(new T.PlaneGeometry(10,3.5),new T.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,side:T.DoubleSide}),[0,logoY,logoZ-1.45],'rear-ford-script');word.rotation.y=Math.PI;word.castShadow=false;word.receiveShadow=false;
+      }else{
+        for(const [rx,ry]of [[6.4,4.2],[3.4,1.6],[1.8,3.4]]){const emblem=mesh(new T.TorusGeometry(1,.22,8,40),metal,[0,logoY,logoZ],'rear-toyota-elliptical-emblem');emblem.scale.set(rx,ry,1);emblem.rotation.y=Math.PI;}
       }
-      badgeGeometry.computeVertexNormals();mesh(badgeGeometry,lettering,[0,0,z],'factory-rear-model-lettering');
+      const hatchEdge={focus:[[-.40,.724],[-.445,.665],[-.445,.425],[-.405,.345],[0,.325],[.405,.345],[.445,.425],[.445,.665],[.40,.724]],kuga:[[-.40,.735],[-.447,.682],[-.447,.443],[-.405,.365],[0,.348],[.405,.365],[.447,.443],[.447,.682],[.40,.735]]}[s.id];
+      if(hatchEdge){const pts=hatchEdge.map(([x,y])=>{const X=x*W*.45,Y=y*H;return[X,Y,rearZ(X,Y)-.18];});tube(pts,.20,trim,root,true);}
+      if(s.id==='altis'){
+        const pts=Array.from({length:33},(_,i)=>{const x=(-.39+i/32*.78)*W*.45,y=H*.562;return[x,y,rearZ(x,y)-.18];});tube(pts,.18,trim,root,true);
+      }
     }
     // Sculpted bumper volumes, lower intakes and tailgate shut-lines anchor the fascia in the body.
     for(const sign of [-1,1]){

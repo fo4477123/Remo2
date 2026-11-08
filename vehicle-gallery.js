@@ -6,7 +6,7 @@ window.W=(x,y,z=0)=>new T.Vector3(x,z,y);
 window.B1_MODELS={rounded(x,y,w,d,h,m,z,parent){const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(x,z+h/2,y);parent.add(o);return o;}};
 const status=document.querySelector('#status'),select=document.querySelector('#model'),compare=document.querySelector('#compare'),spin=document.querySelector('#spin');
 try{
-  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261108-vehiclebatch01';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
+  for(const file of ['studio-vehicles.js','studio-vehicle-faces.js','studio-vehicle-sculpt.js','studio-vehicle-ev.js','studio-vehicle-commercial.js','studio-vehicle-imports.js','studio-taiwan-traffic.js'])await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=file+'?v=20261108-vehiclemodel02';s.onload=resolve;s.onerror=()=>reject(Error('無法載入 '+file));document.head.append(s);});
   if(!await B1_VEHICLES.ready)throw Error('Model Y 對照資產載入失敗，請重新整理。');
   await B1_VEHICLE_IMPORTS.loaded;
   const renderer=new T.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
@@ -20,7 +20,10 @@ try{
   for(const type of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(type,e=>{if(drag?.id===e.pointerId)drag=null;});
   canvas.addEventListener('wheel',e=>{e.preventDefault();spherical.radius*=Math.exp(e.deltaY*.001);},{passive:false});canvas.addEventListener('contextmenu',e=>e.preventDefault());
   // Local studio light rig; no network textures or renderer-specific postprocessing.
-  const environment=new T.Scene();environment.background=new T.Color('#9ba6af');
+  const environment=new T.Scene();environment.background=new T.Color('#78838b');
+  const addSoftbox=(position,width,height,color)=>{const panel=new T.Mesh(new T.PlaneGeometry(width,height),new T.MeshBasicMaterial({color,side:T.DoubleSide,toneMapped:false}));panel.position.set(...position);panel.lookAt(0,0,0);environment.add(panel);};
+  addSoftbox([58,62,42],90,44,'#f7f5ef');addSoftbox([-63,38,22],58,70,'#d9e3e8');addSoftbox([6,42,-68],82,52,'#e7edf0');addSoftbox([-16,26,60],50,38,'#f1e4d3');
+  const envFloor=new T.Mesh(new T.PlaneGeometry(520,520),new T.MeshBasicMaterial({color:'#59656d',side:T.DoubleSide,toneMapped:false}));envFloor.rotation.x=-Math.PI/2;envFloor.position.y=-42;environment.add(envFloor);
   for(const [p,size,value]of [[[0,500,0],[900,10,850],5],[[-400,230,350],[10,400,650],8],[[400,230,-250],[10,450,600],4]]){const o=new T.Mesh(new T.BoxGeometry(...size),new T.MeshBasicMaterial({color:new T.Color(value,value,value)}));o.position.set(...p);environment.add(o);}
   const pmrem=new T.PMREMGenerator(renderer);scene.environment=pmrem.fromScene(environment,.04).texture;pmrem.dispose();environment.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});
   scene.add(new T.HemisphereLight('#f2f6ff','#a5a7a6',2));

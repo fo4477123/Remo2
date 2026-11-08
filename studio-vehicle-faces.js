@@ -1,19 +1,24 @@
 /* Individually traced current Taiwan-market face layouts. Fractions of width/height. */
 (() => {
   const profiles={
-    focus:{generation:'New Focus 五門・台灣現售款',source:'https://static.fordlioho.com.tw/assets/upload/Brochure/Focus/2025.10/New_Ford_Focus_Brochure.pdf',grille:[[-.59,.57],[.59,.57],[.64,.48],[.43,.30],[-.43,.30],[-.64,.48]],head:[[.45,.62],[.94,.66],[.88,.56],[.64,.54]],drl:[[.47,.612],[.88,.642],[.86,.596],[.68,.575]],pattern:'honeycomb',badge:[0,.48],rim:'split-five',tailStyle:'fork',frontH:.67,shoulder:.63,rearH:.64},
-    altis:{generation:'2026/10 Corolla Altis HEV 尊爵',source:'https://hotaicdn.azureedge.net/toyotaweb/CAR_2026100111133267457327.pdf',grille:[[-.53,.43],[.53,.43],[.68,.22],[.59,.16],[-.59,.16],[-.68,.22]],head:[[.27,.61],[.95,.66],[.86,.55],[.47,.50]],drl:[[.29,.605],[.46,.535],[.83,.57],[.91,.62]],pattern:'slats',badge:[0,.59],rim:'ten-spoke',tailStyle:'wing',frontH:.66,shoulder:.64,rearH:.64},
+    focus:{generation:'New Focus 五門・台灣現售款',source:'https://static.fordlioho.com.tw/assets/upload/Brochure/Focus/2025.10/New_Ford_Focus_Brochure.pdf',grille:[[-.59,.57],[.59,.57],[.64,.48],[.43,.30],[-.43,.30],[-.64,.48]],head:[[.45,.62],[.94,.66],[.88,.56],[.64,.54]],drl:[[.47,.612],[.88,.642],[.86,.596],[.68,.575]],projectors:[[.69,.584],[.80,.59]],lensStyle:'matrix',pattern:'honeycomb',badge:[0,.48],rim:'split-five',tailStyle:'fork',frontH:.67,shoulder:8,rearH:.64},
+    altis:{generation:'2026/10 Corolla Altis HEV 尊爵',source:'https://hotaicdn.azureedge.net/toyotaweb/CAR_2026100111133267457327.pdf',grille:[[-.53,.43],[.53,.43],[.68,.22],[.59,.16],[-.59,.16],[-.68,.22]],head:[[.27,.61],[.95,.66],[.86,.55],[.47,.50]],drl:[[.29,.605],[.46,.535],[.83,.57],[.91,.62]],projectors:[[.74,.575]],lensStyle:'matrix',pattern:'slats',badge:[0,.59],rim:'ten-spoke',tailStyle:'wing',frontH:.66,shoulder:7,rearH:.64},
     sentra:{generation:'2026 Sentra MOMIJI・台灣現售款',source:'https://event.nissan.com.tw/momiji_event/',grille:[[-.71,.60],[.71,.60],[.76,.47],[.65,.17],[-.65,.17],[-.76,.47]],head:[[.58,.65],[.96,.69],[.86,.55],[.72,.52]],drl:[[.60,.642],[.88,.66],[.82,.56],[.72,.54]],pattern:'horizontal-shield',badge:[0,.50],rim:'split-five',tailStyle:'boomerang',frontH:.69,shoulder:.64,rearH:.63},
     kicks:{generation:'2026 Kicks MOMIJI・台灣現售款',source:'https://event.nissan.com.tw/momiji_event/',grille:[[-.58,.59],[.58,.59],[.55,.44],[.33,.30],[-.33,.30],[-.55,.44]],head:[[.48,.64],[.97,.67],[.84,.57],[.64,.54]],drl:[[.50,.632],[.89,.65],[.84,.61]],pattern:'v-motion',badge:[0,.49],rim:'double-five',tailStyle:'boomerang',frontH:.68,shoulder:.66,rearH:.64},
-    kuga:{generation:'The All-New Kuga Vignale・台灣現售款',source:'https://static.fordlioho.com.tw/assets/upload/Brochure/Kuga/The%20All-New%20Ford%20Kuga_Brochure.pdf',grille:[[-.54,.58],[.54,.58],[.66,.50],[.60,.36],[.37,.33],[-.37,.33],[-.60,.36],[-.66,.50]],head:[[.57,.64],[.96,.63],[.91,.53],[.67,.52]],drl:[[.59,.628],[.90,.617],[.86,.55],[.70,.55]],pattern:'vertical-mesh',badge:[0,.48],rim:'ten-spoke',tailStyle:'split-wing',frontH:.66,shoulder:.66,rearH:.64},
+    kuga:{generation:'The All-New Kuga Vignale・台灣現售款',source:'https://static.fordlioho.com.tw/assets/upload/Brochure/Kuga/The%20All-New%20Ford%20Kuga_Brochure.pdf',grille:[[-.54,.58],[.54,.58],[.66,.50],[.60,.36],[.37,.33],[-.37,.33],[-.60,.36],[-.66,.50]],head:[[.57,.64],[.96,.63],[.91,.53],[.67,.52]],drl:[[.59,.628],[.90,.617],[.86,.55],[.70,.55]],projectors:[[.75,.582],[.83,.575]],lensStyle:'matrix',pattern:'vertical-mesh',badge:[0,.48],rim:'ten-spoke',tailStyle:'split-wing',frontH:.66,shoulder:10,rearH:.64},
     'corolla-cross':{generation:'2026/10 Corolla Cross HEV・台灣現售款',source:'https://hotaicdn.azureedge.net/toyotaweb/CAR_202610011031537C05D23G.pdf',grille:[[-.64,.54],[.64,.54],[.66,.43],[.51,.39],[-.51,.39],[-.66,.43]],head:[[.30,.64],[.97,.66],[.86,.56],[.47,.56]],drl:[[.32,.629],[.90,.64],[.82,.59]],pattern:'body-color-perforated',badge:[0,.57],rim:'sculpted-five',tailStyle:'horizontal-smoke',frontH:.68,shoulder:.68,rearH:.64}
   };
+  // These lower apertures are separate openings in the ST front fascias, not
+  // one tall generic grille. Keep them on the same curved bumper surface.
+  Object.assign(profiles.focus,{grille:[[-.64,.56],[.64,.56],[.72,.48],[.55,.30],[-.55,.30],[-.72,.48]],lowerGrille:[[-.55,.285],[.55,.285],[.69,.245],[.62,.175],[-.62,.175],[-.69,.245]],lowerPattern:'honeycomb'});
+  Object.assign(profiles.kuga,{grille:[[-.58,.57],[.58,.57],[.68,.49],[.62,.35],[.40,.32],[-.40,.32],[-.62,.35],[-.68,.49]],lowerGrille:[[-.63,.30],[.63,.30],[.69,.255],[.62,.175],[-.62,.175],[-.69,.255]],pattern:'honeycomb',lowerPattern:'honeycomb'});
   const inside=(p,poly)=>{let on=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++)if((poly[i][1]>p[1])!==(poly[j][1]>p[1])&&p[0]<(poly[j][0]-poly[i][0])*(p[1]-poly[i][1])/(poly[j][1]-poly[i][1])+poly[i][0])on=!on;return on;};
   function tailHeight(profile,y){const anchor=profile.tailHeightAnchor||0;return anchor+(y-anchor)*(profile.tailHeightScale||1)-(profile.tailPocketShift||0);}
   function build({s,root,mesh,box,tube,rod,poly,frontZ,rearZ,paint,trim,metal,darkMetal,red,led,lamps}){
     const p=profiles[s.id],W=s.width,H=s.height,L=s.length,scale=a=>[a[0]*W*.45,a[1]*H*(s.body==='sedan'||s.body==='hatch'?.90:1)],to3=(a,depth=1)=>{const [x,y]=scale(a);return[x,y,frontZ(x,y)+depth];},rect=(cx,cy,w,h)=>[[cx-w/2,cy+h/2],[cx+w/2,cy+h/2],[cx+w/2,cy-h/2],[cx-w/2,cy-h/2]];
     const front=(points,m,depth=1)=>poly(points.map(scale),m,(x,y)=>frontZ(x,y)+depth),line=(points,r,m,depth=2)=>tube(points.flatMap((a,i)=>i?Array.from({length:8},(_,k)=>{const b=points[i-1],t=(k+1)/8;return to3([b[0]+(a[0]-b[0])*t,b[1]+(a[1]-b[1])*t],depth);}):[to3(a,depth)]),r,m,root,true);
     const tailPoint=([x,y])=>[x*W*.45,tailHeight(p,y)*H],tailSurface=(x,y,depth)=>rearZ(x,y)+(p.tailOpticInset||0)-depth;
+    const rearLampHousing=new T.MeshStandardMaterial({color:'#68737a',metalness:.38,roughness:.32});
     function splitTail(points){
       const split=W*(s.id==='fox-b'?.315:.335);
       const clip=(polygon,limit,less)=>{const result=[];for(let i=0;i<polygon.length;i++){const a=polygon[i],b=polygon[(i+1)%polygon.length],inside=q=>less?q[0]<=limit:q[0]>=limit,ia=inside(a),ib=inside(b);if(ia)result.push(a);if(ia!==ib){const t=(limit-a[0])/(b[0]-a[0]);result.push([limit,a[1]+(b[1]-a[1])*t]);}}return result;};
@@ -47,7 +52,24 @@
         }
         line([[-.98,.160],[-.86,.154],[0,.154],[.86,.154],[.98,.160]],.35,metal,.7);
       }
-    }else for(let y=Math.min(...ys)+4,row=0;y<Math.max(...ys)-3;y+=5.5,row++)for(let x=Math.min(...xs)+3;x<Math.max(...xs)-2;x+=8){const q=[x+(row%2?4:0),y];if(!inside(q,gs))continue;if(p.pattern==='body-color-perforated'){const w=s.id==='fox-d'?4.5:5.2,h=s.id==='fox-d'?1.8:2.5;poly([[q[0]-w/2,y-h/2],[q[0]+w/2,y-h/2],[q[0]+w/2,y+h/2],[q[0]-w/2,y+h/2]],trim,(x,y)=>grilleZ(x,y)+.85,'recessed-grille-perforation');}else if(p.pattern==='slats'||p.pattern==='horizontal-shield'){box([q[0],y,grilleZ(q[0],y)+2],[7.4,p.pattern==='slats'?1:2,1],darkMetal,.35);}else if(p.pattern==='vertical-mesh'){box([q[0],y,grilleZ(q[0],y)+2],[.7,5.2,1],metal,.25);box([q[0],y,grilleZ(q[0],y)+1.8],[7,.65,.8],darkMetal,.2);}else{const points=Array.from({length:7},(_,i)=>[q[0]+3.4*Math.sin(i*Math.PI/3),y+2.15*Math.cos(i*Math.PI/3),grilleZ(q[0],y)+2]);tube(points,.45,darkMetal);}}
+    }else for(let y=Math.min(...ys)+4,row=0;y<Math.max(...ys)-3;y+=7.1,row++)for(let x=Math.min(...xs)+3;x<Math.max(...xs)-2;x+=10.2){const q=[x+(row%2?5.1:0),y];if(!inside(q,gs))continue;if(p.pattern==='body-color-perforated'){const w=s.id==='fox-d'?4.5:5.2,h=s.id==='fox-d'?1.8:2.5;poly([[q[0]-w/2,y-h/2],[q[0]+w/2,y-h/2],[q[0]+w/2,y+h/2],[q[0]-w/2,y+h/2]],trim,(x,y)=>grilleZ(x,y)+.85,'recessed-grille-perforation');}else if(p.pattern==='slats'||p.pattern==='horizontal-shield'){box([q[0],y,grilleZ(q[0],y)+2],[7.4,p.pattern==='slats'?1:2,1],darkMetal,.35);}else if(p.pattern==='vertical-mesh'){box([q[0],y,grilleZ(q[0],y)+2],[.7,5.2,1],metal,.25);box([q[0],y,grilleZ(q[0],y)+1.8],[7,.65,.8],darkMetal,.2);}else{const points=Array.from({length:6},(_,i)=>[q[0]+4.2*Math.sin(i*Math.PI/3),y+2.7*Math.cos(i*Math.PI/3),grilleZ(q[0],y)+2]);tube([...points,points[0]],.3,darkMetal,root,true);}}
+    if(p.lowerGrille){
+      front(p.lowerGrille,trim,1.35);
+      if(p.lowerPattern==='honeycomb'){
+        const xs=p.lowerGrille.map(v=>v[0]),ys=p.lowerGrille.map(v=>v[1]),left=Math.min(...xs),right=Math.max(...xs),low=Math.min(...ys),high=Math.max(...ys);
+        for(let row=0,y=low+.014;y<high-.008;y+=.027,row++)for(let x=left+.018+(row%2?.018:0);x<right-.012;x+=.036){
+          if(!inside([x,y],p.lowerGrille))continue;
+          const aperture=Array.from({length:7},(_,i)=>[x+.016*Math.cos(i*Math.PI/3),y+.012*Math.sin(i*Math.PI/3)]);
+          line([...aperture,aperture[0]],.34,darkMetal,2.0);
+        }
+      }
+    }
+    if(s.id==='kuga'){
+      // Taiwan-market facelift: 920 mm signature strip integrated into a
+      // shallow smoked bridge just above the main grille.
+      front([[-.50,.615],[.50,.615],[.515,.594],[.50,.582],[-.50,.582],[-.515,.594]],darkMetal,.75);
+      lamps.push(line([[-.49,.601],[-.30,.601],[0,.601],[.30,.601],[.49,.601]],.82,led,1.05));
+    }
     if(p.pattern==='v-motion')line([[-.55,.59],[-.43,.41],[-.28,.32],[.28,.32],[.43,.41],[.55,.59]],2.5,metal);
     // A smoked optical bridge supports the light guide across the centre
     // inlet; the luminous ribbon must not appear suspended above the bonnet.
@@ -78,8 +100,28 @@
       }else vehicleEmblem(H*(tailHeight(p,.674)+tailHeight(p,.706))/2,-1,'official-tailgate-emblem',.73);
     }
     if(s.id==='fox-b')for(const sign of [-1,1])front([[.90,.508],[.97,.51],[.94,.18],[.85,.18],[.87,.36]].map(([x,y])=>[sign*x,y]),trim,.9);
+    if(s.id==='focus')for(const side of [-1,1]){
+      const vent=[[.755,.355],[.895,.386],[.914,.354],[.89,.286],[.79,.277],[.748,.307]].map(([x,y])=>[side*x,y]);
+      front(vent,paint,.65);front([[side*.779,.348],[side*.881,.369],[side*.891,.347],[side*.873,.300],[side*.80,.294],[side*.775,.312]],darkMetal,1.45);
+      line([[side*.786,.305],[side*.866,.323]],.48,metal,1.8);line([[side*.797,.291],[side*.86,.305]],.38,metal,1.8);
+      const fog=mesh(new T.SphereGeometry(1,16,10),led,to3([side*.846,.335],2.05),'focus-bumper-corner-led');fog.scale.set(1.8,1.2,.45);
+    }
+    if(s.id==='kuga')for(const side of [-1,1]){
+      const vent=[[.765,.330],[.895,.354],[.914,.326],[.892,.263],[.795,.258],[.755,.286]].map(([x,y])=>[side*x,y]);
+      front(vent,paint,.65);front([[side*.786,.323],[side*.879,.340],[side*.887,.321],[side*.868,.275],[side*.807,.271],[side*.779,.291]],darkMetal,1.45);
+      for(let row=0;row<2;row++)line([[side*(.798+row*.024),.285+row*.017],[side*(.864-row*.014),.298+row*.017]],.40,metal,1.8);
+      const fog=mesh(new T.SphereGeometry(1,16,10),led,to3([side*.84,.319],2.0),'kuga-bumper-corner-led');fog.scale.set(1.7,1.0,.4);
+    }
+    if(s.id==='altis'){
+      line([[-.69,.205],[-.52,.183],[0,.176],[.52,.183],[.69,.205]],1.15,metal,1.1);
+      for(const side of [-1,1]){
+        front([[side*.775,.337],[side*.895,.349],[side*.908,.324],[side*.85,.296],[side*.78,.307]],paint,.65);
+        front([[side*.795,.330],[side*.875,.339],[side*.882,.322],[side*.844,.307],[side*.801,.313]],darkMetal,1.35);
+        const fog=mesh(new T.SphereGeometry(1,16,10),led,to3([side*.84,.323],1.9),'altis-bumper-corner-led');fog.scale.set(1.35,.8,.35);
+      }
+    }
     // Individual lamp outlines and their light signature; no shared triple-round-eye face.
-    for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);if(formedGrille)poly(head.map(scale),darkMetal,(x,y)=>frontOpticZ(x,y,2),'recessed-head-housing');else front(head,darkMetal,s.id==='model-3'?1.0:2);line([...head,head[0]],formedGrille?.12:.38,s.nose==='ev'?trim:metal,formedGrille?-2:2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'||formedGrille?.55:1.1,led,formedGrille?.45:2.9));
+    for(const side of [-1,1]){const mirror=pts=>pts.map(([x,y])=>[side*x,y]),head=mirror(p.head);if(formedGrille)poly(head.map(scale),darkMetal,(x,y)=>frontOpticZ(x,y,2),'recessed-head-housing');else front(head,darkMetal,s.id==='model-3'?1.0:2);const housingTrim=['focus','altis','kuga'].includes(s.id)?darkMetal:(s.nose==='ev'?trim:metal);line([...head,head[0]],formedGrille?.12:['focus','altis','kuga'].includes(s.id)?.18:.38,housingTrim,formedGrille?-2:2.4);const path=mirror(p.drl);lamps.push(line(path,s.id==='model-3'||formedGrille?.55:1.1,led,formedGrille?.45:2.9));
       const centre=p.head.reduce((a,v)=>[a[0]+v[0]/p.head.length,a[1]+v[1]/p.head.length],[0,0]),lensCount=p.projectors?p.projectors.length:s.id==='fox-d'?0:s.id==='focus'?2:s.id==='kuga'?2:1;for(let i=0;i<lensCount;i++){const x=side*(p.projectors?.[i]?.[0]??(centre[0]+(i?-.08:.04)))*W*.45,y=scale([0,p.projectors?.[i]?.[1]??(centre[1]-.005)])[1];if(p.lensStyle==='foxtron-projector'){
           const w=s.id==='fox-b'?7.8:7.2,h=s.id==='fox-b'?3.5:3.2;
           const optic=(width,height,radius,m,depth)=>{const points=[];for(let corner=0;corner<4;corner++){const a0=corner*Math.PI/2,cx=x+(corner===0||corner===3?1:-1)*(width/2-radius),cy=y+(corner<2?1:-1)*(height/2-radius);for(let k=0;k<=5;k++){const a=a0+k/5*Math.PI/2;points.push([cx+radius*Math.cos(a),cy+radius*Math.sin(a)]);}}return poly(points,m,(px,py)=>frontOpticZ(px,py,depth),'surface-fitted-projector');};
@@ -87,16 +129,18 @@
           lamps.push(optic(w-1.2,h-.65,.7,led,2.8));
           for(const dx of [-1.6,1.6])poly([[x+dx-.12,y-h*.3],[x+dx+.12,y-h*.3],[x+dx+.12,y+h*.3],[x+dx-.12,y+h*.3]],metal,(px,py)=>frontOpticZ(px,py,2.95),'projector-optical-divider');
           continue;
-        }if(p.lensStyle==='matrix'){const w=s.id==='model-3'?1.5:3.1,h=s.id==='model-3'?.45:1.9;poly([[x-w,y-h],[x+w,y-h],[x+w,y+h],[x-w,y+h]],led,(x,y)=>frontZ(x,y)+2.55,'recessed-led-module');continue;}const lens=mesh(new T.SphereGeometry(1,20,14),metal,[x,y,frontZ(x,y)+2.2],'lamp-reflector');lens.scale.set(s.id==='altis'?4.5:3.7,2.8,1.2);const bulb=mesh(new T.SphereGeometry(1,18,12),led,[x,y,frontZ(x,y)+3.3],'projector-lens');bulb.scale.set(s.id==='altis'?3:2.5,2.1,.7);lamps.push(bulb);}
-      if(s.id==='altis'){front(mirror([[.71,.45],[.85,.44],[.88,.21],[.73,.19]]),trim,2);line(mirror([[.69,.47],[.83,.44],[.86,.20],[.73,.19]]),1.35,metal);const fog=mesh(new T.SphereGeometry(3,20,12),led,to3([side*.79,.24],4),'round-foglamp');fog.scale.z=.5;}
-      else if(s.id==='kicks'||s.id==='kuga'||s.id==='sentra'){const tall=s.id==='kicks',points=mirror([[.79,tall?.48:.42],[.91,tall?.49:.43],[.87,.22],[.75,.23]]);front(points,trim,2);for(let row=0;row<4;row++)line(mirror([[.79,.26+row*.037],[.86,.26+row*.037]]),.65,darkMetal);if(s.id!=='sentra')line(mirror([[.79,.30],[.84,.30]]),1.3,led);}
+        }if(p.lensStyle==='matrix'){const w=s.id==='model-3'?1.5:s.id==='altis'?3.3:2.7,h=s.id==='model-3'?.45:1.05;poly([[x-w,y-h],[x+w,y-h],[x+w,y+h],[x-w,y+h]],led,(x,y)=>frontZ(x,y)+2.55,'recessed-led-module');continue;}const lens=mesh(new T.SphereGeometry(1,20,14),metal,[x,y,frontZ(x,y)+2.2],'lamp-reflector');lens.scale.set(s.id==='altis'?4.5:3.7,2.8,1.2);const bulb=mesh(new T.SphereGeometry(1,18,12),led,[x,y,frontZ(x,y)+3.3],'projector-lens');bulb.scale.set(s.id==='altis'?3:2.5,2.1,.7);lamps.push(bulb);}
+      if(s.id==='kicks'||s.id==='sentra'){const tall=s.id==='kicks',points=mirror([[.79,tall?.48:.42],[.91,tall?.49:.43],[.87,.22],[.75,.23]]);front(points,trim,2);for(let row=0;row<4;row++)line(mirror([[.79,.26+row*.037],[.86,.26+row*.037]]),.65,darkMetal);if(s.id!=='sentra')line(mirror([[.79,.30],[.84,.30]]),1.3,led);}
       else if(s.id==='corolla-cross'){front(mirror([[.78,.43],[.91,.43],[.89,.28],[.79,.31]]),trim,2);for(let row=0;row<5;row++)line(mirror([[.81,.32+row*.02],[.87,.32+row*.02]]),.65,darkMetal);}
     }
-    if(s.id==='kuga')lamps.push(line([[-.58,.638],[0,.638],[.58,.638]],1.05,led,2.4));
-    if(s.id==='altis')line([[-.46,.63],[0,.59],[.46,.63]],1.6,trim);if(s.id==='corolla-cross'){line([[-.35,.65],[0,.65],[.35,.65]],1.2,metal);front(rect(0,.27,1.56,.17),trim,2);for(let row=0;row<3;row++)line([[-.67,.23+row*.034],[.67,.23+row*.034]],1,darkMetal);}
-    else if(s.id==='kuga'||s.id==='kicks')front(rect(0,.20,1.25,.10),trim,2);
+    if(s.id==='corolla-cross'){line([[-.35,.65],[0,.65],[.35,.65]],1.2,metal);front(rect(0,.27,1.56,.17),trim,2);for(let row=0;row<3;row++)line([[-.67,.23+row*.034],[.67,.23+row*.034]],1,darkMetal);}
+    else if(s.id==='kicks')front(rect(0,.20,1.25,.10),trim,2);
     if(s.id==='model-3'){line([[-.045,.67],[0,.675],[.045,.67]],.65,metal,.8);line([[0,.675],[0,.62]],.7,metal,.8);}
-    else if(!s.id.startsWith('fox-')){const badge=mesh(new T.SphereGeometry(1,24,16),metal,to3(p.badge,3),'brand-emblem');badge.scale.set(s.nose==='ford'?6:4.5,s.nose==='ford'?2.5:4.5,1);const centre=mesh(new T.SphereGeometry(1,20,12),s.nose==='ford'?mat('#244b73',.26,{metalness:.3}):trim,to3(p.badge,4),'emblem-inset');centre.scale.set(s.nose==='ford'?5.1:3.6,1.8,.5);}
+    else if(!s.id.startsWith('fox-')){if(s.id==='altis'){for(const [rx,ry,rotation] of [[4.9,3.3,0],[2.6,1.25,0],[1.45,2.65,0]]){const badge=mesh(new T.TorusGeometry(1,.18,8,32),metal,to3(p.badge,3.1),'toyota-elliptical-emblem');badge.scale.set(rx,ry,1);badge.rotation.z=rotation;}}else{const badge=mesh(new T.SphereGeometry(1,24,16),metal,to3(p.badge,3),'brand-emblem');badge.scale.set(s.nose==='ford'?6:4.5,s.nose==='ford'?2.5:4.5,1);const centre=mesh(new T.SphereGeometry(1,20,12),s.nose==='ford'?mat('#244b73',.26,{metalness:.3}):trim,to3(p.badge,4),'emblem-inset');centre.scale.set(s.nose==='ford'?5.1:3.6,1.8,.5);}}
+    if(s.nose==='ford'&&['focus','kuga'].includes(s.id)){
+      const canvas=document.createElement('canvas');canvas.width=256;canvas.height=96;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,256,96);ctx.fillStyle='#f5f5ef';ctx.font='italic bold 62px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Ford',128,51);const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
+      const word=mesh(new T.PlaneGeometry(9.8,3.6),new T.MeshBasicMaterial({map:texture,transparent:true,depthWrite:false,side:T.DoubleSide}),to3(p.badge,4.65),'ford-script-emblem');word.castShadow=false;word.receiveShadow=false;
+    }
     if(s.id.startsWith('fox-')&&!['fox-b','fox-c'].includes(s.id)){lamps.push(line([[-.94,p.bar||.65],[0,p.bar||.65],[.94,p.bar||.65]],1.15,led,1.9));}
     if(s.id==='fox-c')for(const side of [-1,1]){
       front([[side*.92,.54],[side*.95,.53],[side*.90,.20],[side*.87,.20]],trim,.8);
@@ -133,7 +177,8 @@
       for(const side of [-1,1])tube([[side*W*.31,H*.245,rearZ(side*W*.31,H*.245)-2],[side*W*.40,H*.245,rearZ(side*W*.40,H*.245)-2]],.9,red);
     }
     // The name also acts as a testable vehicle identity when viewed from the front/rear.
-    const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#e4e6e2';ctx.fillRect(0,0,512,160);ctx.fillStyle='#222b31';ctx.textAlign='center';ctx.font='bold 91px sans-serif';ctx.fillText('R'+s.id.replace(/[^a-z]/g,'').slice(0,2).toUpperCase()+'-2026',256,118,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.65});for(const side of [-1,1]){const plateY=side>0?H*(s.id==='fox-c'?.325:.25):H*(s.id==='fox-b'?.26:s.id==='fox-c'?.275:.36);if(side>0&&formedGrille)box([0,plateY,frontZ(0,plateY)-1.8],[7,13,4.4],trim,.5);const o=mesh(new T.PlaneGeometry(34,12),material,[0,plateY,side>0?frontZ(0,plateY)+(formedGrille?1.2:4.4):rearZ(0,plateY)-2.5],'model-name-plate');if(side<0)o.rotation.y=Math.PI;}
+    const plateNumber={focus:'BTV-5186',kuga:'BKU-2753',altis:'BTA-3986'}[s.id]||'B1-2026';
+    const c=document.createElement('canvas');c.width=512;c.height=160;const ctx=c.getContext('2d');ctx.fillStyle='#f2f2ed';ctx.fillRect(0,0,512,160);ctx.fillStyle='#202326';ctx.textAlign='center';ctx.font='bold 76px Arial';ctx.fillText(plateNumber,256,111,480);const texture=new T.CanvasTexture(c);texture.colorSpace=T.SRGBColorSpace;const material=new T.MeshStandardMaterial({map:texture,roughness:.68});for(const side of [-1,1]){const plateY=side>0?H*(s.id==='fox-c'?.325:.25):H*(s.id==='fox-b'?.26:s.id==='fox-c'?.275:.36);if(side>0&&formedGrille)box([0,plateY,frontZ(0,plateY)-1.8],[7,13,4.4],trim,.5);const o=mesh(new T.PlaneGeometry(34,12),material,[0,plateY,side>0?frontZ(0,plateY)+(formedGrille?1.2:4.4):rearZ(0,plateY)-2.5],'taiwan-style-license-plate');if(side<0)o.rotation.y=Math.PI;}
     const rearBand=p.tailOutline||{focus:[[.24,.63],[.68,.63],[.94,.68],[.90,.59],[.69,.54]],altis:[[.24,.64],[.70,.63],[.94,.67],[.88,.57],[.58,.54]],sentra:[[.23,.64],[.73,.63],[.93,.67],[.88,.55],[.61,.53]],kicks:[[.30,.75],[.66,.76],[.94,.79],[.91,.66],[.60,.62]],kuga:[[.23,.68],[.69,.68],[.94,.72],[.91,.61],[.59,.60]],'corolla-cross':[[.22,.71],[.67,.71],[.94,.74],[.92,.64],[.60,.63]]}[s.id];
     if(p.tailPocketContours)for(const contour of p.tailPocketContours)poly(contour.map(([x,y])=>[x*W*.45,y*H]),trim,(x,y)=>tailSurface(x,y,s.id==='fox-b'?1:.6),'tail-pocket-back');
     for(const side of [-1,1]){
@@ -155,6 +200,15 @@
           const tile=[];for(let corner=0;corner<4;corner++){const angle=corner*Math.PI/2,cx=x+(corner===0||corner===3?.010:-.010),cy=y+(corner<2?.002:-.002);for(let k=0;k<=3;k++){const a=angle+k/3*Math.PI/2;tile.push([cx+Math.cos(a)*.003,cy+Math.sin(a)*.002]);}}
           smallRearOptic(tile.map(([x,y])=>[side*x,y]),red,1.8);
         }
+        continue;
+      }
+      if(['focus','altis','kuga'].includes(s.id)){
+        const housing={focus:[[.39,.694],[.91,.716],[.965,.689],[.955,.570],[.88,.554],[.66,.590],[.42,.608]],altis:[[.30,.666],[.89,.695],[.955,.669],[.91,.590],[.79,.572],[.55,.595],[.33,.607]],kuga:[[.30,.717],[.905,.750],[.965,.719],[.955,.622],[.86,.601],[.61,.634],[.32,.652]]}[s.id];
+        const lamp=housing.map(([x,y])=>tailPoint([side*x,y]));tailLayer(lamp,rearLampHousing,.42,'model-specific-rear-lamp-housing');
+        const blade={focus:[[.43,.671],[.89,.696],[.935,.680],[.93,.657],[.72,.626],[.48,.632]],altis:[[.34,.647],[.86,.675],[.916,.655],[.86,.632],[.64,.615],[.37,.624]],kuga:[[.36,.696],[.89,.728],[.927,.707],[.856,.684],[.62,.666],[.38,.672]]}[s.id].map(([x,y])=>[side*x,y]);
+        tailLayer(blade.map(([x,y])=>tailPoint([x,y])),red,.78,'integrated-red-rear-light-blade');
+        const inner={focus:[[.867,.667],[.938,.678],[.946,.598],[.896,.585]],altis:[[.835,.642],[.915,.658],[.918,.625],[.865,.606]],kuga:[[.865,.700],[.94,.714],[.944,.645],[.89,.632]]}[s.id].map(([x,y])=>[side*x,y]);
+        tailLayer(inner.map(([x,y])=>tailPoint([x,y])),red,.86,'outer-wrap-red-tail-light');
         continue;
       }
       const contour=rearBand.map(([x,y])=>[side*x*W*.45,y*H]),tailZ=(x,y)=>rearZ(x,y)-.45;poly(contour,darkMetal,tailZ,'tail-smoke-housing');poly(contour.map(([x,y])=>[x,y-(s.id==='model-3'?.35:1)]),red,(x,y)=>tailZ(x,y)-.45,'tail-'+p.tailStyle);tube(contour.slice(0,3).map(([x,y])=>[x,y,tailZ(x,y)-1]),.75,red,root,true);}
