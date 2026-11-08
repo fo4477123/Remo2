@@ -5,11 +5,13 @@
   led.userData.vehicleHeadlight=true;
   function cloneLights(group){const lamps=[],materials=new Map();group.traverse(o=>{if(o.isMesh&&o.material.userData.vehicleHeadlight){if(!materials.has(o.material))materials.set(o.material,o.material.clone());o.material=materials.get(o.material);lamps.push(o);}});return lamps;}
   const shapes={
-    focus:{cabin:[[-.465,.685,.435],[-.344,.92,.354],[-.13,1,.351],[.047,.95,.36],[.245,.652,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],crease:3.8,panelDepth:4.2,spokes:5,wheelRadius:38,bodyHandles:true,productionPillars:true},
-    altis:{cabin:[[-.332,.656,.425],[-.179,.918,.355],[-.068,.98,.35],[.039,.945,.354],[.248,.653,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],crease:2.4,panelDepth:3.0,spokes:10,wheelRadius:35,bodyHandles:true,productionPillars:true},
+    // Separate roof volumes and rear closures keep the hatchback, sedan and
+    // SUV from inheriting the same generic side silhouette.
+    focus:{cabin:[[-.47,.665,.435],[-.325,.935,.354],[-.115,1,.351],[.055,.955,.36],[.245,.665,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],sideSection:[[0,.925],[.18,.965],[.42,.976],[.69,1],[.84,.99],[1,.925]],crease:1.4,panelDepth:1.6,hoodSection:[[0,3.7],[.35,4.4],[.72,2.2],[1,-2.4]],spokes:5,wheelRadius:38,bodyHandles:true,productionPillars:true},
+    altis:{cabin:[[-.315,.658,.425],[-.205,.916,.355],[-.075,.98,.35],[.045,.945,.354],[.255,.655,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],sideSection:[[0,.945],[.18,.98],[.43,.987],[.7,1],[.86,.985],[1,.92]],crease:1.0,panelDepth:1.2,hoodSection:[[0,2.8],[.3,3.8],[.72,2.5],[1,-2.0]],spokes:10,wheelRadius:35,bodyHandles:true,productionPillars:true},
     sentra:{cabin:[[-.341,.654,.423],[-.185,.949,.361],[-.067,1,.354],[.030,.981,.355],[.258,.656,.439]],belt:[[-.5,.632],[-.35,.685],[-.18,.668],[.14,.646],[.32,.626],[.5,.612]],width:[[-.5,.94],[-.42,.994],[-.29,1],[-.04,.973],[.24,1],[.37,.987],[.5,.947]],crease:1.9,spokes:5},
     kicks:{cabin:[[-.479,.763,.430],[-.349,.975,.356],[-.12,1,.348],[.027,.978,.354],[.233,.662,.430]],belt:[[-.5,.72],[-.36,.755],[-.22,.717],[0,.687],[.23,.661],[.38,.646],[.5,.628]],width:[[-.5,.925],[-.40,.984],[-.30,1],[-.08,.968],[.21,1],[.38,.975],[.5,.932]],crease:2.4,spokes:10},
-    kuga:{cabin:[[-.474,.716,.427],[-.335,.94,.365],[-.1,1,.362],[.045,.95,.363],[.262,.651,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],crease:3.2,panelDepth:4.0,spokes:10,wheelRadius:39,bodyHandles:true,productionPillars:true},
+    kuga:{cabin:[[-.478,.724,.427],[-.382,.948,.365],[-.14,1,.362],[.045,.962,.363],[.275,.690,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],sideSection:[[0,.99],[.18,1],[.43,.982],[.68,1],[.86,.985],[1,.925]],crease:1.5,panelDepth:1.8,hoodSection:[[0,4.1],[.34,4.8],[.75,3.0],[1,-2.4]],spokes:10,wheelRadius:39,bodyHandles:true,productionPillars:true},
     'corolla-cross':{cabin:[[-.482,.755,.435],[-.364,.968,.371],[-.12,1,.363],[.045,.982,.366],[.252,.684,.443]],belt:[[-.5,.716],[-.35,.743],[-.15,.725],[.14,.704],[.31,.688],[.5,.655]],width:[[-.5,.939],[-.42,.989],[-.295,1],[-.05,.977],[.22,1],[.38,.986],[.5,.947]],crease:2.0,spokes:5}
   };
   // Shape-preserving Hermite interpolation keeps each photographed silhouette independent.
@@ -57,9 +59,9 @@
       width(z)*sample(shape.sideSection,Math.max(0,Math.min(1,v)))
       +1.4*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/48,2))))*Math.exp(-Math.pow((v-.63)/.32,2))
       -(s.id==='fox-b'?4:3.5)*Math.exp(-Math.pow((v-(.29+.10*Math.exp(-Math.pow((z+A*.7)/70,2))))/.24,2))*Math.exp(-Math.pow(z/(A*.92),4)):
-      width(z)*(.91+.09*Math.sin(v*Math.PI*.79))-(shape.crease+2.4)*Math.pow(Math.sin(v*Math.PI),2)+3.3*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/46,2))))*Math.sin(v*Math.PI)
-      -(shape.panelDepth||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.29+.13*Math.exp(-Math.pow((z+A*.7)/60,2)):.34))/.20,2))*Math.exp(-Math.pow(z/(A*.83),6))
-      +(shape.shoulder||cfg.shoulder||0)*Math.exp(-Math.pow((v-(shape.sectionedBody?.76-.12*z/L:.80))/.105,2))*Math.exp(-Math.pow(z/(L*.46),6));
+      width(z)*(shape.sideSection?sample(shape.sideSection,v):(.975+.025*Math.sin(v*Math.PI*.79)))-(shape.crease||0)*.32*Math.pow(Math.sin(v*Math.PI),2)+4.1*Math.max(...[-A,A].map(a=>Math.exp(-Math.pow((z-a)/43,2))))*Math.sin(v*Math.PI)
+      -(shape.panelDepth||0)*.45*Math.exp(-Math.pow((v-(shape.sectionedBody?.29+.13*Math.exp(-Math.pow((z+A*.7)/60,2)):.34))/.22,2))*Math.exp(-Math.pow(z/(A*.83),6))
+      +(shape.shoulder||cfg.shoulder||0)*.42*Math.exp(-Math.pow((v-(shape.sectionedBody?.76-.12*z/L:.80))/.13,2))*Math.exp(-Math.pow(z/(L*.46),6));
     const hoodCrown=(z,u)=>{const a=Math.min(1,Math.abs(u)),t=Math.max(0,Math.min(1,(z/L-.39)/.11)),section=sample(shape.hoodSection||[[0,2.5],[.78,4],[1,-1.5]],a);return section*(1-t)+(1.3*(1-u*u)-1.5*Math.pow(u,4))*t;};
     const topY=(z,u)=>(shape.bonnet&&z/L>=shape.bonnet[0][0]?H*sample(shape.bonnet,z/L):belt(z))+(shape.sectionedBody?(z<0?1.5*(1-u*u)-1.5*Math.pow(u,4):hoodCrown(z,u)):3.5*(1-u*u)-5*Math.pow(Math.abs(u),5))+(s.id==='model-3'?Math.max(0,(z/L-.28)/.22)*(-8*(1-u*u)+12*Math.pow(Math.abs(u),4)):0);
     // Continuous curved body skin, separately formed wheel shoulders, recessed sill and hood crown.
@@ -191,7 +193,8 @@
       // Body creases follow the real rising belt line, with long lower-door concavity.
       if(!shape.sectionedBody){
         tube(Array.from({length:30},(_,i)=>{const z=-L*.39+L*.77*i/29,v=.80;return[side*(sideX(z,v)+.25),19+(edge(z)-19)*v,z];}),.25,paint);
-        tube(Array.from({length:22},(_,i)=>{const z=-L*.30+L*.59*i/21;return[side*(sideX(z,.18)+.3),19+(edge(z)-19)*.18,z];}),suv?2:1.2,suv?trim:paint);
+        // The lower door panel is modeled by the continuous body skin. Avoid
+        // a separate tube here: it reads as a floating rail between wheel arches.
       }else{
         patch(48,6,(t,u)=>{const z=-A+R+4+t*(2*A-2*R-8),v=u*.095;return[side*(sideX(z,v)+.45),19+(edge(z)-19)*v,z];},trim,'formed-rocker-cladding');
       }
