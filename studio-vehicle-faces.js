@@ -203,15 +203,15 @@
         continue;
       }
       if(['focus','altis','kuga'].includes(s.id)){
-        // Kuga's lamp wraps down the rear quarter. A horizontal hatchback
-        // blade made the SUV read as the same generic rear as Focus/Altis.
+        // Kuga uses a wide, horizontal two-piece lamp that wraps around the
+        // quarter into the tailgate, not a vertical SUV lamp.
         if(s.id==='kuga'){
-          const outer=[[.868,.745],[.946,.742],[.955,.713],[.947,.666],[.936,.608],[.918,.555],[.891,.531],[.850,.545],[.861,.590],[.875,.652],[.878,.706]];
-          tailLayer(outer.map(([x,y])=>tailPoint([side*x,y])),rearLampHousing,.48,'kuga-vertical-rear-lamp-housing');
-          const redBlade=[[.875,.727],[.936,.724],[.941,.701],[.934,.661],[.920,.611],[.904,.568],[.891,.550],[.866,.559],[.876,.607],[.887,.659],[.889,.703]];
-          tailLayer(redBlade.map(([x,y])=>tailPoint([side*x,y])),red,.86,'kuga-vertical-wraparound-tail-lamp');
-          const clearOptic=[[.884,.650],[.914,.645],[.919,.623],[.904,.601],[.878,.609]];
-          tailLayer(clearOptic.map(([x,y])=>tailPoint([side*x,y])),led,.96,'kuga-reverse-light');
+          const outer=[[.34,.716],[.46,.741],[.70,.748],[.91,.739],[.954,.715],[.956,.680],[.92,.654],[.74,.647],[.53,.660],[.38,.675]];
+          tailLayer(outer.map(([x,y])=>tailPoint([side*x,y])),rearLampHousing,.42,'kuga-horizontal-wrap-lamp-housing');
+          const redBlade=[[.37,.706],[.49,.727],[.72,.734],[.91,.727],[.939,.708],[.941,.685],[.91,.670],[.74,.665],[.56,.674],[.40,.686]];
+          tailLayer(redBlade.map(([x,y])=>tailPoint([side*x,y])),red,.82,'kuga-integrated-red-tail-light');
+          const clearOptic=[[.44,.697],[.56,.707],[.73,.712],[.89,.706],[.91,.695],[.88,.687],[.72,.687],[.57,.692]];
+          tailLayer(clearOptic.map(([x,y])=>tailPoint([side*x,y])),led,.94,'kuga-tail-lamp-light-guide');
           continue;
         }
         const housing={focus:[[.405,.702],[.916,.708],[.951,.689],[.941,.644],[.887,.615],[.66,.616],[.423,.625]],altis:[[.315,.682],[.891,.690],[.935,.668],[.905,.635],[.858,.611],[.64,.613],[.342,.624]],kuga:[[.325,.735],[.902,.741],[.941,.715],[.921,.682],[.866,.664],[.63,.669],[.365,.678]]}[s.id];
