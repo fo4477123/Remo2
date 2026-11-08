@@ -15,7 +15,8 @@
   const inside=(p,poly)=>{let on=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++)if((poly[i][1]>p[1])!==(poly[j][1]>p[1])&&p[0]<(poly[j][0]-poly[i][0])*(p[1]-poly[i][1])/(poly[j][1]-poly[i][1])+poly[i][0])on=!on;return on;};
   function tailHeight(profile,y){const anchor=profile.tailHeightAnchor||0;return anchor+(y-anchor)*(profile.tailHeightScale||1)-(profile.tailPocketShift||0);}
   function build({s,root,mesh,box,tube,rod,poly,frontZ,rearZ,paint,trim,metal,darkMetal,red,led,lamps}){
-    const p=profiles[s.id],W=s.width,H=s.height,L=s.length,scale=a=>[a[0]*W*.45,a[1]*H*(s.body==='sedan'||s.body==='hatch'?.90:1)],to3=(a,depth=1)=>{const [x,y]=scale(a);return[x,y,frontZ(x,y)+depth];},rect=(cx,cy,w,h)=>[[cx-w/2,cy+h/2],[cx+w/2,cy+h/2],[cx+w/2,cy-h/2],[cx-w/2,cy-h/2]];
+    const p=profiles[s.id],W=s.width,H=s.height,L=s.length,scale=a=>[a[0]*W*.45,a[1]*H*(s.body==='sedan'||s.body==='hatch'?.90:1)],to3=(a,depth=1)=>{const [x,y]=scale(a);return[x,y,frontZ(x,y)+depth];},rect=(cx,cy,w,h)=>[[cx-w/2,cy+h/2],[cx+w/2,cy+h/2],[cx+w/2,cy-h/2],[cx-w/2,cy-h/2]],tailRed=red.clone();
+    tailRed.color.set('#76151c');tailRed.emissive.set('#260407');tailRed.emissiveIntensity=.08;tailRed.roughness=.28;tailRed.metalness=.08;tailRed.clearcoat=.82;tailRed.clearcoatRoughness=.12;
     const front=(points,m,depth=1)=>poly(points.map(scale),m,(x,y)=>frontZ(x,y)+depth),line=(points,r,m,depth=2)=>tube(points.flatMap((a,i)=>i?Array.from({length:8},(_,k)=>{const b=points[i-1],t=(k+1)/8;return to3([b[0]+(a[0]-b[0])*t,b[1]+(a[1]-b[1])*t],depth);}):[to3(a,depth)]),r,m,root,true);
     const tailPoint=([x,y])=>[x*W*.45,tailHeight(p,y)*H],tailSurface=(x,y,depth)=>rearZ(x,y)+(p.tailOpticInset||0)-depth;
     const rearLampHousing=darkMetal;
@@ -202,24 +203,43 @@
         }
         continue;
       }
-      if(['focus','altis','kuga'].includes(s.id)){
+      if(s.id==='altis'){
+        // Corolla Altis sedan lamps are split by the trunk shut line: a slim
+        // outer quarter lamp turns around the corner, with a narrow inner
+        // blade continuing onto the boot lid. The old single broad polygon
+        // read as a pair of rectangular stickers from the rear.
+        const outer=[[.55,.704],[.66,.716],[.88,.712],[.956,.691],[.945,.659],[.895,.641],[.76,.651],[.61,.672]];
+        smallRearOptic(outer.map(([x,y])=>[side*x,y]),rearLampHousing,.42);
+        const redOuter=[[.59,.695],[.70,.704],[.88,.701],[.936,.687],[.924,.668],[.88,.655],[.77,.661],[.64,.679]];
+        smallRearOptic(redOuter.map(([x,y])=>[side*x,y]),tailRed,.82);
+        const inner=[[.345,.692],[.555,.702],[.615,.690],[.61,.669],[.55,.657],[.365,.666]];
+        smallRearOptic(inner.map(([x,y])=>[side*x,y]),rearLampHousing,.44);
+        const redInner=[[.37,.686],[.545,.695],[.587,.686],[.58,.675],[.54,.668],[.38,.674]];
+        smallRearOptic(redInner.map(([x,y])=>[side*x,y]),tailRed,.84);
+        const bridge=[[.535,.690],[.735,.697],[.758,.686],[.735,.677],[.55,.679]];
+        smallRearOptic(bridge.map(([x,y])=>[side*x,y]),tailRed,.88);
+        const clear=[ [.414,.681],[.50,.686],[.56,.683],[.55,.678],[.48,.676] ];
+        smallRearOptic(clear.map(([x,y])=>[side*x,y]),led,.96);
+        continue;
+      }
+      if(['focus','kuga'].includes(s.id)){
         // Kuga uses a wide, horizontal two-piece lamp that wraps around the
         // quarter into the tailgate, not a vertical SUV lamp.
         if(s.id==='kuga'){
           const outer=[[.34,.716],[.46,.741],[.70,.748],[.91,.739],[.954,.715],[.956,.680],[.92,.654],[.74,.647],[.53,.660],[.38,.675]];
-          tailLayer(outer.map(([x,y])=>tailPoint([side*x,y])),rearLampHousing,.42,'kuga-horizontal-wrap-lamp-housing');
+          smallRearOptic(outer.map(([x,y])=>[side*x,y]),rearLampHousing,.42);
           const redBlade=[[.37,.706],[.49,.727],[.72,.734],[.91,.727],[.939,.708],[.941,.685],[.91,.670],[.74,.665],[.56,.674],[.40,.686]];
-          tailLayer(redBlade.map(([x,y])=>tailPoint([side*x,y])),red,.82,'kuga-integrated-red-tail-light');
+          smallRearOptic(redBlade.map(([x,y])=>[side*x,y]),tailRed,.82);
           const clearOptic=[[.44,.697],[.56,.707],[.73,.712],[.89,.706],[.91,.695],[.88,.687],[.72,.687],[.57,.692]];
-          tailLayer(clearOptic.map(([x,y])=>tailPoint([side*x,y])),led,.94,'kuga-tail-lamp-light-guide');
+          smallRearOptic(clearOptic.map(([x,y])=>[side*x,y]),led,.94);
           continue;
         }
-        const housing={focus:[[.405,.702],[.916,.708],[.951,.689],[.941,.644],[.887,.615],[.66,.616],[.423,.625]],altis:[[.315,.682],[.891,.690],[.935,.668],[.905,.635],[.858,.611],[.64,.613],[.342,.624]],kuga:[[.325,.735],[.902,.741],[.941,.715],[.921,.682],[.866,.664],[.63,.669],[.365,.678]]}[s.id];
-        const lamp=housing.map(([x,y])=>tailPoint([side*x,y]));tailLayer(lamp,rearLampHousing,.42,'model-specific-rear-lamp-housing');
-        const blade={focus:[[.43,.671],[.89,.696],[.935,.680],[.93,.657],[.72,.626],[.48,.632]],altis:[[.34,.647],[.86,.675],[.916,.655],[.86,.632],[.64,.615],[.37,.624]],kuga:[[.36,.696],[.89,.728],[.927,.707],[.856,.684],[.62,.666],[.38,.672]]}[s.id].map(([x,y])=>[side*x,y]);
-        tailLayer(blade.map(([x,y])=>tailPoint([x,y])),red,.78,'integrated-red-rear-light-blade');
-        const inner={focus:[[.867,.667],[.938,.678],[.946,.598],[.896,.585]],altis:[[.835,.642],[.915,.658],[.918,.625],[.865,.606]],kuga:[[.865,.700],[.94,.714],[.944,.645],[.89,.632]]}[s.id].map(([x,y])=>[side*x,y]);
-        tailLayer(inner.map(([x,y])=>tailPoint([x,y])),red,.86,'outer-wrap-red-tail-light');
+        const housing={focus:[[.405,.702],[.916,.708],[.951,.689],[.941,.644],[.887,.615],[.66,.616],[.423,.625]],kuga:[[.325,.735],[.902,.741],[.941,.715],[.921,.682],[.866,.664],[.63,.669],[.365,.678]]}[s.id];
+        smallRearOptic(housing.map(([x,y])=>[side*x,y]),rearLampHousing,.42);
+        const blade={focus:[[.43,.671],[.89,.696],[.935,.680],[.93,.657],[.72,.626],[.48,.632]],kuga:[[.36,.696],[.89,.728],[.927,.707],[.856,.684],[.62,.666],[.38,.672]]}[s.id].map(([x,y])=>[side*x,y]);
+        smallRearOptic(blade,tailRed,.78);
+        const inner={focus:[[.867,.667],[.938,.678],[.946,.598],[.896,.585]],kuga:[[.865,.700],[.94,.714],[.944,.645],[.89,.632]]}[s.id].map(([x,y])=>[side*x,y]);
+        smallRearOptic(inner,tailRed,.86);
         continue;
       }
       const contour=rearBand.map(([x,y])=>[side*x*W*.45,y*H]),tailZ=(x,y)=>rearZ(x,y)-.45;poly(contour,darkMetal,tailZ,'tail-smoke-housing');poly(contour.map(([x,y])=>[x,y-(s.id==='model-3'?.35:1)]),red,(x,y)=>tailZ(x,y)-.45,'tail-'+p.tailStyle);tube(contour.slice(0,3).map(([x,y])=>[x,y,tailZ(x,y)-1]),.75,red,root,true);}

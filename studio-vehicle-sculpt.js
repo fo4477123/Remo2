@@ -7,11 +7,11 @@
   const shapes={
     // Separate roof volumes and rear closures keep the hatchback, sedan and
     // SUV from inheriting the same generic side silhouette.
-    focus:{cabin:[[-.47,.665,.435],[-.325,.935,.354],[-.115,1,.351],[.055,.955,.36],[.245,.665,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],sideSection:[[0,.925],[.18,.965],[.42,.976],[.69,1],[.84,.99],[1,.925]],shoulderLine:[[-.5,.73],[-.34,.78],[-.12,.75],[.12,.70],[.34,.77],[.5,.81]],shoulderAmp:2.1,characterLine:[[-.5,.52],[-.30,.57],[-.06,.52],[.24,.54],[.5,.63]],characterAmp:1.2,archBulge:3.5,doorSeams:[-.252,.004,.225],bPillar:.004,bPillarSpan:7,cPillar:.70,cPillarSpan:8,crease:1.4,panelDepth:2.5,hoodSection:[[0,3.7],[.35,4.4],[.72,2.2],[1,-2.4]],spokes:5,wheelRadius:38,bodyHandles:true,productionPillars:true},
-    altis:{cabin:[[-.315,.658,.425],[-.205,.916,.355],[-.075,.98,.35],[.045,.945,.354],[.255,.655,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],sideSection:[[0,.945],[.18,.98],[.43,.987],[.7,1],[.86,.985],[1,.92]],shoulderLine:[[-.5,.68],[-.33,.70],[-.08,.69],[.18,.68],[.38,.72],[.5,.74]],shoulderAmp:2.0,characterLine:[[-.5,.47],[-.28,.50],[-.03,.49],[.27,.50],[.5,.55]],characterAmp:1.3,archBulge:2.9,doorSeams:[-.268,-.034,.235],bPillar:-.034,bPillarSpan:9,cPillar:.70,cPillarSpan:10,crease:1.0,panelDepth:2.5,hoodSection:[[0,2.8],[.3,3.8],[.72,2.5],[1,-2.0]],spokes:10,wheelRadius:35,bodyHandles:true,productionPillars:true},
+    focus:{cabin:[[-.47,.735,.435],[-.365,.918,.365],[-.115,1,.351],[.055,.955,.36],[.245,.665,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],sideSection:[[0,.915],[.18,.966],[.42,.98],[.69,1],[.84,.99],[1,.915]],shoulderLine:[[-.5,.735],[-.30,.755],[-.08,.750],[.18,.750],[.38,.765],[.5,.785]],shoulderAmp:4.8,characterLine:[[-.5,.50],[-.30,.525],[-.05,.545],[.24,.560],[.5,.590]],characterAmp:4.2,archBulge:4.2,doorSeams:[-.252,.004,.225],bPillar:.004,bPillarSpan:7,cPillar:.70,cPillarSpan:8,crease:1.6,panelDepth:2.8,hoodSection:[[0,3.7],[.35,4.4],[.72,2.2],[1,-2.4]],spokes:5,wheelRadius:38,bodyHandles:true,productionPillars:true},
+    altis:{cabin:[[-.315,.658,.425],[-.205,.916,.355],[-.075,.98,.35],[.045,.945,.354],[.255,.655,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],sideSection:[[0,.93],[.18,.98],[.43,.99],[.7,1],[.86,.985],[1,.91]],shoulderLine:[[-.5,.675],[-.30,.695],[-.08,.690],[.18,.690],[.38,.710],[.5,.735]],shoulderAmp:4.0,characterLine:[[-.5,.465],[-.28,.490],[-.03,.495],[.27,.510],[.5,.550]],characterAmp:3.2,archBulge:3.4,doorSeams:[-.268,-.034,.235],bPillar:-.034,bPillarSpan:9,cPillar:.70,cPillarSpan:10,crease:1.1,panelDepth:2.8,hoodSection:[[0,2.8],[.3,3.8],[.72,2.5],[1,-2.0]],spokes:10,wheelRadius:35,bodyHandles:true,productionPillars:true},
     sentra:{cabin:[[-.341,.654,.423],[-.185,.949,.361],[-.067,1,.354],[.030,.981,.355],[.258,.656,.439]],belt:[[-.5,.632],[-.35,.685],[-.18,.668],[.14,.646],[.32,.626],[.5,.612]],width:[[-.5,.94],[-.42,.994],[-.29,1],[-.04,.973],[.24,1],[.37,.987],[.5,.947]],crease:1.9,spokes:5},
     kicks:{cabin:[[-.479,.763,.430],[-.349,.975,.356],[-.12,1,.348],[.027,.978,.354],[.233,.662,.430]],belt:[[-.5,.72],[-.36,.755],[-.22,.717],[0,.687],[.23,.661],[.38,.646],[.5,.628]],width:[[-.5,.925],[-.40,.984],[-.30,1],[-.08,.968],[.21,1],[.38,.975],[.5,.932]],crease:2.4,spokes:10},
-    kuga:{cabin:[[-.478,.724,.427],[-.382,.948,.365],[-.14,1,.362],[.045,.962,.363],[.275,.690,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],sideSection:[[0,.99],[.18,1],[.43,.982],[.68,1],[.86,.985],[1,.925]],shoulderLine:[[-.5,.73],[-.33,.73],[-.09,.69],[.18,.68],[.39,.71],[.5,.73]],shoulderAmp:2.3,characterLine:[[-.5,.49],[-.30,.52],[-.02,.50],[.28,.50],[.5,.57]],characterAmp:1.4,archBulge:4.2,doorSeams:[-.238,-.016,.242],bPillar:-.016,bPillarSpan:12,cPillar:.76,cPillarSpan:15,crease:1.5,panelDepth:2.5,hoodSection:[[0,4.1],[.34,4.8],[.75,3.0],[1,-2.4]],spokes:10,wheelRadius:39,bodyHandles:true,productionPillars:true},
+    kuga:{cabin:[[-.478,.785,.427],[-.382,.962,.365],[-.14,1,.362],[.045,.962,.363],[.275,.690,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],sideSection:[[0,.985],[.18,1],[.43,.982],[.68,1],[.86,.985],[1,.915]],shoulderLine:[[-.5,.705],[-.32,.720],[-.08,.700],[.18,.695],[.39,.715],[.5,.745]],shoulderAmp:5.5,characterLine:[[-.5,.49],[-.30,.515],[-.02,.525],[.28,.530],[.5,.570]],characterAmp:4.8,archBulge:5.2,doorSeams:[-.238,-.016,.242],bPillar:-.016,bPillarSpan:12,cPillar:.76,cPillarSpan:15,crease:1.7,panelDepth:3.2,hoodSection:[[0,4.1],[.34,4.8],[.75,3.0],[1,-2.4]],spokes:10,wheelRadius:39,bodyHandles:true,productionPillars:true},
     'corolla-cross':{cabin:[[-.482,.755,.435],[-.364,.968,.371],[-.12,1,.363],[.045,.982,.366],[.252,.684,.443]],belt:[[-.5,.716],[-.35,.743],[-.15,.725],[.14,.704],[.31,.688],[.5,.655]],width:[[-.5,.939],[-.42,.989],[-.295,1],[-.05,.977],[.22,1],[.38,.986],[.5,.947]],crease:2.0,spokes:5}
   };
   // Shape-preserving Hermite interpolation keeps each photographed silhouette independent.
@@ -21,7 +21,7 @@
   function smoothNormals(g){const p=g.attributes.position,n=g.attributes.normal,buckets=new Map();for(let i=0;i<p.count;i++){const key=[p.getX(i),p.getY(i),p.getZ(i)].map(v=>Math.round(v*1000)).join(',');if(!buckets.has(key))buckets.set(key,[]);buckets.get(key).push(i);}for(const ids of buckets.values()){if(ids.length<2)continue;const normal=new T.Vector3();for(const i of ids)normal.add(new T.Vector3(n.getX(i),n.getY(i),n.getZ(i)));normal.normalize();for(const i of ids)n.setXYZ(i,normal.x,normal.y,normal.z);}n.needsUpdate=true;}
   function build(s,color){
     const leather=mat(['fox-b','fox-c'].includes(s.id)?'#252b30':'#313a40',.82);
-    const root=new T.Group(),wheels=[],lamps=[],cfg={...looks[s.id],...B1_VEHICLE_FACES.profiles[s.id]},shape=shapes[s.id],L=s.length,W=s.width,H=s.height,A=s.axle/2,suv=['suv','crossover'].includes(s.body),R=shape.wheelRadius||(s.id==='fox-d'?39:suv?35:33),premiumPaint=['focus','altis','kuga'].includes(s.id),paint=new T.MeshPhysicalMaterial({color,roughness:shape.sectionedBody?.27:premiumPaint?.21:.24,metalness:shape.sectionedBody?.48:premiumPaint?.52:.34,clearcoat:1,clearcoatRoughness:.075,envMapIntensity:premiumPaint?1.8:1.35}),roofPaint=['sentra','kicks','fox-a','fox-b','fox-c','fox-d'].includes(s.id)?(shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#151b20',roughness:.26,metalness:.25,clearcoat:1}):trim):paint;
+    const root=new T.Group(),wheels=[],lamps=[],cfg={...looks[s.id],...B1_VEHICLE_FACES.profiles[s.id]},shape=shapes[s.id],L=s.length,W=s.width,H=s.height,A=s.axle/2,suv=['suv','crossover'].includes(s.body),R=shape.wheelRadius||(s.id==='fox-d'?39:suv?35:33),premiumPaint=['focus','altis','kuga'].includes(s.id),paint=new T.MeshPhysicalMaterial({color,roughness:shape.sectionedBody?.27:premiumPaint?.34:.24,metalness:shape.sectionedBody?.48:premiumPaint?.42:.34,clearcoat:premiumPaint?.72:.92,clearcoatRoughness:premiumPaint?.16:.11,envMapIntensity:premiumPaint?1.15:1.35}),roofPaint=['sentra','kicks','fox-a','fox-b','fox-c','fox-d'].includes(s.id)?(shape.sectionedBody?new T.MeshPhysicalMaterial({color:'#151b20',roughness:.26,metalness:.25,clearcoat:1}):trim):paint;
     paint.userData.noSelfShadow=true;root.name='sculpted-'+s.id;const parts={body:0,lamps:0,cabin:0,wheel:0};
     function mesh(g,m,p=[0,0,0],name='',parent=root){const o=new T.Mesh(g,m);o.position.set(...p);o.name=name;o.castShadow=!m.transparent;o.receiveShadow=!m.userData.noSelfShadow;parent.add(o);return o;}
     const box=(p,sz,m=paint,r=1,parent=root)=>{const g=new T.BoxGeometry(sz[0],sz[1],sz[2],r<.2?1:3,r<.2?1:3,r<.2?1:3),v=g.attributes.position,q=new T.Vector3(),c=new T.Vector3(),radius=Math.min(r,...sz.map(n=>n*.32));for(let i=0;i<v.count;i++){q.fromBufferAttribute(v,i);c.set(...sz.map((n,k)=>Math.max(-n/2+radius,Math.min(n/2-radius,q.getComponent(k)))));q.sub(c).normalize().multiplyScalar(radius).add(c);v.setXYZ(i,q.x,q.y,q.z);}g.computeVertexNormals();smoothNormals(g);return mesh(g,m,p,'bevelled-detail',parent);};
@@ -43,7 +43,7 @@
       const o=mesh(g,m,[0,0,0],name);o.material.side=T.DoubleSide;return o;}
 
     const profile=B1_VEHICLE_FACES.profiles[s.id],faceScale=['sedan','hatch'].includes(s.body)?.90:1,frontTop=H*Math.max(...profile.head.map(p=>p[1]))*faceScale+5,rearTop=H*(profile.tailOutline?Math.max(...profile.tailOutline.map(p=>p[1])):profile.rearH||.66)+5;
-    const belt=z=>{const base=H*sample(shape.belt,z/L),t=Math.max(0,Math.min(1,(Math.abs(z/L)-.28)/.22)),blend=t*t*(3-2*t);return base+(shape.sectionedBody?0:Math.max(0,(z>0?(s.id==='model-3'?0:frontTop):rearTop)-H*sample(shape.belt,z>0?.5:-.5))*blend);},width=z=>W/2*sample(shape.width,z/L),edge=z=>shape.sectionedBody?topY(z,1):belt(z)-5+(s.id==='model-3'?12*Math.max(0,(z/L-.28)/.22):0);
+    const belt=z=>{const base=H*sample(shape.belt,z/L),t=Math.max(0,Math.min(1,(Math.abs(z/L)-.28)/.22)),blend=t*t*(3-2*t);return base+(shape.sectionedBody?0:Math.max(0,(z>0?(s.id==='model-3'?0:frontTop):rearTop)-H*sample(shape.belt,z>0?.5:-.5))*blend);},width=z=>W/2*sample(shape.width,z/L),edge=z=>shape.sectionedBody?topY(z,1):belt(z)-2+(s.id==='model-3'?12*Math.max(0,(z/L-.28)/.22):0);
     // Both lights and coachwork project onto the same rounded end surface.
     const endInset=(x,y,sign=1)=>{const top=topY(sign*L/2,Math.min(1,Math.abs(x)/(width(sign*L/2)*.96))),v=Math.max(0,Math.min(1,(y-19)/(top-19)));
       if(shape.sectionedBody){
@@ -71,7 +71,7 @@
     // Set opening height in centimetres relative to the tyre, not as an
     // arbitrary fraction of the varying bumper / fender panel height.
     for(const vent of fenderVents)vent.hi=Math.min(.92,(2*R+(vent.z>0?8:7)-19)/(edge(vent.z)-19));
-    const zNodes=[...new Set([...Array.from({length:177},(_,i)=>-L/2+i/176*L),...fenderVents.flatMap(v=>[v.z-v.w/2,v.z+v.w/2])])].sort((a,b)=>a-b),vNodes=[...new Set([...Array.from({length:shape.sectionedBody?25:19},(_,i)=>i/(shape.sectionedBody?24:18)),...fenderVents.flatMap(v=>[v.lo,v.hi])])].sort((a,b)=>a-b);
+    const zNodes=[...new Set([...Array.from({length:273},(_,i)=>-L/2+i/272*L),...fenderVents.flatMap(v=>[v.z-v.w/2,v.z+v.w/2])])].sort((a,b)=>a-b),vNodes=[...new Set([...Array.from({length:shape.sectionedBody?33:31},(_,i)=>i/(shape.sectionedBody?32:30)),...fenderVents.flatMap(v=>[v.lo,v.hi])])].sort((a,b)=>a-b);
     const nodeAt=(nodes,t)=>{const n=t*(nodes.length-1),i=Math.min(nodes.length-2,Math.floor(n));return nodes[i]+(nodes[i+1]-nodes[i])*(n-i);};
     const sideSurface=(z,v,side,depth=0)=>{const bottom=archBase(z),y=bottom+(edge(z)-bottom)*v,sv=(y-19)/(edge(z)-19),x=side*(sideX(z,sv)-depth);return[x,y,noseZ(x,z,y)];};
     for(const side of [-1,1]){
@@ -99,7 +99,7 @@
     }
     for(const sign of [-1,1]){
       const integratedTail=sign<0&&shape.sectionedBody&&profile.tailPocket;
-      if(!shape.sectionedBody||sign<0&&!integratedTail){patch(20,42,(t,u)=>{const z=sign*L/2,a=u*2-1,y=19+(topY(z,a)-19)*t,x=a*sideX(z,(y-19)/(edge(z)-19));return[x,y,noseZ(x,z,y)];},paint,sign>0?'formed-front-bumper':'formed-rear-bumper');continue;}
+      if(!shape.sectionedBody||sign<0&&!integratedTail){patch(40,72,(t,u)=>{const z=sign*L/2,a=u*2-1,y=19+(topY(z,a)-19)*t,x=a*sideX(z,(y-19)/(edge(z)-19));return[x,y,noseZ(x,z,y)];},paint,sign>0?'formed-front-bumper':'formed-rear-bumper');continue;}
       // Triangulate real openings for the intake or tail-lamp pockets.
       const z=sign*L/2,outline=[];
       for(let i=0;i<=48;i++){const a=-1+2*i/48;outline.push(new T.Vector2(a*sideX(z,0),19));}
@@ -142,7 +142,7 @@
     const glassCrown=z=>shape.sectionedBody?8-6*Math.max(Math.exp(-Math.pow((z-rear)/22,2)),Math.exp(-Math.pow((z-front)/22,2))):8;
     const rearBlend=z=>shape.sectionedBody?Math.pow(Math.max(0,Math.min(1,(roofRear-z)/(roofRear-rear))),3):0;
     function roofAt(z,a){const p=cabin(z),x=a*p.w,b=rearBlend(z),end=cabin(rear),target=topY(rear,a*end.w/sideX(rear,1))+.25,y=p.h-glassCrown(z)*a*a+b*(target-(end.h-glassCrown(rear)*a*a));return[x,y,z+b*(noseZ(x,z,y)-z)];}
-    function glassSide(z,v,side){const p=cabin(z),x=side*(p.w+(width(z)*.916-p.w)*v+2.4*Math.sin(v*Math.PI)),b=rearBlend(z),base=(belt(z)+1)*(1-b)+(topY(z,x/sideX(z,1))+.25)*b,top=roofAt(z,side),y=top[1]+(base-top[1])*v;return[x,y,z+b*(noseZ(x,z,y)-z)];}
+    function glassSide(z,v,side){const p=cabin(z),x=side*(p.w+(width(z)*.916-p.w)*v+2.4*Math.sin(v*Math.PI)),b=rearBlend(z),base=(belt(z)-1)*(1-b)+(topY(z,x/sideX(z,1))+.25)*b,top=roofAt(z,side),y=top[1]+(base-top[1])*v;return[x,y,z+b*(noseZ(x,z,y)-z)];}
     for(const z of [rear,front])patch(3,32,(t,u)=>{const a=u*2-1,top=roofAt(z,a),x=sideX(z,1)*a,y=topY(z,a),end=[x,y,noseZ(x,z,y)];return top.map((v,i)=>v*(1-t)+end[i]*t);},shape.sectionedBody&&z===rear?trim:paint,'sealed-glazing-cowl');
     patch(18,32,(t,u)=>roofAt(rear+(roofRear-rear)*t,u*2-1),shape.sectionedBody?privacyGlass:glass,'rear-glass-'+s.id);
     if(shape.sectionedBody){
@@ -190,7 +190,10 @@
       }
       for(const [z,r,m]of (shape.sail?[]:[[bZ,2.4,trim],[rear+(roofRear-rear)*(cPillarAt+.03),1.5,roofPaint],[front-3,1.5,paint]]))tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,0,side)),1.05,roofPaint);
-      tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,1,side)),.7,['altis','kuga'].includes(s.id)?metal:trim);
+      // The lower glass run sits just inside the painted belt; the old bright
+      // full-width bead made the window look like a separate visor and could
+      // visibly overshoot the rear quarter in profile.
+      tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,.965,side)),.14,trim);
       // Body creases follow the real rising belt line, with long lower-door concavity.
       if(!shape.sectionedBody){
         // The shoulder is sculpted into the skin and follows each model's
@@ -225,9 +228,16 @@
           points.push(points[0]);tube(points,.075,trim);
           patch(4,20,(t,u)=>{const zz=z-5.8+11.6*u,yy=y-.65+1.3*t,v=(yy-19)/(edge(zz)-19),xx=side*(sideX(zz,v)+.10);return[xx,yy,noseZ(xx,zz,yy)];},paint,'flush-door-handle');
         }else if(shape.bodyHandles){
-          box([x+side*.55,y,z],[.7,2.6,11.5],darkMetal,.55);
-          box([x+side*1.25,y+.18,z],[.85,1.65,8.3],metal,.55);
-          box([x+side*1.62,y+.18,z],[.75,1.35,7.2],paint,.5);
+          // Production Focus/Kuga use conventional pull handles; the previous
+          // tiny three-layer bars read as flush EV handles at full-car scale.
+          if(['focus','kuga'].includes(s.id)){
+            const recess=mesh(new T.CapsuleGeometry(1.8,11,4,12),darkMetal,[x+side*.8,y,z],'recessed-pull-handle');recess.rotation.x=Math.PI/2;
+            const grip=mesh(new T.CapsuleGeometry(1.25,10,4,12),paint,[x+side*2.1,y+.35,z],'body-colour-pull-handle');grip.rotation.x=Math.PI/2;
+          }else{
+            box([x+side*.55,y,z],[.7,2.6,11.5],darkMetal,.55);
+            box([x+side*1.25,y+.18,z],[.85,1.65,8.3],metal,.55);
+            box([x+side*1.62,y+.18,z],[.75,1.35,7.2],paint,.5);
+          }
         }
         else box([x,y,z],[1.8,2.7,15],s.id==='model-3'?trim:s.id==='kicks'||s.id==='altis'?metal:paint,1);
       }
@@ -283,6 +293,13 @@
         // leaving separate rectangular patches floating over the side glass.
         for(const side of [-1,1])patch(48,8,(t,v)=>{const q=roofAt(roofRear+(rear-roofRear)*t,side*(.94+.06*v));q[0]+=side*.18;q[1]+=.22;q[2]-=.18;return q;},roofPaint,'rear-glazing-aero-blade');
         const stopLamp=tube(Array.from({length:41},(_,i)=>{const a=(i/40*2-1)*.55,q=foilAt(1,a,1);q[2]-=.45;return q;}),.35,red);stopLamp.name='spoiler-third-brake-lamp';stopLamp.userData.keep=true;
+      }else if(['focus','kuga'].includes(s.id)){
+        // These two body styles have a narrow tailgate roof spoiler tied into
+        // the roof edge. A cross-car box looked like a detached luggage rail.
+        const z=roofRear-3,span=s.id==='kuga'?.92:.88;
+        const wing=(u,depth=0)=>{const q=roofAt(z,u*span);return[q[0],q[1]+1.4+1.1*(1-u*u),q[2]-depth-5*(1-u*u)];};
+        patch(8,48,(v,u)=>wing(u*2-1,v*1.2),roofPaint,'formed-roof-spoiler-'+s.id);
+        patch(4,48,(v,u)=>{const q=wing(u*2-1,v*1.2);q[1]-=1.2;return q;},trim,'spoiler-underside-'+s.id);
       }else{const z=roofRear-4,h=cabin(z).h;box([0,h-.2,z],[W*.73,3.5,16],roofPaint,2);box([0,h-1,z-8],[W*.40,1.5,1.3],red,.4);}
     }
     if(shape.sectionedBody){
