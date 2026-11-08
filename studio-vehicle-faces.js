@@ -203,6 +203,17 @@
         continue;
       }
       if(['focus','altis','kuga'].includes(s.id)){
+        // Kuga's lamp wraps down the rear quarter. A horizontal hatchback
+        // blade made the SUV read as the same generic rear as Focus/Altis.
+        if(s.id==='kuga'){
+          const outer=[[.868,.745],[.946,.742],[.955,.713],[.947,.666],[.936,.608],[.918,.555],[.891,.531],[.850,.545],[.861,.590],[.875,.652],[.878,.706]];
+          tailLayer(outer.map(([x,y])=>tailPoint([side*x,y])),rearLampHousing,.48,'kuga-vertical-rear-lamp-housing');
+          const redBlade=[[.875,.727],[.936,.724],[.941,.701],[.934,.661],[.920,.611],[.904,.568],[.891,.550],[.866,.559],[.876,.607],[.887,.659],[.889,.703]];
+          tailLayer(redBlade.map(([x,y])=>tailPoint([side*x,y])),red,.86,'kuga-vertical-wraparound-tail-lamp');
+          const clearOptic=[[.884,.650],[.914,.645],[.919,.623],[.904,.601],[.878,.609]];
+          tailLayer(clearOptic.map(([x,y])=>tailPoint([side*x,y])),led,.96,'kuga-reverse-light');
+          continue;
+        }
         const housing={focus:[[.405,.702],[.916,.708],[.951,.689],[.941,.644],[.887,.615],[.66,.616],[.423,.625]],altis:[[.315,.682],[.891,.690],[.935,.668],[.905,.635],[.858,.611],[.64,.613],[.342,.624]],kuga:[[.325,.735],[.902,.741],[.941,.715],[.921,.682],[.866,.664],[.63,.669],[.365,.678]]}[s.id];
         const lamp=housing.map(([x,y])=>tailPoint([side*x,y]));tailLayer(lamp,rearLampHousing,.42,'model-specific-rear-lamp-housing');
         const blade={focus:[[.43,.671],[.89,.696],[.935,.680],[.93,.657],[.72,.626],[.48,.632]],altis:[[.34,.647],[.86,.675],[.916,.655],[.86,.632],[.64,.615],[.37,.624]],kuga:[[.36,.696],[.89,.728],[.927,.707],[.856,.684],[.62,.666],[.38,.672]]}[s.id].map(([x,y])=>[side*x,y]);
