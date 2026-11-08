@@ -7,11 +7,11 @@
   const shapes={
     // Separate roof volumes and rear closures keep the hatchback, sedan and
     // SUV from inheriting the same generic side silhouette.
-    focus:{cabin:[[-.47,.665,.435],[-.325,.935,.354],[-.115,1,.351],[.055,.955,.36],[.245,.665,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],sideSection:[[0,.925],[.18,.965],[.42,.976],[.69,1],[.84,.99],[1,.925]],crease:1.4,panelDepth:1.6,hoodSection:[[0,3.7],[.35,4.4],[.72,2.2],[1,-2.4]],spokes:5,wheelRadius:38,bodyHandles:true,productionPillars:true},
-    altis:{cabin:[[-.315,.658,.425],[-.205,.916,.355],[-.075,.98,.35],[.045,.945,.354],[.255,.655,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],sideSection:[[0,.945],[.18,.98],[.43,.987],[.7,1],[.86,.985],[1,.92]],crease:1.0,panelDepth:1.2,hoodSection:[[0,2.8],[.3,3.8],[.72,2.5],[1,-2.0]],spokes:10,wheelRadius:35,bodyHandles:true,productionPillars:true},
+    focus:{cabin:[[-.47,.665,.435],[-.325,.935,.354],[-.115,1,.351],[.055,.955,.36],[.245,.665,.438]],belt:[[-.5,.628],[-.35,.665],[-.15,.657],[.15,.638],[.32,.627],[.5,.594]],width:[[-.5,.946],[-.42,.995],[-.30,1],[-.1,.981],[.22,1],[.37,.99],[.5,.948]],sideSection:[[0,.925],[.18,.965],[.42,.976],[.69,1],[.84,.99],[1,.925]],doorSeams:[-.252,.004,.225],bPillar:.004,bPillarSpan:7,cPillar:.70,cPillarSpan:8,crease:1.4,panelDepth:1.6,hoodSection:[[0,3.7],[.35,4.4],[.72,2.2],[1,-2.4]],spokes:5,wheelRadius:38,bodyHandles:true,productionPillars:true},
+    altis:{cabin:[[-.315,.658,.425],[-.205,.916,.355],[-.075,.98,.35],[.045,.945,.354],[.255,.655,.438]],belt:[[-.5,.63],[-.34,.672],[-.12,.66],[.20,.644],[.35,.624],[.5,.595]],width:[[-.5,.922],[-.4,.982],[-.29,1],[-.08,.968],[.25,.998],[.39,.975],[.5,.93]],sideSection:[[0,.945],[.18,.98],[.43,.987],[.7,1],[.86,.985],[1,.92]],doorSeams:[-.268,-.034,.235],bPillar:-.034,bPillarSpan:9,cPillar:.70,cPillarSpan:10,crease:1.0,panelDepth:1.2,hoodSection:[[0,2.8],[.3,3.8],[.72,2.5],[1,-2.0]],spokes:10,wheelRadius:35,bodyHandles:true,productionPillars:true},
     sentra:{cabin:[[-.341,.654,.423],[-.185,.949,.361],[-.067,1,.354],[.030,.981,.355],[.258,.656,.439]],belt:[[-.5,.632],[-.35,.685],[-.18,.668],[.14,.646],[.32,.626],[.5,.612]],width:[[-.5,.94],[-.42,.994],[-.29,1],[-.04,.973],[.24,1],[.37,.987],[.5,.947]],crease:1.9,spokes:5},
     kicks:{cabin:[[-.479,.763,.430],[-.349,.975,.356],[-.12,1,.348],[.027,.978,.354],[.233,.662,.430]],belt:[[-.5,.72],[-.36,.755],[-.22,.717],[0,.687],[.23,.661],[.38,.646],[.5,.628]],width:[[-.5,.925],[-.40,.984],[-.30,1],[-.08,.968],[.21,1],[.38,.975],[.5,.932]],crease:2.4,spokes:10},
-    kuga:{cabin:[[-.478,.724,.427],[-.382,.948,.365],[-.14,1,.362],[.045,.962,.363],[.275,.690,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],sideSection:[[0,.99],[.18,1],[.43,.982],[.68,1],[.86,.985],[1,.925]],crease:1.5,panelDepth:1.8,hoodSection:[[0,4.1],[.34,4.8],[.75,3.0],[1,-2.4]],spokes:10,wheelRadius:39,bodyHandles:true,productionPillars:true},
+    kuga:{cabin:[[-.478,.724,.427],[-.382,.948,.365],[-.14,1,.362],[.045,.962,.363],[.275,.690,.443]],belt:[[-.5,.677],[-.35,.708],[-.15,.687],[.15,.657],[.32,.635],[.5,.615]],width:[[-.5,.93],[-.41,.988],[-.29,1],[-.09,.976],[.23,1],[.38,.978],[.5,.941]],sideSection:[[0,.99],[.18,1],[.43,.982],[.68,1],[.86,.985],[1,.925]],doorSeams:[-.238,-.016,.242],bPillar:-.016,bPillarSpan:12,cPillar:.76,cPillarSpan:15,crease:1.5,panelDepth:1.8,hoodSection:[[0,4.1],[.34,4.8],[.75,3.0],[1,-2.4]],spokes:10,wheelRadius:39,bodyHandles:true,productionPillars:true},
     'corolla-cross':{cabin:[[-.482,.755,.435],[-.364,.968,.371],[-.12,1,.363],[.045,.982,.366],[.252,.684,.443]],belt:[[-.5,.716],[-.35,.743],[-.15,.725],[.14,.704],[.31,.688],[.5,.655]],width:[[-.5,.939],[-.42,.989],[-.295,1],[-.05,.977],[.22,1],[.38,.986],[.5,.947]],crease:2.0,spokes:5}
   };
   // Shape-preserving Hermite interpolation keeps each photographed silhouette independent.
@@ -183,11 +183,11 @@
         patch(40,6,(v,u)=>{const q=glassSide(jambZ(v)+u*3.2,v,side);q[0]+=side*.52;return q;},roofPaint,'rear-door-window-jamb');
         const jamb=tube(Array.from({length:41},(_,i)=>{const v=i/40,q=glassSide(jambZ(v),v,side);q[0]+=side*.68;return q;}),.10,darkMetal,root,true);jamb.name='rear-door-window-seam-'+side;jamb.userData.keep=true;
       }else patch(12,10,(t,v)=>{const q=glassSide(rear+(roofRear-rear)*t*(s.id==='model-3'?.30:s.id==='fox-d'?.32:.55),v,side);q[0]+=side*.35;return q;},roofPaint,'rear-pillar-'+s.id);
-      const bZ=s.id==='kicks'?-L*.075:-L*.055;
+      const bZ=shape.bPillar!==undefined?L*shape.bPillar:s.id==='kicks'?-L*.075:-L*.055,cPillarAt=shape.cPillar??.76;
       if(shape.productionPillars){
-        for(const [centre,span]of (shape.sail?[[bZ,9]]:[[bZ,9],[rear+(roofRear-rear)*.76,12]]))patch(8,8,(t,v)=>{const q=glassSide(centre+(t-.5)*span,v,side);q[0]+=side*.65;return q;},trim,'production-window-pillar');
+        for(const [centre,span]of (shape.sail?[[bZ,9]]:[[bZ,shape.bPillarSpan||9],[rear+(roofRear-rear)*cPillarAt,shape.cPillarSpan||12]]))patch(8,8,(t,v)=>{const q=glassSide(centre+(t-.5)*span,v,side);q[0]+=side*.65;return q;},trim,'production-window-pillar');
       }
-      for(const [z,r,m]of (shape.sail?[]:[[bZ,2.4,trim],[rear+(roofRear-rear)*.79,1.5,roofPaint],[front-3,1.5,paint]]))tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
+      for(const [z,r,m]of (shape.sail?[]:[[bZ,2.4,trim],[rear+(roofRear-rear)*(cPillarAt+.03),1.5,roofPaint],[front-3,1.5,paint]]))tube([glassSide(z,0,side),glassSide(z,1,side)],r,m);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,0,side)),1.05,roofPaint);
       tube(Array.from({length:40},(_,i)=>glassSide(rear+(front-rear)*i/39,1,side)),.7,['altis','kuga'].includes(s.id)?metal:trim);
       // Body creases follow the real rising belt line, with long lower-door concavity.
@@ -212,7 +212,7 @@
         const z=upperZ*L,x=side*(sideX(z,1)+.12),body=[x,edge(z),noseZ(x,z,edge(z))],window=glassSide(z,1,side);window[0]+=side*.68;
         tube(Array.from({length:9},(_,i)=>body.map((n,k)=>n+(window[k]-n)*i/8)),.12,trim,root,true);
         tube(Array.from({length:65},(_,i)=>{const z=L*(lowerZ+i/64*(frontDoorZ(.10)-lowerZ)),v=.10,x=side*(sideX(z,v)+.12),y=19+(edge(z)-19)*v;return[x,y,noseZ(x,z,y)];}),.12,trim);
-      }else for(const seamZ of [-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
+      }else for(const seamZ of shape.doorSeams?shape.doorSeams.map(z=>z*L):[-L*.255,bZ,L*.216]){const pts=Array.from({length:30},(_,i)=>{const v=.08+.9*i/29,z=seamZ+(shape.wheelStyle?(seamZ<-.2*L?12*Math.pow(1-v,2):seamZ>.2*L?-7*Math.pow(1-v,3):2*Math.sin(v*Math.PI)):0);return[side*(sideX(z,v)+.16),19+(edge(z)-19)*v,z];}).filter(p=>![-A,A].some(a=>Math.hypot(p[2]-a,p[1]-R)<R+4));if(pts.length>1)tube(pts,shape.wheelStyle?.16:.25,trim);}
       for(const z of [-L*.175,L*.12]){
         const x=side*(sideX(z,.90)+.7),y=19+(edge(z)-19)*.90;
         if(s.id==='fox-b'){
@@ -367,7 +367,7 @@
         const curve=new T.CatmullRomCurve3(outline.map(([x,y])=>new T.Vector3(x*W,y*H,0)),false,'centripetal');
         tube(Array.from({length:121},(_,i)=>{const q=curve.getPoint(i/120);return[q.x,q.y,rearZ(q.x,q.y)-.10];}),.12,trim,root,true);
       }
-      const contour=(s.id==='fox-c'?[[-.32,.65],[-.31,.43],[-.27,.38],[.27,.38],[.31,.43],[.32,.65]]:s.id==='fox-b'?[[-.37,.63],[-.32,.46],[.32,.46],[.37,.63]]:[[-.42,.58],[-.37,.37],[.37,.37],[.42,.58]]).map(([x,y])=>[x*W,y*H,rearZ(x*W,y*H)]);if(!shape.sectionedBody)tube(contour,.32,trim,root,true);if(!shape.sectionedBody)box([0,H*.36,rearZ(0,H*.36)+1],[38,14,1],trim,2);if(!shape.sectionedBody)box([0,H*.54,rearZ(0,H*.54)-.6],[s.nose==='ford'?11:8,4,.8],metal,1);if(!shape.sectionedBody)for(const side of [-1,1])tube(Array.from({length:9},(_,i)=>{const x=side*(W*.27+i*2);return[x,29,rearZ(x,29)-.6];}),.9,red);}
+      const contour=(profile.tailgateSeam||(s.id==='fox-c'?[[-.32,.65],[-.31,.43],[-.27,.38],[.27,.38],[.31,.43],[.32,.65]]:s.id==='fox-b'?[[-.37,.63],[-.32,.46],[.32,.46],[.37,.63]]:[[-.42,.58],[-.37,.37],[.37,.37],[.42,.58]])).map(([x,y])=>[x*W,y*H,rearZ(x*W,y*H)]);if(!shape.sectionedBody)tube(contour,.32,trim,root,true);if(!shape.sectionedBody)box([0,H*.36,rearZ(0,H*.36)+1],[38,14,1],trim,2);if(!shape.sectionedBody)box([0,H*.54,rearZ(0,H*.54)-.6],[s.nose==='ford'?11:8,4,.8],metal,1);if(!shape.sectionedBody)for(const side of [-1,1])tube(Array.from({length:9},(_,i)=>{const x=side*(W*.27+i*2);return[x,29,rearZ(x,29)-.6];}),.9,red);}
     }
     if(suv&&!s.id.startsWith('fox-'))for(const sign of [-1,1])tube(Array.from({length:25},(_,i)=>{const x=(i/24-.5)*W*.60;return[x,22,noseZ(x,sign*L/2,22)+sign];}),1.4,metal);
     // Seats, dashboard, console, instrument cluster, steering and door cards are actual geometry.
